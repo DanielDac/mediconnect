@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediConnect – Donar</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .donar-header {
+      background: var(--white);
+      padding: 52px 20px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; background: var(--gray-100);
+    }
+    .back-btn svg { width: 20px; height: 20px; color: var(--gray-800); }
+    .donar-header h1 { font-family: var(--font-title); font-size: 20px; font-weight: 700; color: var(--gray-800); }
+
+    .donar-content { padding: 20px 20px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* Barcode scanner area */
+    .scanner-area {
+      background: var(--primary-light);
+      border: 2px dashed rgba(37,99,235,0.3);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .scanner-area:hover { background: #dbeafe; border-color: var(--primary); }
+    .scanner-icon { font-size: 36px; margin-bottom: 8px; }
+    .scanner-area span {
+      display: block;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 2px;
+    }
+
+    /* Two col row */
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Photo upload */
+    .photo-upload {
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--gray-50);
+    }
+    .photo-upload:hover { border-color: var(--primary); background: var(--primary-light); }
+    .photo-upload-icon { font-size: 28px; margin-bottom: 6px; }
+    .photo-upload span { font-size: 13px; color: var(--gray-400); font-weight: 600; }
+    .photo-upload input { display: none; }
+
+    #photoPreview { max-width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
+
+    /* Select */
+    select.input-field {
+      padding-left: 14px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+
+    /* QR Modal */
+    .qr-modal-content { text-align: center; }
+    .qr-modal-content h2 { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 6px; font-family: var(--font-title); }
+    .qr-modal-content p { font-size: 13px; color: var(--gray-400); margin-bottom: 20px; }
+    .qr-box {
+      background: var(--white);
+      border: 2px dashed var(--gray-200);
+      border-radius: 12px;
+      padding: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    #qrCode { width: 160px; height: 160px; }
+    .qr-id { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <!-- Header -->
+  <div class="donar-header">
+    <button class="back-btn" onclick="history.back()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+    </button>
+    <h1>Registrar Donación</h1>
+  </div>
+
+  <div class="donar-content">
+
+    <!-- Scanner -->
+    <div class="scanner-area fade-up" onclick="simulateScan()">
+      <div class="scanner-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
+      <span>Escanear Código de Barras</span>
+    </div>
+
+    <!-- Nombre -->
+    <div class="input-group fade-up delay-1">
+      <label>Nombre del Medicamento</label>
+      <div class="input-wrap">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+        <input class="input-field" type="text" id="medNombre" placeholder="Ej. Ibuprofeno 400mg"/>
+      </div>
+    </div>
+
+    <!-- Tipo + Cantidad -->
+    <div class="row-2 fade-up delay-2">
+      <div class="input-group">
+        <label>Tipo</label>
+        <select class="input-field no-icon" id="medTipo" style="padding-left:14px;appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;">
+          <option>Antibiótico</option>
+          <option>Antiinflamatorio</option>
+          <option>Antidiabético</option>
+          <option>Analgésico</option>
+          <option>Vitamina</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Cantidad (un.)</label>
+        <input class="input-field no-icon" type="number" id="medCantidad" value="1" min="1" style="padding-left:14px;"/>
+      </div>
+    </div>
+
+    <!-- Fecha vencimiento -->
+    <div class="input-group fade-up delay-3">
+      <label>Fecha de Vencimiento</label>
+      <div class="input-wrap">
+        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/></svg>
+        <input class="input-field" type="date" id="medFecha"/>
+      </div>
+    </div>
+
+    <!-- Foto -->
+    <div class="input-group fade-up delay-4">
+      <label>Foto del Empaque (Opcional)</label>
+      <div class="photo-upload" onclick="document.getElementById('fotoInput').click()">
+        <input type="file" id="fotoInput" accept="image/*" onchange="previewPhoto(event)"/>
+        <div class="photo-upload-icon">📷</div>
+        <span>Toca para subir foto</span>
+        <img id="photoPreview"/>
+      </div>
+    </div>
+
+    <button class="btn-primary fade-up" id="submitBtn" onclick="submitDonation()" style="margin-top:4px">
+      Registrar Donación
+    </button>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+    Inicio
+  </a>
+  <a href="buscar.html" class="nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
+    Buscar
+  </a>
+  <button class="nav-btn-center" style="background:var(--gray-800);box-shadow:none" onclick="">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+  </button>
+  <a href="perfil.html" class="nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+    Perfil
+  </a>
+</nav>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrOverlay">
+  <div class="modal qr-modal-content" id="qrModal">
+    <h2>Código de Trazabilidad</h2>
+    <p>Escanea este código para ver el estado de la donación.</p>
+    <div class="qr-box">
+      <canvas id="qrCode"></canvas>
+    </div>
+    <div class="qr-id" id="qrId"></div>
+    <button class="btn-secondary" onclick="closeQR()">Cerrar</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- QR library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
+<script>
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function simulateScan() {
+    const names = ['Amoxicilina 500mg', 'Ibuprofeno 400mg', 'Paracetamol 500mg', 'Metformina 850mg'];
+    const types = ['Antibiótico', 'Antiinflamatorio', 'Analgésico', 'Antidiabético'];
+    const rand = Math.floor(Math.random() * 4);
+    document.getElementById('medNombre').value = names[rand];
+    document.getElementById('medTipo').value = types[rand];
+    showToast('Código escaneado ✓', 'success');
+  }
+
+  function previewPhoto(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('photoPreview');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  let qrInstance = null;
+
+  async function submitDonation() {
+    const user = mediConnect.getUser();
+    if (!user) { location.href = 'index.html'; return; }
+    const nombre = document.getElementById('medNombre').value.trim();
+    const tipo   = document.getElementById('medTipo').value;
+    const cant   = parseInt(document.getElementById('medCantidad').value);
+    const fecha  = document.getElementById('medFecha').value;
+    if (!nombre) { showToast('Ingresa el nombre del medicamento', 'error'); return; }
+    if (!fecha)  { showToast('Ingresa la fecha de vencimiento', 'error'); return; }
+    if (cant < 1){ showToast('La cantidad debe ser al menos 1', 'error'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    const donation = { nombre, tipo, cantidad: cant, fecha_vencimiento: fecha, donante: user.nombre, estado: 'disponible' };
+    const result = await mediConnect.addDonation(donation);
+    btn.disabled = false;
+    btn.textContent = 'Registrar Donación';
+
+    if (result) {
+      showQR(result.id || ('don-' + Math.random().toString(36).substr(2,6)));
+    } else {
+      showToast('Error al registrar', 'error');
+    }
+  }
+
+  function showQR(id) {
+    const overlay = document.getElementById('qrOverlay');
+    document.getElementById('qrId').textContent = id;
+    const canvas = document.getElementById('qrCode');
+    canvas.innerHTML = '';
+    if (qrInstance) { try { qrInstance.clear(); } catch(e){} }
+    try {
+      qrInstance = new QRCode(canvas, { text: 'https://mediconnect.app/track/' + id, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M });
+    } catch(e) {}
+    overlay.classList.add('show');
+  }
+
+  function closeQR() {
+    document.getElementById('qrOverlay').classList.remove('show');
+    // Reset form
+    document.getElementById('medNombre').value = '';
+    document.getElementById('medCantidad').value = '1';
+    document.getElementById('medFecha').value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    showToast('¡Donación registrada exitosamente!', 'success');
+    setTimeout(() => location.href = 'dashboard.html', 1200);
+  }
+
+  const user = mediConnect.getUser();
+  if (!user) location.href = 'index.html';
+</script>
+</body>
+</html>

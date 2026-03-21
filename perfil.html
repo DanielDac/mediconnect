@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediConnect – Perfil</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .profile-hero {
+      background: linear-gradient(160deg, #1e40af 0%, #3B82F6 100%);
+      padding: 52px 20px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+      bottom: -60px; right: -40px;
+    }
+    .avatar-lg {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 14px;
+      overflow: hidden;
+      position: relative; z-index: 1;
+    }
+    .profile-name {
+      font-family: var(--font-title);
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 6px;
+      position: relative; z-index: 1;
+    }
+    .profile-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      backdrop-filter: blur(4px);
+      position: relative; z-index: 1;
+    }
+
+    .profile-content {
+      padding: 0 16px 20px;
+      margin-top: -24px;
+      position: relative; z-index: 5;
+    }
+
+    /* Section */
+    .profile-section { margin-bottom: 16px; }
+    .profile-section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray-400);
+      padding: 0 4px;
+      margin-bottom: 8px;
+    }
+
+    /* Donation item */
+    .donation-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+      margin-bottom: 8px;
+    }
+    .donation-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .donation-icon.green { background: #D1FAE5; }
+    .donation-icon.yellow { background: #FEF3C7; }
+    .donation-icon.blue { background: var(--primary-light); }
+    .donation-info { flex: 1; }
+    .donation-info h4 { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+    .donation-info p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+    .donation-arrow { color: var(--gray-400); }
+    .donation-arrow svg { width: 16px; height: 16px; }
+
+    /* Account options */
+    .account-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 15px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-100);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .account-item:hover { background: var(--gray-50); }
+    .account-item-icon {
+      width: 36px; height: 36px;
+      background: var(--primary-light);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .account-item-icon svg { width: 18px; height: 18px; color: var(--primary); }
+    .account-item-label { flex: 1; font-size: 14px; font-weight: 600; color: var(--gray-800); }
+    .account-item-arrow { color: var(--gray-400); }
+    .account-item-arrow svg { width: 16px; height: 16px; }
+
+    .logout-btn {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: none;
+      border-radius: var(--radius);
+      padding: 15px;
+      width: 100%;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font-main);
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .logout-btn:hover { background: #FECACA; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <!-- Hero -->
+  <div class="profile-hero fade-up">
+    <div class="avatar-lg" id="avatarLg">?</div>
+    <div class="profile-name" id="profileName">...</div>
+    <div class="profile-badge">⭐ Donante Estrella</div>
+  </div>
+
+  <div class="profile-content">
+
+    <!-- Mis Donaciones -->
+    <div class="profile-section fade-up delay-1">
+      <div class="profile-section-title">Mis Donaciones</div>
+      <div id="myDonationsList">
+        <div class="donation-item">
+          <div class="donation-icon skeleton" style="width:40px;height:40px;"></div>
+          <div class="donation-info">
+            <div class="skeleton" style="height:13px;width:60%;margin-bottom:5px;"></div>
+            <div class="skeleton" style="height:11px;width:35%;"></div>
+          </div>
+        </div>
+        <div class="donation-item">
+          <div class="donation-icon skeleton" style="width:40px;height:40px;"></div>
+          <div class="donation-info">
+            <div class="skeleton" style="height:13px;width:50%;margin-bottom:5px;"></div>
+            <div class="skeleton" style="height:11px;width:30%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cuenta -->
+    <div class="profile-section fade-up delay-2">
+      <div class="profile-section-title">Cuenta</div>
+
+      <div class="account-item" onclick="showToast('Función próximamente', '')">
+        <div class="account-item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+        </div>
+        <span class="account-item-label">Editar Perfil</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
+      </div>
+
+      <div class="account-item" onclick="showToast('Función próximamente', '')">
+        <div class="account-item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+        </div>
+        <span class="account-item-label">Notificaciones</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
+      </div>
+
+      <div class="account-item" onclick="showToast('Función próximamente', '')">
+        <div class="account-item-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+        </div>
+        <span class="account-item-label">Privacidad y Datos</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
+      </div>
+
+      <button class="logout-btn" onclick="handleLogout()">
+        Cerrar Sesión
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="dashboard.html" class="nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+    Inicio
+  </a>
+  <a href="buscar.html" class="nav-item">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
+    Buscar
+  </a>
+  <button class="nav-btn-center" onclick="location.href='donar.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+  </button>
+  <a href="perfil.html" class="nav-item active">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+    Perfil
+  </a>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<script src="app.js"></script>
+<script>
+  const MEDICINE_EMOJIS = {'Antibiótico':'💊','Antiinflamatorio':'🩹','Antidiabético':'💉','Analgésico':'🔴','Vitamina':'🍋','default':'💊'};
+  const ICON_COLORS = ['green','yellow','blue'];
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function handleLogout() {
+    mediConnect.logout();
+    location.href = 'index.html';
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '–';
+    const d = new Date(iso);
+    return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  async function loadProfile() {
+    const user = mediConnect.getUser();
+    if (!user) { location.href = 'index.html'; return; }
+
+    document.getElementById('profileName').textContent = user.nombre;
+    document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
+
+    const donations = await mediConnect.getDonations();
+    const mine = donations.filter(d => d.donante === user.nombre);
+    const listEl = document.getElementById('myDonationsList');
+
+    if (mine.length === 0) {
+      listEl.innerHTML = '<p style="color:var(--gray-400);padding:16px 4px;font-size:14px;">Aún no tienes donaciones registradas.</p>';
+      return;
+    }
+    listEl.innerHTML = mine.map((d,i) => `
+      <div class="donation-item">
+        <div class="donation-icon ${ICON_COLORS[i%3]}">${MEDICINE_EMOJIS[d.tipo]||MEDICINE_EMOJIS.default}</div>
+        <div class="donation-info">
+          <h4>${d.nombre}</h4>
+          <p>${formatDate(d.created_at || d.fecha_vencimiento)}</p>
+        </div>
+        <div class="donation-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>
