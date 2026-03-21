@@ -1,15 +1,105 @@
 body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 50px;
-}
-
-input {
-  padding: 10px;
-  width: 250px;
-}
-
-button {
-  padding: 10px 20px;
-  cursor: pointer;
-}
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f5f7fb;
+  }
+  
+  .container {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .logo {
+    font-size: 40px;
+    background: #2d6cdf;
+    color: white;
+    width: 70px;
+    height: 70px;
+    margin: auto;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  h1 {
+    margin: 10px 0;
+  }
+  
+  .subtitle {
+    color: gray;
+  }
+  
+  .card {
+    background: white;
+    width: 320px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  
+  .tab.active {
+    background: white;
+    font-weight: bold;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .roles {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .role {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #fafafa;
+  }
+  
+  .role.active {
+    border: 2px solid #2d6cdf;
+    background: #eef3ff;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #2d6cdf;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  footer {
+    margin-top: 20px;
+    color: gray;
+    font-size: 12px;
+  }
