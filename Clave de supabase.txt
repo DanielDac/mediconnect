@@ -1,0 +1,3 @@
+Clave de supabase
+
+Mediconnect_2026_db!34
