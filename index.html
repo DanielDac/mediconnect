@@ -12,14 +12,14 @@
 
   <div class="logo">💊</div>
   <h1>MediConnect</h1>
-  <p class="subtitle">Conectando salud, salvando vidas.</p>
+  <p class="subtitle">Conectando salud, salvando vidas</p>
 
   <div class="card">
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab" id="loginTab">Iniciar Sesión</button>
-      <button class="tab active" id="registerTab">Registrarse</button>
+      <button class="tab active" id="loginTab">Iniciar Sesión</button>
+      <button class="tab" id="registerTab">Registrarse</button>
     </div>
 
     <!-- ROLES -->
@@ -32,22 +32,28 @@
     <!-- FORM -->
     <form id="form">
 
+      <!-- SOLO REGISTRO -->
       <input type="text" id="name" placeholder="Nombre completo">
 
-      <input type="email" id="email" placeholder="Correo electrónico">
+      <!-- AMBOS -->
+      <input type="email" id="email" placeholder="Correo electrónico" required>
 
-      <input type="password" id="password" placeholder="Contraseña">
+      <input type="password" id="password" placeholder="Contraseña" required>
 
-      <button type="submit" id="submitBtn">Crear Cuenta</button>
+      <button type="submit" id="submitBtn">Ingresar</button>
 
     </form>
 
   </div>
 
-  <footer>© 2026 MediConnect. Protegemos tus datos.</footer>
+  <footer>© 2026 MediConnect</footer>
 
 </div>
+
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- APP -->
 <script src="app.js"></script>
 
 </body>

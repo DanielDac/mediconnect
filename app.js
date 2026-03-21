@@ -3,20 +3,28 @@ const supabaseClient = supabase.createClient(
     "sb_publishable_G8KQLinduaGFtPbK5uNHVg_woqWiUwJ"
   );
   
-  let currentMode = "register";
+  let currentMode = "login";
   let selectedRole = "donante";
   
+  const nameInput = document.getElementById("name");
+  const submitBtn = document.getElementById("submitBtn");
+  
+  // Estado inicial
+  nameInput.style.display = "none";
+  
   // ----------------------
-  // CAMBIO DE TABS
+  // TABS
   // ----------------------
   document.getElementById("loginTab").onclick = () => {
     currentMode = "login";
-    document.getElementById("submitBtn").innerText = "Ingresar";
+    submitBtn.innerText = "Ingresar";
+    nameInput.style.display = "none";
   };
   
   document.getElementById("registerTab").onclick = () => {
     currentMode = "register";
-    document.getElementById("submitBtn").innerText = "Crear Cuenta";
+    submitBtn.innerText = "Crear Cuenta";
+    nameInput.style.display = "block";
   };
   
   // ----------------------
@@ -31,17 +39,21 @@ const supabaseClient = supabase.createClient(
   });
   
   // ----------------------
-  // FORM (LOGIN + REGISTER)
+  // FORM
   // ----------------------
   document.getElementById("form").addEventListener("submit", async (e) => {
     e.preventDefault();
   
+    const nombre = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    const name = document.getElementById("name").value;
   
+    // ----------------------
     // REGISTRO
+    // ----------------------
     if (currentMode === "register") {
+  
+      // 1. Crear usuario en Auth
       const { data, error } = await supabaseClient.auth.signUp({
         email,
         password
@@ -52,22 +64,30 @@ const supabaseClient = supabase.createClient(
         return;
       }
   
-      // Guardar datos extra (nombre + rol)
-      if (data.user) {
-        await supabaseClient.from("profiles").insert([
-          {
-            id: data.user.id,
-            name: name,
-            role: selectedRole
-          }
-        ]);
+      // 2. Guardar en tabla usuarios
+      const { error: dbError } = await supabaseClient.from("usuarios").insert([
+        {
+          nombre: nombre,
+          email: email,
+          password: password, // ⚠️ solo para proyecto
+          rol: selectedRole
+        }
+      ]);
+  
+      if (dbError) {
+        alert("Error guardando usuario: " + dbError.message);
+        return;
       }
   
       alert("Registro exitoso");
+  
     }
   
+    // ----------------------
     // LOGIN
+    // ----------------------
     else {
+  
       const { error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
@@ -78,14 +98,8 @@ const supabaseClient = supabase.createClient(
         return;
       }
   
-      window.location.href = "dashboard.html";
-    }
-  });
+      alert("Login exitoso");
   
-  // ----------------------
-  // LOGOUT
-  // ----------------------
-  async function logout() {
-    await supabaseClient.auth.signOut();
-    window.location.href = "index.html";
-  }
+    }
+  
+  });

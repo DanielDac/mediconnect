@@ -119,3 +119,12 @@ body {
   button:hover {
     opacity: 0.9;
   }
+
+  input {
+    transition: 0.2s;
+  }
+  
+  input:focus {
+    border-color: #2d6cdf;
+    outline: none;
+  }
