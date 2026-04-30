@@ -1,7 +1,8 @@
 // ===== MediConnect – app.js =====
 
-const SUPABASE_URL = 'https://nkiadfcivfgbpvagovib.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_G8KQLinduaGFtPbK5uNHVg_woqWiUwJ';
+const SUPABASE_URL = 'https://htuagycwflhqxghhotjf.supabase.co';
+// IMPORTANTE: Reemplaza esto con tu verdadera anon public key
+const SUPABASE_KEY = 'sb_publishable_y6Py69cWc_hxdXlZHE2ivw_HHweYutU';
 
 const sb = {
   headers: {
@@ -11,33 +12,56 @@ const sb = {
     'Prefer': 'return=representation'
   },
   async select(table, query = '') {
-    const url = `${SUPABASE_URL}/rest/v1/${table}?${query}&order=created_at.desc`;
-    const r = await fetch(url, { headers: sb.headers });
-    return r.ok ? await r.json() : [];
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/${table}?${query}&order=created_at.desc`;
+      const r = await fetch(url, { headers: sb.headers });
+      if (!r.ok) {
+        const err = await r.json();
+        console.error(`Error al consultar la tabla ${table}:`, err);
+        throw new Error(err.message || 'Error en la consulta');
+      }
+      return await r.json();
+    } catch (error) {
+      console.error("Error de conexión (select):", error);
+      throw error;
+    }
   },
   async insert(table, body) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-      method: 'POST', headers: sb.headers, body: JSON.stringify(body)
-    });
-    const data = await r.json();
-    return r.ok ? (Array.isArray(data) ? data[0] : data) : null;
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+        method: 'POST', headers: sb.headers, body: JSON.stringify(body)
+      });
+      if (!r.ok) {
+        const err = await r.json();
+        console.error(`Error al insertar en la tabla ${table}:`, err);
+        throw new Error(err.message || 'Error al insertar');
+      }
+      const data = await r.json();
+      return Array.isArray(data) ? data[0] : data;
+    } catch (error) {
+      console.error("Error de conexión (insert):", error);
+      throw error;
+    }
   },
   async update(table, id, body) {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-      method: 'PATCH', headers: sb.headers, body: JSON.stringify(body)
-    });
-    return r.ok;
+    try {
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+        method: 'PATCH', headers: sb.headers, body: JSON.stringify(body)
+      });
+      if (!r.ok) {
+        const err = await r.json();
+        console.error(`Error al actualizar la tabla ${table}:`, err);
+        throw new Error(err.message || 'Error al actualizar');
+      }
+      return true;
+    } catch (error) {
+      console.error("Error de conexión (update):", error);
+      throw error;
+    }
   }
 };
 
 const USER_KEY = 'mc_user';
-
-const DEMO_DONATIONS = [
-  { id: 'don-001', nombre: 'Amoxicilina 500mg',  tipo: 'Antibiótico',     cantidad: 10, fecha_vencimiento: '2026-12-15', donante: 'Farmacia Central', estado: 'disponible', created_at: '2026-02-12' },
-  { id: 'don-002', nombre: 'Ibuprofeno 400mg',   tipo: 'Antiinflamatorio', cantidad: 5,  fecha_vencimiento: '2026-08-20', donante: 'Juan Pérez',       estado: 'disponible', created_at: '2026-02-10' },
-  { id: 'don-003', nombre: 'Insulina Glargina',  tipo: 'Antidiabético',   cantidad: 2,  fecha_vencimiento: '2026-05-10', donante: 'María López',      estado: 'reservado',  created_at: '2026-01-20' },
-  { id: 'don-004', nombre: 'Paracetamol 500mg',  tipo: 'Analgésico',      cantidad: 20, fecha_vencimiento: '2027-01-01', donante: 'Clínica Norte',    estado: 'disponible', created_at: '2026-01-15' },
-];
 
 const mediConnect = {
   getUser() {
@@ -45,61 +69,115 @@ const mediConnect = {
   },
   saveUser(user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
+    console.log("Usuario guardado en sesión:", user);
   },
   logout() {
     localStorage.removeItem(USER_KEY);
+    console.log("Sesión cerrada.");
   },
-  async login(nombre, rol) {
+
+  async login(email, password, rol) {
     try {
-      const rows = await sb.select('usuarios', `nombre=ilike.${encodeURIComponent(nombre)}&rol=eq.${rol}`);
-      if (rows && rows.length > 0) { this.saveUser(rows[0]); return true; }
-      this.saveUser({ nombre, rol, id: 'demo-' + Date.now() });
-      return true;
-    } catch {
-      this.saveUser({ nombre, rol, id: 'demo-' + Date.now() });
-      return true;
+      console.log(`Intentando login para el email: ${email} con rol: ${rol}`);
+      // Consultar usuario por email, password y rol usando eq (igualdad exacta)
+      const query = `email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&rol=eq.${rol}`;
+      const rows = await sb.select('usuarios', query);
+
+      if (rows && rows.length > 0) {
+        this.saveUser(rows[0]);
+        console.log("Login exitoso.");
+        return true;
+      }
+      console.warn("Credenciales incorrectas o usuario no encontrado.");
+      alert("Credenciales incorrectas o usuario no existe.");
+      return false;
+    } catch (error) {
+      console.error("Fallo el login debido a un error de conexión:", error);
+      alert("Error al intentar iniciar sesión. Verifica la consola.");
+      return false;
     }
   },
+
   async register(nombre, email, password, rol) {
     try {
-      const user = await sb.insert('usuarios', { nombre, email, password, rol });
-      if (user) { this.saveUser(user); return true; }
-      const demo = { id: 'demo-' + Date.now(), nombre, email, rol };
-      this.saveUser(demo); return true;
-    } catch {
-      const demo = { id: 'demo-' + Date.now(), nombre, email, rol };
-      this.saveUser(demo); return true;
+      console.log(`Registrando nuevo usuario: ${nombre}`);
+      const userBody = { nombre, email, password, rol };
+      const user = await sb.insert('usuarios', userBody);
+
+      if (user) {
+        this.saveUser(user);
+        console.log("Registro exitoso.");
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error al registrarse:", error);
+      alert("Error al crear cuenta. Verifica la conexión.");
+      return false;
     }
   },
+
   async getDonations(filters = {}) {
     try {
+      console.log("Obteniendo donaciones...");
       let query = '';
       if (filters.estado) query += `estado=eq.${filters.estado}&`;
-      if (filters.tipo)   query += `tipo=eq.${encodeURIComponent(filters.tipo)}&`;
+      if (filters.tipo) query += `tipo=eq.${encodeURIComponent(filters.tipo)}&`;
+
+      if (query.endsWith('&')) query = query.slice(0, -1);
+
       const data = await sb.select('donaciones', query);
-      if (data && data.length > 0) return data;
-      const local = JSON.parse(localStorage.getItem('mc_local_donations') || '[]');
-      return [...local, ...DEMO_DONATIONS];
-    } catch {
-      return DEMO_DONATIONS;
+      console.log("Donaciones obtenidas:", data);
+      return data || [];
+    } catch (error) {
+      console.error("Error al obtener donaciones:", error);
+      alert("No se pudieron cargar las donaciones.");
+      return [];
     }
   },
+
   async addDonation(donation) {
     try {
-      const result = await sb.insert('donaciones', donation);
-      if (result) return result;
-      throw new Error('fail');
-    } catch {
-      const id = 'don-' + Math.random().toString(36).substr(2, 6);
-      const newDon = { ...donation, id, created_at: new Date().toISOString() };
-      const local = JSON.parse(localStorage.getItem('mc_local_donations') || '[]');
-      local.unshift(newDon);
-      localStorage.setItem('mc_local_donations', JSON.stringify(local));
-      return newDon;
+      console.log("Registrando nueva donación...");
+      const currentUser = this.getUser();
+
+      if (!currentUser) {
+        alert("No hay usuario autenticado.");
+        throw new Error("No hay usuario autenticado.");
+      }
+
+      const newDonation = {
+        nombre: donation.nombre,
+        tipo: donation.tipo,
+        cantidad: donation.cantidad,
+        fecha_vencimiento: donation.fecha_vencimiento,
+        estado: donation.estado || 'disponible',
+        donante_id: currentUser.id
+      };
+
+      const result = await sb.insert('donaciones', newDonation);
+      if (result) {
+        console.log("Donación registrada correctamente:", result);
+        return result;
+      }
+      throw new Error("No se devolvió respuesta al insertar");
+    } catch (error) {
+      console.error("Error al registrar la donación:", error);
+      alert("Error al guardar la donación. Revisa la consola.");
+      return null;
     }
   },
+
   async updateDonationStatus(id, estado) {
-    try { return await sb.update('donaciones', id, { estado }); }
-    catch { return false; }
+    try {
+      console.log(`Actualizando estado de donación ${id} a ${estado}...`);
+      const ok = await sb.update('donaciones', id, { estado });
+      if (ok) console.log("Estado actualizado exitosamente.");
+      return ok;
+    } catch (error) {
+      console.error("Error al actualizar la donación:", error);
+      alert("Error al actualizar estado. Revisa la consola.");
+      return false;
+    }
   }
 };
