@@ -269,7 +269,7 @@
   }
 
   async function reservar(id) {
-    const ok = await mediConnect.updateDonationStatus(id, 'reservado');
+    const ok = await mediConnect.reserveDonation(id);
     if (ok) {
       showToast('¡Medicamento reservado!', 'success');
       closeDetail();

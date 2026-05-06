@@ -373,7 +373,7 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
-      const donation = { nombre, tipo, cantidad: cant, fecha_vencimiento: fecha, donante: user.nombre, estado: 'disponible' };
+      const donation = { nombre, tipo, cantidad: cant, fecha_vencimiento: fecha, donante: user.nombre, estado: 'pendiente' };
 
       // --- Subida de imagen (NO bloquea el flujo si falla) ---
       let imagen_url = null;

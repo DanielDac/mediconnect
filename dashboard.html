@@ -6,67 +6,39 @@
   <title>MediConnect – Inicio</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    .dashboard-header {
-      background: linear-gradient(160deg, #1e40af 0%, #3B82F6 80%);
-      padding: 48px 24px 70px;
-      position: relative;
-      overflow: hidden;
+    .header {
+      padding: 56px 20px 24px;
+      background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .dashboard-header::before {
-      content: '';
-      position: absolute;
-      width: 200px; height: 200px;
-      background: rgba(255,255,255,0.07);
-      border-radius: 50%;
-      bottom: -60px; right: -40px;
-    }
-    .header-top { display: flex; align-items: center; justify-content: space-between; }
     .header-greeting h2 {
-      font-family: var(--font-title);
-      font-size: 22px;
-      font-weight: 700;
-      color: white;
-    }
-    .header-greeting p { font-size: 13px; color: rgba(255,255,255,0.78); margin-top: 2px; }
-    .avatar {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      border: 2.5px solid rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      font-weight: 800;
-      color: white;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* Stats */
-    .stats-section {
-      padding: 0 16px;
-      margin-top: -42px;
-      position: relative; z-index: 5;
-    }
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .stat-card {
-      background: var(--white);
-      border-radius: 14px;
-      padding: 14px 10px;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-    }
-    .stat-icon { font-size: 22px; margin-bottom: 6px; }
-    .stat-num {
       font-family: var(--font-title);
       font-size: 22px;
       font-weight: 800;
       color: var(--gray-800);
-      line-height: 1;
+      letter-spacing: -0.5px;
     }
-    .stat-label { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
-
-    /* Content */
+    .header-greeting p { font-size: 14px; color: var(--gray-400); font-weight: 600; }
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--gray-100);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: var(--primary);
+      border: 1px solid var(--gray-200);
+      cursor: pointer;
+    }
+    .stats-container {
+      display: flex;
+      gap: 12px;
+      padding: 0 20px;
+      margin-top: -10px;
+    }
     .dash-content { padding: 20px 16px; display: flex; flex-direction: column; gap: 20px; }
 
     /* Activity */
@@ -103,37 +75,19 @@
 <div class="page">
 
   <!-- Header -->
-  <div class="dashboard-header fade-up">
-    <div class="header-top">
-      <div class="header-greeting">
-        <h2 id="greeting">Hola, ...</h2>
-        <p>Gracias por tu generosidad.</p>
-      </div>
-      <div class="avatar" id="avatarEl" onclick="location.href='perfil.html'">
-        <span id="avatarLetter">?</span>
-      </div>
+  <div class="header fade-up">
+    <div class="header-greeting">
+      <h2 id="greeting">Hola, ...</h2>
+      <div id="roleBadgeContainer"></div>
+    </div>
+    <div class="avatar" id="avatarEl" onclick="location.href='perfil.html'">
+      <span id="avatarLetter">?</span>
     </div>
   </div>
 
   <!-- Stats -->
-  <div class="stats-section fade-up delay-1">
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">📦</div>
-        <div class="stat-num" id="statDonaciones">–</div>
-        <div class="stat-label">Donaciones</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="color:var(--success)">✅</div>
-        <div class="stat-num" id="statEntregados">–</div>
-        <div class="stat-label">Entregados</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-num" id="statProceso">–</div>
-        <div class="stat-label">En Proceso</div>
-      </div>
-    </div>
+  <div class="stats-container fade-up delay-1" id="statsContainer">
+    <!-- Dinámico -->
   </div>
 
   <!-- Content -->
@@ -142,7 +96,7 @@
     <!-- Actividad Reciente -->
     <div class="fade-up delay-2">
       <div class="section-header">
-        <h2>Actividad Reciente</h2>
+        <h2 id="listTitle">Actividad Reciente</h2>
         <a href="buscar.html">Ver todo</a>
       </div>
       <div class="activity-list" id="activityList">
@@ -198,7 +152,13 @@
 <script src="app.js"></script>
 <script>
   const MEDICINE_EMOJIS = { 'Antibiótico':'💊', 'Antiinflamatorio':'🩹', 'Antidiabético':'💉', 'Analgésico':'🔴', 'default':'💊' };
-  const STATUS_MAP = { 'disponible': 'badge-success', 'reservado': 'badge-warning', 'entregado': 'badge-blue' };
+  const STATUS_MAP = { 
+    'disponible': 'badge-success', 
+    'reservado': 'badge-warning', 
+    'entregado': 'badge-blue',
+    'pendiente': 'badge-warning',
+    'rechazado': 'badge-danger'
+  };
 
   function showToast(msg, type='') {
     const t = document.getElementById('toast');
@@ -218,24 +178,76 @@
     const user = mediConnect.getUser();
     if (!user) { location.href = 'index.html'; return; }
 
-    document.getElementById('greeting').textContent = 'Hola, ' + user.nombre;
+    const role = user.rol || 'receptor';
+    const roleUpper = role.charAt(0).toUpperCase() + role.slice(1);
+
+    document.getElementById('greeting').textContent = 'Hola, ' + user.nombre.split(' ')[0];
     document.getElementById('avatarLetter').textContent = user.nombre.charAt(0).toUpperCase();
+    document.getElementById('roleBadgeContainer').innerHTML = `
+      <span class="role-badge ${role.toLowerCase()}">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
+        ${roleUpper}
+      </span>
+    `;
 
-    const donations = await mediConnect.getDonations();
-    const mine = donations.filter(d => d.donante === user.nombre);
-    const entregados = mine.filter(d => d.estado === 'entregado').length;
-    const proceso = mine.filter(d => d.estado === 'reservado').length;
-
-    document.getElementById('statDonaciones').textContent = mine.length;
-    document.getElementById('statEntregados').textContent = entregados;
-    document.getElementById('statProceso').textContent = proceso;
+    // Stats Dinámicos
+    const statsContainer = document.getElementById('statsContainer');
+    let statsHTML = '';
+    if (role === 'donante') {
+      statsHTML = `
+        <div class="stat-card">
+          <div class="icon-wrap" style="background:#ECFDF5;color:#10B981"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
+          <h4 id="stat1">0</h4><p>Donaciones</p>
+        </div>
+        <div class="stat-card">
+          <div class="icon-wrap" style="background:#EFF6FF;color:#3B82F6"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <h4 id="stat2">0</h4><p>Entregados</p>
+        </div>
+      `;
+    } else if (role === 'validador') {
+      statsHTML = `
+        <div class="stat-card">
+          <div class="icon-wrap" style="background:#FFFBEB;color:#F59E0B"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+          <h4 id="stat1">0</h4><p>Pendientes</p>
+        </div>
+        <div class="stat-card">
+          <div class="icon-wrap" style="background:#F3F4F6;color:#4B5563"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></div>
+          <h4 id="stat2">0</h4><p>Revisados</p>
+        </div>
+      `;
+    } else {
+      statsHTML = `
+        <div class="stat-card">
+          <div class="icon-wrap" style="background:#F5F3FF;color:#8B5CF6"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg></div>
+          <h4 id="stat1">0</h4><p>Mis Reservas</p>
+        </div>
+      `;
+    }
+    statsContainer.innerHTML = statsHTML;
 
     const list = document.getElementById('activityList');
-    const recent = donations.slice(0, 4);
-    if (recent.length === 0) {
-      list.innerHTML = '<p style="color:var(--gray-400);text-align:center;padding:20px 0;font-size:14px;">No hay actividad reciente</p>';
+    let donations = [];
+    
+    if (role === 'donante') {
+      document.getElementById('listTitle').textContent = "Mis Donaciones";
+      donations = await mediConnect.getDonations({ donante: user.nombre });
+    } else if (role === 'validador') {
+      document.getElementById('listTitle').textContent = "Por Validar";
+      donations = await mediConnect.getDonations({ estado: 'pendiente' });
+    } else {
+      document.getElementById('listTitle').textContent = "Mis Reservas";
+      donations = await mediConnect.getDonations({ receptor_id: user.id });
+    }
+
+    if (donations.length === 0) {
+      list.innerHTML = '<p style="color:var(--gray-400);text-align:center;padding:40px 0;font-size:14px;font-weight:600;">No hay actividad para mostrar</p>';
       return;
     }
+
+    if (document.getElementById('stat1')) document.getElementById('stat1').textContent = donations.length;
+    if (document.getElementById('stat2')) document.getElementById('stat2').textContent = donations.filter(d => d.estado === 'entregado').length;
+
+    const recent = donations.slice(0, 5);
     list.innerHTML = recent.map(d => {
       console.log(`Donación ${d.nombre}: imagen_url =`, d.imagen_url);
       return `
@@ -256,11 +268,32 @@
             Vence: ${d.fecha_vencimiento}
           </div>
         </div>
-        <div class="med-badge-wrap">
+        <div class="med-badge-wrap" style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
           <span class="badge ${STATUS_MAP[d.estado] || 'badge-blue'}">${d.estado}</span>
+          ${role === 'validador' && d.estado === 'pendiente' ? `
+            <div style="display:flex; gap:4px; margin-top:4px;">
+              <button onclick="event.stopPropagation(); updateMedStatus('${d.id}', 'disponible')" style="background:var(--success); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Aprobar</button>
+              <button onclick="event.stopPropagation(); updateMedStatus('${d.id}', 'rechazado')" style="background:var(--danger); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Rechazar</button>
+            </div>
+          ` : ''}
         </div>
       </div>
     `; }).join('');
+  }
+
+  async function updateMedStatus(id, newStatus) {
+    try {
+      const ok = await sb.update('donaciones', { estado: newStatus }, id);
+      if (ok) {
+        showToast(newStatus === 'disponible' ? 'Medicamento aprobado ✓' : 'Medicamento rechazado ✗', 'success');
+        loadDashboard();
+      } else {
+        showToast('Error al actualizar', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Error de conexión', 'error');
+    }
   }
 
   loadDashboard();

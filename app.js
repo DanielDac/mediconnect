@@ -45,18 +45,24 @@ const sb = {
   },
   async update(table, id, body) {
     try {
+      console.log(`Intentando UPDATE en ${table} para ID: ${id}`, body);
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-        method: 'PATCH', headers: sb.headers, body: JSON.stringify(body)
+        method: 'PATCH', 
+        headers: sb.headers, 
+        body: JSON.stringify(body)
       });
+      
       if (!r.ok) {
         const err = await r.json();
-        console.error(`Error al actualizar la tabla ${table}:`, err);
-        throw new Error(err.message || 'Error al actualizar');
+        console.error("Error detallado de Supabase:", err);
+        return false;
       }
+      
+      console.log("UPDATE exitoso (Status 204/200)");
       return true;
     } catch (error) {
       console.error("Error de conexión (update):", error);
-      throw error;
+      return false;
     }
   },
 
@@ -209,7 +215,8 @@ const mediConnect = {
 
       // Se agrega select=*,usuarios(nombre) para hacer JOIN con la tabla usuarios
       // Supabase PostgREST resuelve el JOIN automáticamente usando la FK donante_id → usuarios.id
-      let query = 'select=*,usuarios(nombre)';
+      // Usamos el nombre de la relación explícita (donante_id) para evitar ambigüedad con receptor_id
+      let query = 'select=*,usuarios!donante_id(nombre)';
       if (filters.estado) query += `&estado=eq.${filters.estado}`;
       if (filters.tipo) query += `&tipo=eq.${encodeURIComponent(filters.tipo)}`;
 
@@ -279,11 +286,29 @@ const mediConnect = {
     }
   },
 
+  // Nueva función para reservar un medicamento guardando el ID del receptor
+  async reserveDonation(id) {
+    try {
+      const user = this.getUser();
+      if (!user) return false;
+      
+      console.log(`Reservando donación ${id} por el usuario ${user.id}...`);
+      const ok = await sb.update('donaciones', id, { 
+        estado: 'reservado',
+        receptor_id: user.id
+      });
+      return ok;
+    } catch (error) {
+      console.error("Error al reservar donación:", error);
+      return false;
+    }
+  },
+
   // Obtiene una donación por su ID con JOIN a usuarios para obtener el nombre del donante
   async getDonationById(id) {
     try {
       console.log(`Buscando donación con id: ${id}`);
-      const query = `select=*,usuarios(nombre)&id=eq.${id}`;
+      const query = `select=*,usuarios!donante_id(nombre)&id=eq.${id}`;
       const data = await sb.select('donaciones', query);
       console.log("Donación cruda por ID (con join):", data);
 

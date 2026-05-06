@@ -24,6 +24,14 @@
   --nav-height: 72px;
   --font-main: 'Nunito', sans-serif;
   --font-title: 'Poppins', sans-serif;
+  
+  /* Role Colors - Premium Palettes */
+  --role-donante: #10B981;
+  --role-donante-bg: rgba(16, 185, 129, 0.1);
+  --role-receptor: #6366F1;
+  --role-receptor-bg: rgba(99, 102, 241, 0.1);
+  --role-validador: #F59E0B;
+  --role-validador-bg: rgba(245, 158, 11, 0.1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -178,6 +186,45 @@ html, body {
 .badge-warning { background: #FEF3C7; color: #92400E; }
 .badge-danger  { background: #FEE2E2; color: #991B1B; }
 .badge-blue    { background: var(--primary-light); color: var(--primary); }
+
+/* ROLE BADGES (Glassmorphism) */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.role-badge.donante { background: var(--role-donante-bg); color: var(--role-donante); border-color: rgba(16, 185, 129, 0.2); }
+.role-badge.receptor { background: var(--role-receptor-bg); color: var(--role-receptor); border-color: rgba(99, 102, 241, 0.2); }
+.role-badge.validador { background: var(--role-validador-bg); color: var(--role-validador); border-color: rgba(245, 158, 11, 0.2); }
+
+/* PREMIUM STATS CARD */
+.stat-card {
+  flex: 1;
+  background: var(--white);
+  border-radius: 18px;
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid var(--gray-100);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.stat-card .icon-wrap {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  margin: 0 auto 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.stat-card h4 { font-size: 20px; font-weight: 800; color: var(--gray-800); margin-bottom: 2px; }
+.stat-card p { font-size: 11px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; }
 
 /* ===== MEDICINE CARD ===== */
 .med-card {
