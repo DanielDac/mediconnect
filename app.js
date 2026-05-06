@@ -2,7 +2,7 @@
 
 const SUPABASE_URL = 'https://htuagycwflhqxghhotjf.supabase.co';
 // IMPORTANTE: Reemplaza esto con tu verdadera anon public key
-const SUPABASE_KEY = 'sb_publishable_y6Py69cWc_hxdXlZHE2ivw_HHweYutU';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw';
 
 const sb = {
   headers: {
@@ -58,6 +58,92 @@ const sb = {
       console.error("Error de conexión (update):", error);
       throw error;
     }
+  },
+
+  // Sube un archivo al bucket 'medicamentos' en Supabase Storage.
+  // Devuelve la URL pública si tiene éxito, o null si falla (nunca bloquea el flujo).
+  async uploadImage(file) {
+    try {
+      console.log("──── INICIO SUBIDA DE IMAGEN ────");
+      console.log("Archivo:", file);
+      console.log("Nombre:", file.name, "| Tipo:", file.type, "| Tamaño:", file.size, "bytes");
+
+      // Nombre de archivo único para evitar colisiones en el bucket
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const filename = `${Date.now()}_${safeName}`;
+      const uploadUrl = `${SUPABASE_URL}/storage/v1/object/medicamentos/${filename}`;
+
+      console.log("URL de subida:", uploadUrl);
+      console.log("apikey usada (primeros 20 chars):", SUPABASE_KEY.substring(0, 20) + '...');
+
+      const r = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': file.type || 'application/octet-stream',
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+
+      console.log("Respuesta status:", r.status, r.statusText);
+
+      // Leer el cuerpo como texto primero para no perderlo si no es JSON
+      const rawText = await r.text();
+      console.log("Respuesta raw:", rawText);
+
+      let responseBody = {};
+      try { responseBody = JSON.parse(rawText); } catch (_) { responseBody = { raw: rawText }; }
+      console.log("Respuesta body (parseado):", responseBody);
+
+      if (!r.ok) {
+        console.error("──── ERROR EN SUBIDA DE IMAGEN ────");
+        console.error("Status HTTP:", r.status, r.statusText);
+        console.error("Cuerpo del error:", responseBody);
+        if (r.status === 400) console.error("  → 400: Solicitud inválida. Verifica Content-Type y que el body sea el archivo binario.");
+        if (r.status === 401) console.error("  → 401: No autorizado. La apikey/anon key es incorrecta o no tiene acceso a Storage.");
+        if (r.status === 403) console.error("  → 403: Prohibido. El bucket 'medicamentos' no tiene política RLS que permita INSERT al rol anon.");
+        if (r.status === 404) console.error("  → 404: Bucket 'medicamentos' NO EXISTE en Supabase Storage. Créalo primero.");
+        console.error("  Solución: Supabase → Storage → Buckets → medicamentos → Policies → New Policy → Allow INSERT for anon");
+        return null;
+      }
+
+      // URL pública del objeto (el bucket debe estar marcado como público en Supabase)
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/medicamentos/${filename}`;
+      console.log("──── IMAGEN SUBIDA EXITOSAMENTE ────");
+      console.log("URL imagen:", publicUrl);
+      return publicUrl;
+    } catch (error) {
+      console.error("Error de conexión al subir imagen:", error);
+      return null;
+    }
+  },
+
+  // Función de diagnóstico: ejecutar desde la consola del navegador → sb.testStorage()
+  async testStorage() {
+    console.log("=== TEST DE ACCESO A SUPABASE STORAGE ===");
+    console.log("URL:", SUPABASE_URL);
+    console.log("Key (primeros 30):", SUPABASE_KEY.substring(0, 30) + '...');
+
+    // Test 1: listar buckets
+    const r1 = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    const buckets = await r1.json().catch(() => r1.text());
+    console.log("Buckets disponibles (status", r1.status + "):", buckets);
+
+    // Test 2: listar objetos del bucket medicamentos
+    const r2 = await fetch(`${SUPABASE_URL}/storage/v1/object/list/medicamentos`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefix: '', limit: 5 })
+    });
+    const objs = await r2.json().catch(() => r2.text());
+    console.log("Objetos en bucket 'medicamentos' (status", r2.status + "):", objs);
+
+    console.log("=== FIN TEST ===");
+    return { buckets, objetos: objs };
   }
 };
 
@@ -120,15 +206,24 @@ const mediConnect = {
   async getDonations(filters = {}) {
     try {
       console.log("Obteniendo donaciones...");
-      let query = '';
-      if (filters.estado) query += `estado=eq.${filters.estado}&`;
-      if (filters.tipo) query += `tipo=eq.${encodeURIComponent(filters.tipo)}&`;
 
-      if (query.endsWith('&')) query = query.slice(0, -1);
+      // Se agrega select=*,usuarios(nombre) para hacer JOIN con la tabla usuarios
+      // Supabase PostgREST resuelve el JOIN automáticamente usando la FK donante_id → usuarios.id
+      let query = 'select=*,usuarios(nombre)';
+      if (filters.estado) query += `&estado=eq.${filters.estado}`;
+      if (filters.tipo) query += `&tipo=eq.${encodeURIComponent(filters.tipo)}`;
 
       const data = await sb.select('donaciones', query);
-      console.log("Donaciones obtenidas:", data);
-      return data || [];
+      console.log("Donaciones crudas desde Supabase (con join):", data);
+
+      // Mapear para que cada donación tenga el campo "donante" con el nombre del usuario
+      const mapped = (data || []).map(d => ({
+        ...d,
+        donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
+      }));
+
+      console.log("Donaciones mapeadas (con donante):", mapped);
+      return mapped;
     } catch (error) {
       console.error("Error al obtener donaciones:", error);
       alert("No se pudieron cargar las donaciones.");
@@ -152,8 +247,11 @@ const mediConnect = {
         cantidad: donation.cantidad,
         fecha_vencimiento: donation.fecha_vencimiento,
         estado: donation.estado || 'disponible',
-        donante_id: currentUser.id
+        donante_id: currentUser.id,
+        // imagen_url viene del proceso de subida en donar.html (null si no hay imagen o falló)
+        imagen_url: donation.imagen_url || null
       };
+      console.log("imagen_url a guardar:", newDonation.imagen_url);
 
       const result = await sb.insert('donaciones', newDonation);
       if (result) {
@@ -178,6 +276,32 @@ const mediConnect = {
       console.error("Error al actualizar la donación:", error);
       alert("Error al actualizar estado. Revisa la consola.");
       return false;
+    }
+  },
+
+  // Obtiene una donación por su ID con JOIN a usuarios para obtener el nombre del donante
+  async getDonationById(id) {
+    try {
+      console.log(`Buscando donación con id: ${id}`);
+      const query = `select=*,usuarios(nombre)&id=eq.${id}`;
+      const data = await sb.select('donaciones', query);
+      console.log("Donación cruda por ID (con join):", data);
+
+      if (data && data.length > 0) {
+        const d = data[0];
+        const mapped = {
+          ...d,
+          donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
+        };
+        console.log("Donación mapeada por ID:", mapped);
+        return mapped;
+      }
+
+      console.warn(`No se encontró donación con id: ${id}`);
+      return null;
+    } catch (error) {
+      console.error("Error al obtener donación por ID:", error);
+      return null;
     }
   }
 };

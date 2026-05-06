@@ -236,9 +236,18 @@
       list.innerHTML = '<p style="color:var(--gray-400);text-align:center;padding:20px 0;font-size:14px;">No hay actividad reciente</p>';
       return;
     }
-    list.innerHTML = recent.map(d => `
+    list.innerHTML = recent.map(d => {
+      console.log(`Donación ${d.nombre}: imagen_url =`, d.imagen_url);
+      return `
       <div class="med-card" onclick="location.href='buscar.html'">
-        <div class="med-img">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</div>
+        <div class="med-img" style="${d.imagen_url ? 'padding:0;overflow:hidden;background:#f1f5f9;' : ''}">
+          ${d.imagen_url
+            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" 
+                onerror="console.warn('Error cargando imagen:', this.src); this.style.display='none'; this.nextElementSibling.style.display='block';">
+               <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
+            : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
+          }
+        </div>
         <div class="med-info">
           <h3>${d.nombre}</h3>
           <p>${d.tipo} · ${d.cantidad} un.</p>
@@ -251,7 +260,7 @@
           <span class="badge ${STATUS_MAP[d.estado] || 'badge-blue'}">${d.estado}</span>
         </div>
       </div>
-    `).join('');
+    `; }).join('');
   }
 
   loadDashboard();

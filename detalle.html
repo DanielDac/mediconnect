@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediConnect – Detalle de Donación</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Header ── */
+    .detalle-header {
+      background: var(--white);
+      padding: 52px 20px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: var(--gray-100);
+      border: none;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+      color: var(--gray-800);
+    }
+
+    .detalle-header h1 {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    /* ── Contenido ── */
+    .detalle-content {
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Tarjeta hero con emoji e icono grande */
+    .detalle-hero {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: white;
+    }
+
+    .detalle-emoji {
+      font-size: 52px;
+      line-height: 1;
+    }
+
+    .detalle-hero-info h2 {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .detalle-hero-info p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Sección de campos */
+    .detalle-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .detalle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .detalle-row:last-child {
+      border-bottom: none;
+    }
+
+    .detalle-row .label {
+      font-size: 13px;
+      color: var(--gray-400);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detalle-row .label svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .detalle-row .value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-800);
+      text-align: right;
+    }
+
+    /* Skeleton loader */
+    .skeleton-hero {
+      background: var(--gray-100);
+      border-radius: var(--radius);
+      height: 108px;
+      animation: shimmer 1.4s infinite;
+    }
+
+    .skeleton-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .skeleton-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Error state */
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .error-state .icon {
+      font-size: 52px;
+      margin-bottom: 12px;
+    }
+
+    .error-state h2 {
+      font-family: var(--font-title);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--gray-800);
+      margin-bottom: 6px;
+    }
+
+    .error-state p {
+      font-size: 14px;
+      color: var(--gray-400);
+    }
+
+    /* ID badge */
+    .id-badge {
+      background: var(--primary-light);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      text-align: center;
+      word-break: break-all;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="detalle-header">
+      <button class="back-btn" onclick="history.back()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h1>Detalle de Donación</h1>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <div class="detalle-content" id="detalleContent">
+      <!-- Skeleton mientras carga -->
+      <div class="skeleton-hero skeleton"></div>
+      <div class="skeleton-card">
+        <div class="skeleton-row">
+          <div class="skeleton" style="width:40%;height:13px;border-radius:6px;"></div>
+          <div class="skeleton" style="width:35%;height:13px;border-radius:6px;"></div>
+        </div>
+        <div class="skeleton-row">
+          <div class="skeleton" style="width:30%;height:13px;border-radius:6px;"></div>
+          <div class="skeleton" style="width:25%;height:13px;border-radius:6px;"></div>
+        </div>
+        <div class="skeleton-row">
+          <div class="skeleton" style="width:35%;height:13px;border-radius:6px;"></div>
+          <div class="skeleton" style="width:40%;height:13px;border-radius:6px;"></div>
+        </div>
+        <div class="skeleton-row">
+          <div class="skeleton" style="width:25%;height:13px;border-radius:6px;"></div>
+          <div class="skeleton" style="width:50%;height:13px;border-radius:6px;"></div>
+        </div>
+        <div class="skeleton-row">
+          <div class="skeleton" style="width:30%;height:13px;border-radius:6px;"></div>
+          <div class="skeleton" style="width:30%;height:13px;border-radius:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      Inicio
+    </a>
+    <a href="buscar.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+      </svg>
+      Buscar
+    </a>
+    <button class="nav-btn-center" onclick="location.href='donar.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    </button>
+    <a href="perfil.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+      Perfil
+    </a>
+  </nav>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+  <script>
+    // Mapa de emojis por tipo de medicamento (igual que en buscar.html y dashboard.html)
+    const MEDICINE_EMOJIS = {
+      'Antibiótico': '💊',
+      'Antiinflamatorio': '🩹',
+      'Antidiabético': '💉',
+      'Analgésico': '🔴',
+      'Vitamina': '🍋',
+      'default': '💊'
+    };
+
+    // Mapa de estados a clases CSS de badge
+    const STATUS_BADGE = {
+      'disponible': 'badge-success',
+      'reservado': 'badge-warning',
+      'entregado': 'badge-blue'
+    };
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // Renderiza la donación en el contenedor principal
+    function renderDetalle(d) {
+      const emoji = MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default;
+      const badgeClass = STATUS_BADGE[d.estado] || 'badge-blue';
+      const fechaFmt = d.fecha_vencimiento
+        ? new Date(d.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '—';
+
+      document.getElementById('detalleContent').innerHTML = `
+        <!-- Hero con nombre e imagen -->
+        <div class="detalle-hero fade-up" style="${d.imagen_url ? 'padding:0;overflow:hidden;height:200px;position:relative;' : ''}">
+          ${d.imagen_url
+            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;">
+               <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.8));padding:20px;color:white;">
+                 <h2 style="margin:0;">${d.nombre}</h2>
+                 <p style="margin:4px 0 0;opacity:0.8;">${d.tipo}</p>
+               </div>`
+            : `<div class="detalle-emoji" style="margin-left:24px;">${emoji}</div>
+               <div class="detalle-hero-info">
+                 <h2>${d.nombre}</h2>
+                 <p>${d.tipo}</p>
+               </div>`
+          }
+        </div>
+
+        <!-- Tarjeta con campos -->
+        <div class="detalle-card fade-up">
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/>
+              </svg>
+              Medicamento
+            </span>
+            <span class="value">${d.nombre}</span>
+          </div>
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+              </svg>
+              Tipo
+            </span>
+            <span class="value">${d.tipo}</span>
+          </div>
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+              </svg>
+              Cantidad
+            </span>
+            <span class="value">${d.cantidad} unidades</span>
+          </div>
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/>
+              </svg>
+              Vencimiento
+            </span>
+            <span class="value">${fechaFmt}</span>
+          </div>
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+              </svg>
+              Donante
+            </span>
+            <span class="value">${d.donante}</span>
+          </div>
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Estado
+            </span>
+            <span class="value"><span class="badge ${badgeClass}">${d.estado}</span></span>
+          </div>
+        </div>
+
+        <!-- Badge con el ID de trazabilidad -->
+        <div class="id-badge fade-up">
+          🔍 ID de trazabilidad: ${d.id}
+        </div>
+      `;
+    }
+
+    // Renderiza el estado de error
+    function renderError(mensaje) {
+      document.getElementById('detalleContent').innerHTML = `
+        <div class="error-state">
+          <div class="icon">❌</div>
+          <h2>Donación no encontrada</h2>
+          <p>${mensaje}</p>
+        </div>
+      `;
+    }
+
+    // Punto de entrada: leer el ?id= de la URL y cargar la donación
+    async function cargarDetalle() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      console.log("ID recibido desde URL:", id);
+
+      if (!id) {
+        renderError('No se proporcionó un ID en la URL. Usa detalle.html?id=TU_ID');
+        return;
+      }
+
+      const donacion = await mediConnect.getDonationById(id);
+      console.log("Donación recibida para renderizar:", donacion);
+
+      if (donacion) {
+        renderDetalle(donacion);
+      } else {
+        renderError(`No existe ninguna donación con el ID: ${id}`);
+      }
+    }
+
+    cargarDetalle();
+  </script>
+</body>
+
+</html>

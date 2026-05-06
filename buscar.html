@@ -188,10 +188,21 @@
   }
 
   function filterMeds() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
+    const q = document.getElementById('searchInput').value.trim();
+    const qLower = q.toLowerCase();
+    
+    // Si parece un ID de trazabilidad (UUID largo), buscamos coincidencia exacta por ID
+    if (q.length > 30) {
+      const foundById = allDonations.find(d => d.id === q);
+      if (foundById) {
+        renderList([foundById]);
+        return;
+      }
+    }
+
     let filtered = allDonations.filter(d => d.estado !== 'entregado');
     if (currentFilter !== 'Todos') filtered = filtered.filter(d => d.tipo === currentFilter);
-    if (q) filtered = filtered.filter(d => d.nombre.toLowerCase().includes(q) || d.tipo.toLowerCase().includes(q));
+    if (q) filtered = filtered.filter(d => d.nombre.toLowerCase().includes(qLower) || d.tipo.toLowerCase().includes(qLower));
     renderList(filtered);
   }
 
@@ -203,7 +214,14 @@
     }
     el.innerHTML = list.map(d => `
       <div class="med-card-full fade-up">
-        <div class="med-img">${MEDICINE_EMOJIS[d.tipo]||MEDICINE_EMOJIS.default}</div>
+        <div class="med-img" style="${d.imagen_url ? 'padding:0;overflow:hidden;background:#f1f5f9;' : ''}">
+          ${d.imagen_url
+            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" 
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+               <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
+            : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
+          }
+        </div>
         <div class="med-info">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <h3>${d.nombre}</h3>
