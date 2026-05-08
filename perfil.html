@@ -162,24 +162,14 @@
 
   <div class="profile-content">
 
-    <!-- Mis Donaciones -->
+    <!-- Enlace a Mis Actividades -->
     <div class="profile-section fade-up delay-1">
-      <div class="profile-section-title">Mis Donaciones</div>
-      <div id="myDonationsList">
-        <div class="donation-item">
-          <div class="donation-icon skeleton" style="width:40px;height:40px;"></div>
-          <div class="donation-info">
-            <div class="skeleton" style="height:13px;width:60%;margin-bottom:5px;"></div>
-            <div class="skeleton" style="height:11px;width:35%;"></div>
-          </div>
+      <div class="account-item" onclick="location.href='mis-actividades.html'" id="historyToggleBtn">
+        <div class="account-item-icon" style="background:#F0FDF4;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#16A34A"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
         </div>
-        <div class="donation-item">
-          <div class="donation-icon skeleton" style="width:40px;height:40px;"></div>
-          <div class="donation-info">
-            <div class="skeleton" style="height:13px;width:50%;margin-bottom:5px;"></div>
-            <div class="skeleton" style="height:11px;width:30%;"></div>
-          </div>
-        </div>
+        <span class="account-item-label" id="historyLabel">Ver mi historial</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
     </div>
 
@@ -203,6 +193,14 @@
         <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
 
+      <div class="account-item" id="adminPanelBtn" onclick="location.href='admin.html'" style="display:none;">
+        <div class="account-item-icon" style="background:#F5F3FF;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7C3AED"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+        </div>
+        <span class="account-item-label" style="color:#7C3AED;">Panel Administrativo</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#7C3AED"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
+      </div>
+
       <div class="account-item" onclick="showToast('Función próximamente', '')">
         <div class="account-item-icon">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
@@ -210,6 +208,8 @@
         <span class="account-item-label">Privacidad y Datos</span>
         <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
+
+      <div id="validatorRequestArea"></div>
 
       <button class="logout-btn" onclick="handleLogout()">
         Cerrar Sesión
@@ -229,7 +229,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
     Buscar
   </a>
-  <button class="nav-btn-center" onclick="location.href='donar.html'">
+  <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
   </button>
   <a href="perfil.html" class="nav-item active">
@@ -269,26 +269,58 @@
     document.getElementById('profileName').textContent = user.nombre;
     document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
 
-    const donations = await mediConnect.getDonations();
-    const mine = donations.filter(d => d.donante === user.nombre);
-    const listEl = document.getElementById('myDonationsList');
+    // Badge dinámico
+    const badgeEl = document.querySelector('.profile-badge');
+    if (user.rol === 'validador') badgeEl.innerHTML = '🛡️ Validador Oficial';
+    else if (user.rol === 'receptor') badgeEl.innerHTML = '📦 Receptor';
+    else badgeEl.innerHTML = '⭐ Donante Estrella';
 
-    if (mine.length === 0) {
-      listEl.innerHTML = '<p style="color:var(--gray-400);padding:16px 4px;font-size:14px;">Aún no tienes donaciones registradas.</p>';
-      return;
+    // Ocultar botón "+" si no es donante
+    const btnAdd = document.getElementById('addDonationBtn');
+    if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+
+    const historyLabel = document.getElementById('historyLabel');
+    
+    if (user.rol === 'donante') {
+      historyLabel.textContent = "Mis Donaciones";
+    } else if (user.rol === 'receptor') {
+      historyLabel.textContent = "Mis Reservas";
     }
-    listEl.innerHTML = mine.map((d,i) => `
-      <div class="donation-item">
-        <div class="donation-icon ${ICON_COLORS[i%3]}">${MEDICINE_EMOJIS[d.tipo]||MEDICINE_EMOJIS.default}</div>
-        <div class="donation-info">
-          <h4>${d.nombre}</h4>
-          <p>${formatDate(d.created_at || d.fecha_vencimiento)}</p>
+
+    // Mostrar panel admin solo si es validador
+    if (user.rol === 'validador') {
+      const adminBtn = document.getElementById('adminPanelBtn');
+      if (adminBtn) adminBtn.style.display = 'flex';
+    }
+
+    loadRequests(user);
+  }
+
+  async function loadRequests(user) {
+    if (user.rol === 'validador') return;
+    
+    const area = document.getElementById('validatorRequestArea');
+    area.innerHTML = `
+      <div class="account-item" onclick="handleValidatorRequest()" id="reqBtn">
+        <div class="account-item-icon" style="background:#E0F2FE;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0284C7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
         </div>
-        <div class="donation-arrow">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-        </div>
+        <span class="account-item-label" style="color:#0284C7;">Solicitar acceso como Validador</span>
+        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#0284C7"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
-    `).join('');
+    `;
+  }
+
+  async function handleValidatorRequest() {
+    const ok = await mediConnect.requestValidatorRole();
+    if (ok) {
+      showToast('Solicitud enviada correctamente', 'success');
+      document.getElementById('validatorRequestArea').innerHTML = `
+        <p style="font-size:12px; color:var(--gray-400); text-align:center; padding:10px;">Tu solicitud está en revisión.</p>
+      `;
+    } else {
+      showToast('Error al enviar solicitud', 'error');
+    }
   }
 
   loadProfile();

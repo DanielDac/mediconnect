@@ -6,181 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Donar</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .donar-header {
-      background: var(--white);
-      padding: 52px 20px 16px;
-      border-bottom: 1px solid var(--gray-100);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
 
-    .back-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: var(--gray-100);
-    }
-
-    .back-btn svg {
-      width: 20px;
-      height: 20px;
-      color: var(--gray-800);
-    }
-
-    .donar-header h1 {
-      font-family: var(--font-title);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--gray-800);
-    }
-
-    .donar-content {
-      padding: 20px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    /* Barcode scanner area */
-    .scanner-area {
-      background: var(--primary-light);
-      border: 2px dashed rgba(37, 99, 235, 0.3);
-      border-radius: var(--radius);
-      padding: 28px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .scanner-area:hover {
-      background: #dbeafe;
-      border-color: var(--primary);
-    }
-
-    .scanner-icon {
-      font-size: 36px;
-      margin-bottom: 8px;
-    }
-
-    .scanner-area span {
-      display: block;
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 15px;
-      margin-top: 2px;
-    }
-
-    /* Two col row */
-    .row-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    /* Photo upload */
-    .photo-upload {
-      border: 2px dashed var(--gray-200);
-      border-radius: var(--radius);
-      padding: 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: var(--gray-50);
-    }
-
-    .photo-upload:hover {
-      border-color: var(--primary);
-      background: var(--primary-light);
-    }
-
-    .photo-upload-icon {
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
-
-    .photo-upload span {
-      font-size: 13px;
-      color: var(--gray-400);
-      font-weight: 600;
-    }
-
-    .photo-upload input {
-      display: none;
-    }
-
-    #photoPreview {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-top: 10px;
-      display: none;
-    }
-
-    /* Select */
-    select.input-field {
-      padding-left: 14px;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-    }
-
-    /* QR Modal */
-    .qr-modal-content {
-      text-align: center;
-    }
-
-    .qr-modal-content h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--gray-800);
-      margin-bottom: 6px;
-      font-family: var(--font-title);
-    }
-
-    .qr-modal-content p {
-      font-size: 13px;
-      color: var(--gray-400);
-      margin-bottom: 20px;
-    }
-
-    .qr-box {
-      background: var(--white);
-      border: 2px dashed var(--gray-200);
-      border-radius: 12px;
-      padding: 20px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-
-    #qrCode {
-      width: 160px;
-      height: 160px;
-    }
-
-    .qr-id {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 16px;
-    }
-  </style>
 </head>
 
 <body>
   <div class="page">
     <!-- Header -->
-    <div class="donar-header">
+    <div class="app-header">
       <button class="back-btn" onclick="history.back()">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
           stroke="currentColor">
@@ -190,7 +22,7 @@
       <h1>Registrar Donación</h1>
     </div>
 
-    <div class="donar-content">
+    <div class="dash-content">
 
       <!-- Scanner -->
       <div class="scanner-area fade-up" onclick="simulateScan()">
@@ -288,7 +120,7 @@
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" style="background:var(--gray-800);box-shadow:none" onclick="">
+    <button class="nav-btn-center" onclick="location.href='donar.html'">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -350,6 +182,49 @@
 
     let qrInstance = null;
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get('edit');
+    let isEditing = false;
+    let existingImageUrl = null;
+
+    if (editId) {
+      isEditing = true;
+      document.querySelector('.donar-header h1').textContent = "Editar Donación";
+      document.getElementById('submitBtn').textContent = "Guardar Cambios";
+      loadEditData(editId);
+    }
+
+    async function loadEditData(id) {
+      try {
+        const d = await mediConnect.getDonationById(id);
+        if (!d) {
+          showToast('No se encontró la donación', 'error');
+          setTimeout(() => location.href = 'dashboard.html', 1500);
+          return;
+        }
+        
+        // Verificar que sea el dueño
+        const user = mediConnect.getUser();
+        if (d.donante_id !== user.id) {
+           location.href = 'dashboard.html';
+           return;
+        }
+
+        document.getElementById('medNombre').value = d.nombre;
+        document.getElementById('medTipo').value = d.tipo;
+        document.getElementById('medCantidad').value = d.cantidad;
+        document.getElementById('medFecha').value = d.fecha_vencimiento;
+        if (d.imagen_url) {
+          const img = document.getElementById('photoPreview');
+          img.src = d.imagen_url;
+          img.style.display = 'block';
+          existingImageUrl = d.imagen_url;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     async function submitDonation() {
       const user = mediConnect.getUser();
       if (!user) { location.href = 'index.html'; return; }
@@ -373,40 +248,45 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
-      const donation = { nombre, tipo, cantidad: cant, fecha_vencimiento: fecha, donante: user.nombre, estado: 'pendiente' };
+      const donation = { nombre, tipo, cantidad: cant, fecha_vencimiento: fecha };
+      if (!isEditing) {
+        donation.donante_id = user.id;
+        donation.estado = 'disponible';
+      }
 
-      // --- Subida de imagen (NO bloquea el flujo si falla) ---
-      let imagen_url = null;
+      // --- Subida de imagen ---
+      let imagen_url = isEditing ? existingImageUrl : null;
       const fotoFile = document.getElementById('fotoInput').files[0];
-      console.log("Archivo seleccionado para subir:", fotoFile);
       if (fotoFile) {
-        console.log("Imagen detectada, intentando subir a Supabase Storage...");
         imagen_url = await sb.uploadImage(fotoFile);
-        if (!imagen_url) {
-          console.error("La imagen no pudo subirse. La donación se guardará sin imagen.");
-        }
-      } else {
-        console.log("No se seleccionó imagen. La donación se guardará sin imagen_url.");
       }
       donation.imagen_url = imagen_url;
-      console.log("donation.imagen_url final antes de guardar:", donation.imagen_url);
-      // ---------------------------------------------------------
 
       try {
-        const result = await mediConnect.addDonation(donation);
+        let result;
+        if (isEditing) {
+          result = await mediConnect.updateDonation(editId, donation);
+        } else {
+          result = await mediConnect.addDonation(donation);
+        }
+
         btn.disabled = false;
-        btn.textContent = 'Registrar Donación';
+        btn.textContent = isEditing ? 'Guardar Cambios' : 'Registrar Donación';
 
         if (result) {
-          showQR(result.id || ('don-' + Math.random().toString(36).substr(2, 6)));
+          if (isEditing) {
+            showToast('¡Donación actualizada!', 'success');
+            setTimeout(() => location.href = 'dashboard.html', 1200);
+          } else {
+            showQR(result.id || ('don-' + Math.random().toString(36).substr(2, 6)));
+          }
         } else {
-          showToast('Error al registrar, no hay datos', 'error');
+          showToast('Error al procesar la solicitud', 'error');
         }
       } catch (error) {
         btn.disabled = false;
-        btn.textContent = 'Registrar Donación';
-        showToast('Error de conexión. Intenta de nuevo', 'error');
-        console.error("Fallo submitDonation:", error);
+        btn.textContent = isEditing ? 'Guardar Cambios' : 'Registrar Donación';
+        showToast('Error de conexión', 'error');
       }
     }
 
@@ -451,6 +331,7 @@
 
     const user = mediConnect.getUser();
     if (!user) location.href = 'index.html';
+    else if (user.rol !== 'donante') location.href = 'dashboard.html';
   </script>
 </body>
 
