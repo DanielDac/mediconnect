@@ -47,17 +47,17 @@ const sb = {
     try {
       console.log(`Intentando UPDATE en ${table} para ID: ${id}`, body);
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-        method: 'PATCH', 
-        headers: sb.headers, 
+        method: 'PATCH',
+        headers: sb.headers,
         body: JSON.stringify(body)
       });
-      
+
       if (!r.ok) {
         const err = await r.json();
         console.error("Error detallado de Supabase:", err);
         return false;
       }
-      
+
       console.log("UPDATE exitoso (Status 204/200)");
       return true;
     } catch (error) {
@@ -181,6 +181,17 @@ const mediConnect = {
     console.log("Sesión cerrada.");
   },
 
+  async updateUsuario(id, data) {
+    try {
+      console.log(`Actualizando usuario ${id}...`, data);
+      const ok = await sb.update('usuarios', id, data);
+      return ok;
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      return false;
+    }
+  },
+
   async login(email, password) {
     try {
       console.log(`Intentando login para el email: ${email}`);
@@ -228,7 +239,7 @@ const mediConnect = {
       // Supabase PostgREST resuelve el JOIN automáticamente usando la FK donante_id → usuarios.id
       // Usamos el nombre de la relación explícita (donante_id) para evitar ambigüedad con receptor_id
       let query = 'select=*,usuarios!donante_id(nombre)';
-      
+
       if (filters.estado) query += `&estado=eq.${filters.estado}`;
       if (filters.tipo) query += `&tipo=eq.${encodeURIComponent(filters.tipo)}`;
       if (filters.receptor_id) query += `&receptor_id=eq.${filters.receptor_id}`;
@@ -292,7 +303,7 @@ const mediConnect = {
     try {
       const user = this.getUser();
       if (!user) return false;
-      
+
       console.log(`Actualizando estado de donación ${id} a ${estado}...`);
 
       const updateData = { estado };
@@ -303,7 +314,7 @@ const mediConnect = {
         const currentMed = await this.getDonationById(id);
         if (currentMed && currentMed.estado === 'reservado') {
           console.log("Detectado rechazo de reserva. Intentando restaurar stock...");
-          
+
           // Buscar si hay una donación disponible del mismo donante para el mismo producto
           const query = `donante_id=eq.${currentMed.donante_id}&nombre=eq.${encodeURIComponent(currentMed.nombre)}&tipo=eq.${encodeURIComponent(currentMed.tipo)}&estado=eq.disponible&fecha_vencimiento=eq.${currentMed.fecha_vencimiento}`;
           const results = await sb.select('donaciones', query);
@@ -312,10 +323,10 @@ const mediConnect = {
             const original = results[0];
             const newQty = parseInt(original.cantidad) + parseInt(currentMed.cantidad);
             console.log(`Restaurando stock: ${original.cantidad} + ${currentMed.cantidad} = ${newQty}`);
-            
+
             // A. Sumar al original
             await this.updateDonationStatus(original.id, 'disponible', newQty); // Usar una versión que actualice cantidad
-            
+
             // B. Eliminar la reserva rechazada para no duplicar datos
             await sb.delete('donaciones', id);
             return true;
@@ -394,17 +405,17 @@ const mediConnect = {
       if (toReserve === available) {
         // Reserva total: solo actualizar estado
         console.log(`Reservando total (${toReserve}) de donación ${id} por el usuario ${user.id}...`);
-        return await sb.update('donaciones', id, { 
+        return await sb.update('donaciones', id, {
           estado: 'reservado',
           receptor_id: user.id
         });
       } else {
         // Reserva parcial:
         console.log(`Reservando parcial (${toReserve} de ${available}) de donación ${id}...`);
-        
+
         // A. Actualizar el original con lo que queda
         await sb.update('donaciones', id, { cantidad: available - toReserve });
-        
+
         // B. Crear una nueva entrada para la reserva
         const newDonation = {
           nombre: med.nombre,
@@ -417,7 +428,7 @@ const mediConnect = {
           imagen_url: med.imagen_url || null,
           created_at: new Date().toISOString()
         };
-        
+
         return await sb.insert('donaciones', newDonation);
       }
     } catch (error) {
@@ -455,14 +466,31 @@ const mediConnect = {
   async requestValidatorRole() {
     try {
       const user = this.getUser();
-      if (!user) return false;
+      if (!user) return { success: false, message: 'Usuario no logueado' };
       const data = { usuario_id: user.id, nombre: user.nombre, email: user.email, estado: 'pendiente' };
       console.log("Enviando solicitud de validador...", data);
-      const res = await sb.insert('solicitudes_validador', data);
-      return res;
+      
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes_validador`, {
+        method: 'POST',
+        headers: sb.headers,
+        body: JSON.stringify(data)
+      });
+
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}));
+        console.error("Error Supabase:", err);
+        if (err.code === '23505' || (err.message && err.message.includes('duplicate'))) {
+          return { success: false, message: 'duplicate' };
+        }
+        if (err.code === '42P01' || err.code === 'PGRST205') {
+           return { success: false, message: 'Falta la tabla solicitudes_validador' };
+        }
+        return { success: false, message: err.message || 'Error en la base de datos' };
+      }
+      return { success: true };
     } catch (error) {
       console.error("Error al solicitar rol de validador:", error);
-      return false;
+      return { success: false, message: 'Error de conexión' };
     }
   },
 
@@ -479,16 +507,16 @@ const mediConnect = {
   async processValidatorRequest(requestId, status, userId) {
     try {
       console.log(`Procesando solicitud ${requestId} con estado ${status} para usuario ${userId}`);
-      
+
       // 1. Actualizar la solicitud
       const okReq = await sb.update('solicitudes_validador', requestId, { estado: status });
-      
+
       // 2. Si es aprobado, actualizar el rol del usuario
       if (okReq && status === 'aprobado') {
         const okUser = await sb.update('usuarios', userId, { rol: 'validador' });
         return okUser;
       }
-      
+
       return okReq;
     } catch (error) {
       console.error("Error al procesar solicitud:", error);

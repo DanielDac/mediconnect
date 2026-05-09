@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediConnect – Notificaciones</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="app-header fade-up">
+      <button class="back-btn" onclick="location.href='perfil.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+      <h1>Notificaciones</h1>
+    </div>
+
+    <div class="view-content" style="padding-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <div class="fade-up delay-1"
+        style="padding: 16px; background: var(--white); border-radius: var(--radius); border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">¡Bienvenido a MediConnect!</h3>
+          <span style="font-size: 10px; color: var(--gray-400);">Hoy</span>
+        </div>
+        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu cuenta ha sido creada exitosamente.
+          Explora las medicinas disponibles.</p>
+      </div>
+
+      <div class="fade-up delay-2"
+        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Seguridad al día</h3>
+          <span style="font-size: 10px; color: var(--gray-400);">Ayer</span>
+        </div>
+        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Recuerda verificar siempre la fecha de
+          vencimiento antes de consumir.</p>
+      </div>
+
+      <div class="fade-up delay-3"
+        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); opacity: 0.7;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Perfil verificado</h3>
+          <span style="font-size: 10px; color: var(--gray-400);">2 may</span>
+        </div>
+        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu correo ha sido validado correctamente.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

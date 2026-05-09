@@ -9,10 +9,9 @@
 </head>
 <body>
 <div class="page">
-
   <!-- Header -->
-  <div class="app-header fade-up" style="justify-content: space-between;">
-    <div class="header-greeting">
+  <div class="app-header fade-up">
+    <div class="header-greeting" style="flex: 1;">
       <h2 id="greeting">Hola, ...</h2>
       <div id="roleBadgeContainer"></div>
     </div>
@@ -21,13 +20,11 @@
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-container fade-up delay-1" id="statsContainer">
-    <!-- Dinámico -->
-  </div>
-
-  <!-- Content -->
   <div class="dash-content">
+    <!-- Stats -->
+    <div class="stats-container fade-up delay-1" id="statsContainer">
+      <!-- Dinámico -->
+    </div>
 
     <!-- Actividad Reciente -->
     <div class="fade-up delay-2">
@@ -35,20 +32,13 @@
         <h2 id="listTitle">Actividad Reciente</h2>
         <a href="buscar.html">Ver todo</a>
       </div>
-      <div class="activity-list" id="activityList">
+      <div class="activity-list" id="activityList" style="display: flex; flex-direction: column; gap: 12px;">
         <!-- Skeleton -->
         <div class="med-card">
-          <div class="med-img skeleton" style="width:60px;height:60px;"></div>
-          <div class="med-info" style="flex:1">
+          <div class="med-img skeleton"></div>
+          <div class="med-info">
             <div class="skeleton" style="height:14px;width:70%;margin-bottom:6px;"></div>
             <div class="skeleton" style="height:11px;width:45%;"></div>
-          </div>
-        </div>
-        <div class="med-card">
-          <div class="med-img skeleton" style="width:60px;height:60px;"></div>
-          <div class="med-info" style="flex:1">
-            <div class="skeleton" style="height:14px;width:60%;margin-bottom:6px;"></div>
-            <div class="skeleton" style="height:11px;width:40%;"></div>
           </div>
         </div>
       </div>
@@ -59,16 +49,16 @@
       <div class="section-header">
         <h2 class="section-title">Historial Reciente</h2>
       </div>
-      <div id="historialList">
+      <div id="historialList" style="display: flex; flex-direction: column; gap: 12px;">
         <!-- Se llena dinámicamente -->
       </div>
     </div>
 
     <!-- Invite Banner -->
-    <div class="invite-banner fade-up delay-3">
-      <h3>¡Invita a un amigo!</h3>
-      <p>Ayuda a crecer nuestra red de donantes.</p>
-      <button class="btn-invite" onclick="shareApp()">Compartir App</button>
+    <div class="invite-banner fade-up delay-3" style="background: var(--white); border-radius: var(--radius); padding: 20px; text-align: center; border: 1px solid var(--gray-100); box-shadow: var(--shadow-sm);">
+      <h3 style="font-size: 16px; margin-bottom: 4px;">¡Invita a un amigo!</h3>
+      <p style="font-size: 13px; color: var(--gray-400); margin-bottom: 16px;">Ayuda a crecer nuestra red de donantes.</p>
+      <button class="btn-primary" onclick="shareApp()" style="padding: 10px 20px; font-size: 14px;">Compartir App</button>
     </div>
 
   </div>

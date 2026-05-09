@@ -10,26 +10,28 @@
 <body>
 <div class="page">
   <!-- Header -->
-  <div class="app-header" style="flex-direction: column; align-items: flex-start; gap: 12px;">
-    <h1>Buscar Medicamentos</h1>
-    <div class="search-box">
+  <div class="app-header fade-up" style="flex-direction: column; align-items: flex-start;">
+    <h1>Buscar</h1>
+    <div class="search-box" style="margin-top: 12px;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
       <input type="text" id="searchInput" placeholder="¿Qué necesitas hoy?" oninput="filterMeds()"/>
     </div>
   </div>
 
-  <!-- Filter chips -->
-  <div class="filter-chips">
-    <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
-    <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
-    <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
-    <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
-    <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
-    <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
-  </div>
+  <div class="view-content">
+    <!-- Filter chips -->
+    <div class="filter-chips">
+      <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
+      <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
+      <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
+      <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
+      <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
+      <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
+    </div>
 
-  <!-- Results -->
-  <div class="results-list" id="resultsList"></div>
+    <!-- Results -->
+    <div class="results-list" id="resultsList"></div>
+  </div>
 </div>
 
 <!-- Bottom Nav -->

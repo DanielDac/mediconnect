@@ -12,95 +12,83 @@
 <body>
   <div class="page">
     <!-- Header -->
-    <div class="app-header">
-      <button class="back-btn" onclick="history.back()">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
+    <div class="app-header fade-up">
+      <button class="back-btn" onclick="location.href='dashboard.html'">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
       </button>
-      <h1>Registrar Donación</h1>
+      <h1 id="formTitle">Nueva Donación</h1>
     </div>
 
-    <div class="dash-content">
-
-      <!-- Scanner -->
-      <div class="scanner-area fade-up" onclick="simulateScan()">
-        <div class="scanner-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;color:var(--primary)" fill="none"
-            viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+    <div class="view-content">
+      <form class="donation-form fade-up delay-1" id="donationForm" onsubmit="handleSubmit(event)" style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Scanner -->
+        <div class="scanner-area fade-up" onclick="openScanner()">
+          <div class="scanner-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <span>Escanear Código de Barras</span>
         </div>
-        <span>Escanear Código de Barras</span>
-      </div>
 
-      <!-- Nombre -->
-      <div class="input-group fade-up delay-1">
-        <label>Nombre del Medicamento</label>
-        <div class="input-wrap">
-          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-          </svg>
-          <input class="input-field" type="text" id="medNombre" placeholder="Ej. Ibuprofeno 400mg" />
+        <!-- Nombre -->
+        <div class="input-group fade-up delay-1">
+          <label>Nombre del Medicamento</label>
+          <div class="input-wrap">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+            </svg>
+            <input class="input-field" type="text" id="medNombre" placeholder="Ej. Ibuprofeno 400mg" />
+          </div>
         </div>
-      </div>
 
-      <!-- Tipo + Cantidad -->
-      <div class="row-2 fade-up delay-2">
-        <div class="input-group">
-          <label>Tipo</label>
-          <select class="input-field no-icon" id="medTipo"
-            style="padding-left:14px;appearance:none;background-image:url(\" data:image/svg+xml,%3Csvg
-            xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239CA3AF' %3E%3Cpath
-            stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'
-            /%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;">
-            <option>Antibiótico</option>
-            <option>Antiinflamatorio</option>
-            <option>Antidiabético</option>
-            <option>Analgésico</option>
-            <option>Vitamina</option>
-            <option>Otro</option>
-          </select>
+        <!-- Tipo + Cantidad -->
+        <div class="row-2 fade-up delay-2">
+          <div class="input-group">
+            <label>Tipo</label>
+            <select class="input-field no-icon" id="medTipo">
+              <option>Antibiótico</option>
+              <option>Antiinflamatorio</option>
+              <option>Antidiabético</option>
+              <option>Analgésico</option>
+              <option>Vitamina</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Cantidad (un.)</label>
+            <input class="input-field no-icon" type="number" id="medCantidad" value="1" min="1" />
+          </div>
         </div>
-        <div class="input-group">
-          <label>Cantidad (un.)</label>
-          <input class="input-field no-icon" type="number" id="medCantidad" value="1" min="1"
-            style="padding-left:14px;" />
+
+        <!-- Fecha vencimiento -->
+        <div class="input-group fade-up delay-3">
+          <label>Fecha de Vencimiento</label>
+          <div class="input-wrap">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+            </svg>
+            <input class="input-field" type="date" id="medFecha" />
+          </div>
         </div>
-      </div>
 
-      <!-- Fecha vencimiento -->
-      <div class="input-group fade-up delay-3">
-        <label>Fecha de Vencimiento</label>
-        <div class="input-wrap">
-          <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-          </svg>
-          <input class="input-field" type="date" id="medFecha" />
+        <!-- Foto -->
+        <div class="input-group fade-up delay-4">
+          <label>Foto del Empaque (Opcional)</label>
+          <div class="photo-upload" onclick="document.getElementById('fotoInput').click()">
+            <input type="file" id="fotoInput" accept="image/*" onchange="previewPhoto(event)" />
+            <div class="photo-upload-icon">📷</div>
+            <span>Toca para subir foto</span>
+            <img id="photoPreview" />
+          </div>
         </div>
-      </div>
 
-      <!-- Foto -->
-      <div class="input-group fade-up delay-4">
-        <label>Foto del Empaque (Opcional)</label>
-        <div class="photo-upload" onclick="document.getElementById('fotoInput').click()">
-          <input type="file" id="fotoInput" accept="image/*" onchange="previewPhoto(event)" />
-          <div class="photo-upload-icon">📷</div>
-          <span>Toca para subir foto</span>
-          <img id="photoPreview" />
-        </div>
-      </div>
+        <button class="btn-primary fade-up" id="submitBtn" onclick="submitDonation()" style="margin-top:10px">
+          Registrar Donación
+        </button>
 
-      <button class="btn-primary fade-up" id="submitBtn" onclick="submitDonation()" style="margin-top:4px">
-        Registrar Donación
-      </button>
-
+      </form>
     </div>
   </div>
 
@@ -147,10 +135,22 @@
     </div>
   </div>
 
+  <!-- Scanner Modal -->
+  <div class="modal-overlay" id="scannerOverlay">
+    <div class="modal" id="scannerModal" style="padding: 15px; text-align: left;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+        <h2 style="font-size: 1.1rem; margin:0; font-family: var(--font-title); font-weight: 700;">Escanear Código</h2>
+        <button class="btn-secondary" style="padding: 6px 12px; margin:0; width: auto; font-size: 13px;" onclick="closeScanner()">Cerrar</button>
+      </div>
+      <div id="reader" style="width:100%; border-radius: 8px; overflow: hidden; background: #000;"></div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <!-- QR library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script src="app.js"></script>
   <script>
     function showToast(msg, type = '') {
@@ -159,13 +159,56 @@
       setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    function simulateScan() {
+    let html5QrcodeScanner = null;
+
+    function openScanner() {
+      document.getElementById('scannerOverlay').classList.add('show');
+      
+      if (!html5QrcodeScanner) {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+      }
+
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        onScanFailure
+      ).catch(err => {
+        console.error("Error al iniciar cámara", err);
+        showToast('Cámara no disponible o sin permisos.', 'error');
+        closeScanner();
+      });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      closeScanner();
+      
+      // Simular base de datos de medicamentos al escanear
       const names = ['Amoxicilina 500mg', 'Ibuprofeno 400mg', 'Paracetamol 500mg', 'Metformina 850mg'];
       const types = ['Antibiótico', 'Antiinflamatorio', 'Analgésico', 'Antidiabético'];
       const rand = Math.floor(Math.random() * 4);
-      document.getElementById('medNombre').value = names[rand];
+      
+      document.getElementById('medNombre').value = names[rand] + " (Ref: " + decodedText.substring(0, 5) + ")";
       document.getElementById('medTipo').value = types[rand];
       showToast('Código escaneado ✓', 'success');
+    }
+
+    function onScanFailure(error) {
+      // Ignorar errores continuos de escaneo
+    }
+
+    function closeScanner() {
+      document.getElementById('scannerOverlay').classList.remove('show');
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          html5QrcodeScanner.clear();
+          html5QrcodeScanner = null;
+        }).catch(err => {
+          console.error("Failed to stop scanner", err);
+        });
+      }
     }
 
     function previewPhoto(e) {
