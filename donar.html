@@ -153,7 +153,7 @@
         <h2 style="font-size: 1.1rem; margin:0; font-family: var(--font-title); font-weight: 700;">Escanear Código</h2>
         <button class="btn-secondary" style="padding: 6px 12px; margin:0; width: auto; font-size: 13px;" onclick="closeScanner()">Cerrar</button>
       </div>
-      <div class="scanner-container" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; aspect-ratio: 1/1;">
+      <div class="scanner-container" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 250px;">
         <div id="reader" style="width:100%;"></div>
         <div class="scan-line"></div>
       </div>
@@ -180,18 +180,34 @@
       document.getElementById('scannerOverlay').classList.add('show');
       
       if (!html5QrcodeScanner) {
-        html5QrcodeScanner = new Html5Qrcode("reader");
+        // Inicializar con formatos específicos para mayor velocidad y precisión
+        html5QrcodeScanner = new Html5Qrcode("reader", { 
+          formatsToSupport: [ 
+            Html5QrcodeSupportedFormats.EAN_13, 
+            Html5QrcodeSupportedFormats.EAN_8, 
+            Html5QrcodeSupportedFormats.CODE_128, 
+            Html5QrcodeSupportedFormats.UPC_A, 
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.QR_CODE
+          ]
+        });
       }
 
       // Configuración optimizada para códigos de barras
       const config = { 
-        fps: 20, 
-        qrbox: { width: 280, height: 200 }, // Box más rectangular para códigos de barras
-        aspectRatio: 1.0
+        fps: 25, 
+        qrbox: { width: 280, height: 160 }, // Más delgado para enfocar mejor las líneas del código
+        aspectRatio: 1.0,
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true // Usa la API nativa del navegador si está disponible
+        }
       };
       
       html5QrcodeScanner.start(
-        { facingMode: "environment" },
+        { 
+          facingMode: "environment",
+          focusMode: "continuous" // Intentar forzar auto-enfoque continuo
+        },
         config,
         onScanSuccess,
         onScanFailure
