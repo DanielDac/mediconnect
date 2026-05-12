@@ -85,8 +85,14 @@
 
 <div id="toast" class="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js"></script>
 <script>
+  // Inicializar Supabase Client (SUPABASE_URL y SUPABASE_KEY ya existen en app.js)
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  console.log('✅ Dashboard: supabaseClient listo');
+
+
   const MEDICINE_EMOJIS = { 'Antibiótico':'💊', 'Antiinflamatorio':'🩹', 'Antidiabético':'💉', 'Analgésico':'🔴', 'default':'💊' };
   const STATUS_MAP = { 
     'disponible': 'badge-success', 
@@ -110,9 +116,74 @@
     }
   }
 
+  // ===== FUNCIÓN PRINCIPAL: Verificar sesión al cargar =====
+  async function initDashboard() {
+    console.log('🔍 Verificando sesión...');
+    
+    // 1. PRIMERO: Verificar sesión de Google (Supabase Auth)
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    
+    if (session?.user) {
+      console.log('✅ Sesión de Google detectada:', session.user.email);
+      
+      const userEmail = session.user.email;
+      const userName = session.user.user_metadata?.full_name || userEmail.split('@')[0];
+      
+      // Buscar si el usuario ya existe en la tabla 'usuarios'
+      const query = `email=eq.${encodeURIComponent(userEmail)}`;
+      const existingUsers = await sb.select('usuarios', query);
+      
+      if (existingUsers && existingUsers.length > 0) {
+        // Usuario existente - guardar en localStorage
+        mediConnect.saveUser(existingUsers[0]);
+        console.log('👤 Usuario existente cargado:', existingUsers[0].nombre);
+      } else {
+        // Primera vez con Google - crear usuario automáticamente
+        console.log('🆕 Creando nuevo usuario desde Google...');
+        const newUser = {
+          nombre: userName,
+          email: userEmail,
+          password: 'google_' + Math.random().toString(36).substring(2),
+          rol: 'receptor'
+        };
+        
+        const createdUser = await sb.insert('usuarios', newUser);
+        if (createdUser) {
+          mediConnect.saveUser(createdUser);
+          console.log('✅ Nuevo usuario creado:', createdUser.nombre);
+        } else {
+          console.error('❌ No se pudo crear el usuario');
+          showToast('Error al crear usuario', 'error');
+          return;
+        }
+      }
+      
+      // Cargar dashboard
+      loadDashboard();
+      return;
+    }
+    
+    // 2. SEGUNDO: Verificar sesión local (email/password)
+    const user = mediConnect.getUser();
+    
+    if (user) {
+      console.log('✅ Sesión local detectada:', user.nombre);
+      loadDashboard();
+      return;
+    }
+    
+    // 3. No hay sesión - redirigir al login
+    console.log('❌ No hay sesión, redirigiendo al login...');
+    window.location.href = 'index.html';
+  }
+
+  // ===== Cargar dashboard (tu código original mejorado) =====
   async function loadDashboard() {
     const user = mediConnect.getUser();
-    if (!user) { location.href = 'index.html'; return; }
+    if (!user) { 
+      window.location.href = 'index.html'; 
+      return; 
+    }
 
     const role = user.rol || 'receptor';
     const roleUpper = role.charAt(0).toUpperCase() + role.slice(1);
@@ -310,7 +381,20 @@
     }
   }
 
-  loadDashboard();
+  // Cerrar sesión (actualizado para Google)
+  async function cerrarSesion() {
+    try {
+      await supabaseClient.auth.signOut();
+      console.log('🔒 Sesión de Google cerrada');
+    } catch (e) {
+      console.log('No había sesión de Google');
+    }
+    mediConnect.logout();
+    window.location.href = 'index.html';
+  }
+
+  // ===== INICIAR DASHBOARD =====
+  initDashboard();
 </script>
 </body>
 </html>
