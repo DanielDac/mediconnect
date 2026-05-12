@@ -175,73 +175,96 @@
     }
 
     let html5QrcodeScanner = null;
+    let isScannerRunning = false;
 
-    function openScanner() {
-      document.getElementById('scannerOverlay').classList.add('show');
+    async function openScanner() {
+      if (isScannerRunning) return;
       
-      if (!html5QrcodeScanner) {
-        // Inicializar con formatos específicos para mayor velocidad y precisión
-        html5QrcodeScanner = new Html5Qrcode("reader", { 
-          formatsToSupport: [ 
-            Html5QrcodeSupportedFormats.EAN_13, 
-            Html5QrcodeSupportedFormats.EAN_8, 
-            Html5QrcodeSupportedFormats.CODE_128, 
-            Html5QrcodeSupportedFormats.UPC_A, 
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.QR_CODE
-          ]
-        });
-      }
-
-      // Configuración optimizada para códigos de barras
-      const config = { 
-        fps: 25, 
-        qrbox: { width: 280, height: 160 }, // Más delgado para enfocar mejor las líneas del código
-        aspectRatio: 1.0,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true // Usa la API nativa del navegador si está disponible
+      const scannerOverlay = document.getElementById('scannerOverlay');
+      scannerOverlay.classList.add('show');
+      
+      try {
+        if (!html5QrcodeScanner) {
+          html5QrcodeScanner = new Html5Qrcode("reader", { 
+            formatsToSupport: [ 
+              Html5QrcodeSupportedFormats.EAN_13, 
+              Html5QrcodeSupportedFormats.EAN_8, 
+              Html5QrcodeSupportedFormats.CODE_128, 
+              Html5QrcodeSupportedFormats.UPC_A, 
+              Html5QrcodeSupportedFormats.UPC_E,
+              Html5QrcodeSupportedFormats.QR_CODE
+            ],
+            verbose: false
+          });
         }
-      };
-      
-      html5QrcodeScanner.start(
-        { 
-          facingMode: "environment",
-          focusMode: "continuous" // Intentar forzar auto-enfoque continuo
-        },
-        config,
-        onScanSuccess,
-        onScanFailure
-      ).catch(err => {
+
+        const config = { 
+          fps: 20, 
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            // Optimizado para códigos de barras (rectángulo horizontal)
+            const width = viewfinderWidth * 0.8;
+            const height = Math.min(viewfinderHeight * 0.5, 160);
+            return { width, height };
+          },
+          aspectRatio: 1.0,
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true
+          }
+        };
+        
+        await html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          config,
+          onScanSuccess,
+          onScanFailure
+        );
+        
+        isScannerRunning = true;
+      } catch (err) {
         console.error("Error al iniciar cámara", err);
-        showToast('Cámara no disponible o sin permisos.', 'error');
+        let errorMsg = 'No se pudo acceder a la cámara.';
+        if (err.name === 'NotAllowedError') errorMsg = 'Permiso de cámara denegado.';
+        if (err.name === 'NotFoundError') errorMsg = 'No se encontró una cámara.';
+        
+        showToast(errorMsg, 'error');
         closeScanner();
-      });
+      }
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-      // Capturar únicamente el número del código
-      const barcodeNumber = decodedText.trim();
+      // Evitar múltiples escaneos simultáneos
+      if (!isScannerRunning) return;
       
+      const barcodeNumber = decodedText.trim();
       document.getElementById('medCodigo').value = barcodeNumber;
       showToast('Código detectado: ' + barcodeNumber, 'success');
       
-      // Cerrar escáner después de éxito
       closeScanner();
     }
 
     function onScanFailure(error) {
-      // Ignorar errores de detección continua
+      // Errores de detección silenciosos (normal durante el escaneo)
     }
 
-    function closeScanner() {
-      document.getElementById('scannerOverlay').classList.remove('show');
+    async function closeScanner() {
+      const scannerOverlay = document.getElementById('scannerOverlay');
+      scannerOverlay.classList.remove('show');
+      
       if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => {
-          html5QrcodeScanner.clear();
+        try {
+          if (isScannerRunning) {
+            isScannerRunning = false;
+            await html5QrcodeScanner.stop();
+          }
+          // Limpiar el DOM inyectado por la librería para evitar conflictos en el próximo inicio
+          await html5QrcodeScanner.clear();
+          html5QrcodeScanner = null; 
+        } catch (err) {
+          console.warn("Error al cerrar el escáner:", err);
+          // Forzar reseteo en caso de error
           html5QrcodeScanner = null;
-        }).catch(err => {
-          console.error("Failed to stop scanner", err);
-        });
+          isScannerRunning = false;
+        }
       }
     }
 
