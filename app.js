@@ -275,6 +275,7 @@ const mediConnect = {
       }
 
       const newDonation = {
+        codigo_barras: donation.codigo_barras || null,
         nombre: donation.nombre,
         tipo: donation.tipo,
         cantidad: donation.cantidad,
