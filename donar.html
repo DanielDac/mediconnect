@@ -154,10 +154,10 @@
         <button class="btn-secondary" style="padding: 6px 12px; margin:0; width: auto; font-size: 13px;" onclick="closeScanner()">Cerrar</button>
       </div>
       <div class="scanner-container" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 250px;">
-        <div id="reader" style="width:100%;"></div>
+        <video id="scannerVideo" style="width:100%; display:block;" playsinline autoplay muted></video>
         <div class="scan-line"></div>
       </div>
-      <p style="margin-top: 15px; font-size: 13px; color: var(--gray-600); text-align: center;">Apunta la cámara al código de barras del medicamento</p>
+      <p id="scannerStatus" style="margin-top: 15px; font-size: 13px; color: var(--gray-600); text-align: center;">Apunta la cámara al código de barras del medicamento</p>
     </div>
   </div>
 
@@ -165,7 +165,8 @@
 
   <!-- QR library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <!-- ZXing barcode reader (UMD) -->
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
   <script src="app.js"></script>
   <script>
     function showToast(msg, type = '') {
@@ -174,74 +175,116 @@
       setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    let html5QrcodeScanner = null;
+    /* ===== ZXing Barcode Scanner ===== */
+    let codeReader = null;
+    let scannerControls = null;
+    let scannerStream = null;
 
-    function openScanner() {
-      document.getElementById('scannerOverlay').classList.add('show');
-      
-      if (!html5QrcodeScanner) {
-        // Inicializar con formatos específicos para mayor velocidad y precisión
-        html5QrcodeScanner = new Html5Qrcode("reader", { 
-          formatsToSupport: [ 
-            Html5QrcodeSupportedFormats.EAN_13, 
-            Html5QrcodeSupportedFormats.EAN_8, 
-            Html5QrcodeSupportedFormats.CODE_128, 
-            Html5QrcodeSupportedFormats.UPC_A, 
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.QR_CODE
-          ]
-        });
-      }
+    async function openScanner() {
+      const overlay = document.getElementById('scannerOverlay');
+      const statusEl = document.getElementById('scannerStatus');
+      const videoEl = document.getElementById('scannerVideo');
 
-      // Configuración optimizada para códigos de barras
-      const config = { 
-        fps: 25, 
-        qrbox: { width: 280, height: 160 }, // Más delgado para enfocar mejor las líneas del código
-        aspectRatio: 1.0,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true // Usa la API nativa del navegador si está disponible
+      overlay.classList.add('show');
+      statusEl.textContent = 'Solicitando acceso a la cámara…';
+      statusEl.style.color = 'var(--gray-600)';
+
+      try {
+        // 1. Request camera permission explicitly first
+        const permStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Stop this temporary stream immediately
+        permStream.getTracks().forEach(t => t.stop());
+
+        // 2. Configure hints for barcode formats only
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+          ZXing.BarcodeFormat.EAN_13,
+          ZXing.BarcodeFormat.CODE_128,
+          ZXing.BarcodeFormat.UPC_A,
+          ZXing.BarcodeFormat.EAN_8,
+          ZXing.BarcodeFormat.UPC_E
+        ]);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+
+        codeReader = new ZXing.BrowserMultiFormatReader(hints, 500);
+
+        // 3. Select rear camera if available (mobile)
+        const devices = await codeReader.listVideoInputDevices();
+        let selectedDeviceId = undefined;
+        if (devices && devices.length > 0) {
+          // Prefer rear/environment camera
+          const rearCam = devices.find(d => {
+            const label = (d.label || '').toLowerCase();
+            return label.includes('back') || label.includes('trasera') || label.includes('rear') || label.includes('environment');
+          });
+          selectedDeviceId = rearCam ? rearCam.deviceId : devices[devices.length - 1].deviceId;
         }
-      };
-      
-      html5QrcodeScanner.start(
-        { 
-          facingMode: "environment",
-          focusMode: "continuous" // Intentar forzar auto-enfoque continuo
-        },
-        config,
-        onScanSuccess,
-        onScanFailure
-      ).catch(err => {
-        console.error("Error al iniciar cámara", err);
-        showToast('Cámara no disponible o sin permisos.', 'error');
+
+        statusEl.textContent = 'Buscando código de barras…';
+
+        // 4. Start continuous decoding
+        scannerControls = await codeReader.decodeFromVideoDevice(
+          selectedDeviceId,
+          videoEl,
+          (result, error, controls) => {
+            if (result) {
+              const barcodeNumber = result.getText().trim();
+              const formatName = ZXing.BarcodeFormat[result.getBarcodeFormat()] || 'Código';
+
+              // Fill the input
+              document.getElementById('medCodigo').value = barcodeNumber;
+              showToast('✅ ' + formatName + ': ' + barcodeNumber, 'success');
+
+              // Stop scanning immediately to prevent duplicate reads
+              closeScanner();
+            }
+            // Ignore NotFoundException (normal during continuous scanning)
+          }
+        );
+
+        // Keep reference to the video stream so we can stop it later
+        scannerStream = videoEl.srcObject;
+
+      } catch (err) {
+        console.error('Error al iniciar escáner:', err);
+        let msg = 'Cámara no disponible.';
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          msg = 'Permiso de cámara denegado. Habilita el acceso en la configuración de tu navegador.';
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          msg = 'No se encontró ninguna cámara en este dispositivo.';
+        } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+          msg = 'La cámara está siendo usada por otra aplicación.';
+        }
+        showToast(msg, 'error');
         closeScanner();
-      });
-    }
-
-    function onScanSuccess(decodedText, decodedResult) {
-      // Capturar únicamente el número del código
-      const barcodeNumber = decodedText.trim();
-      
-      document.getElementById('medCodigo').value = barcodeNumber;
-      showToast('Código detectado: ' + barcodeNumber, 'success');
-      
-      // Cerrar escáner después de éxito
-      closeScanner();
-    }
-
-    function onScanFailure(error) {
-      // Ignorar errores de detección continua
+      }
     }
 
     function closeScanner() {
       document.getElementById('scannerOverlay').classList.remove('show');
-      if (html5QrcodeScanner) {
-        html5QrcodeScanner.stop().then(() => {
-          html5QrcodeScanner.clear();
-          html5QrcodeScanner = null;
-        }).catch(err => {
-          console.error("Failed to stop scanner", err);
-        });
+
+      // Stop ZXing controls
+      if (scannerControls) {
+        try { scannerControls.stop(); } catch(e) { /* ignore */ }
+        scannerControls = null;
+      }
+
+      // Stop and release camera stream
+      if (scannerStream) {
+        scannerStream.getTracks().forEach(track => track.stop());
+        scannerStream = null;
+      }
+
+      // Reset the reader
+      if (codeReader) {
+        try { codeReader.reset(); } catch(e) { /* ignore */ }
+        codeReader = null;
+      }
+
+      // Clear video element
+      const videoEl = document.getElementById('scannerVideo');
+      if (videoEl) {
+        videoEl.srcObject = null;
       }
     }
 
