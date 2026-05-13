@@ -177,7 +177,6 @@
 
     /* ===== ZXing Barcode Scanner ===== */
     let codeReader = null;
-    let scannerControls = null;
     let scannerStream = null;
 
     async function openScanner() {
@@ -186,16 +185,11 @@
       const videoEl = document.getElementById('scannerVideo');
 
       overlay.classList.add('show');
-      statusEl.textContent = 'Solicitando acceso a la cámara…';
+      statusEl.textContent = 'Iniciando cámara...';
       statusEl.style.color = 'var(--gray-600)';
 
       try {
-        // 1. Request camera permission explicitly first
-        const permStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        // Stop this temporary stream immediately
-        permStream.getTracks().forEach(t => t.stop());
-
-        // 2. Configure hints for barcode formats only
+        // 1. Configure hints for barcode formats
         const hints = new Map();
         hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
           ZXing.BarcodeFormat.EAN_13,
@@ -206,27 +200,28 @@
         ]);
         hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
 
-        codeReader = new ZXing.BrowserMultiFormatReader(hints, 500);
-
-        // 3. Select rear camera if available (mobile)
-        const devices = await codeReader.listVideoInputDevices();
-        let selectedDeviceId = undefined;
-        if (devices && devices.length > 0) {
-          // Prefer rear/environment camera
-          const rearCam = devices.find(d => {
-            const label = (d.label || '').toLowerCase();
-            return label.includes('back') || label.includes('trasera') || label.includes('rear') || label.includes('environment');
-          });
-          selectedDeviceId = rearCam ? rearCam.deviceId : devices[devices.length - 1].deviceId;
+        if (!codeReader) {
+          codeReader = new ZXing.BrowserMultiFormatReader(hints, 500);
         }
 
-        statusEl.textContent = 'Buscando código de barras…';
+        // 2. Define constraints - Prioritize rear camera (environment)
+        const constraints = {
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        };
 
-        // 4. Start continuous decoding
-        scannerControls = await codeReader.decodeFromVideoDevice(
-          selectedDeviceId,
+        statusEl.textContent = 'Buscando código de barras...';
+
+        // 3. Start decoding using constraints directly
+        // decodeFromConstraints is more robust than listing devices manually
+        await codeReader.decodeFromConstraints(
+          constraints,
           videoEl,
-          (result, error, controls) => {
+          (result, error) => {
             if (result) {
               const barcodeNumber = result.getText().trim();
               const formatName = ZXing.BarcodeFormat[result.getBarcodeFormat()] || 'Código';
@@ -235,55 +230,67 @@
               document.getElementById('medCodigo').value = barcodeNumber;
               showToast('✅ ' + formatName + ': ' + barcodeNumber, 'success');
 
-              // Stop scanning immediately to prevent duplicate reads
+              // Stop scanning
               closeScanner();
             }
-            // Ignore NotFoundException (normal during continuous scanning)
+            // NotFoundException is normal during continuous scanning
           }
         );
 
-        // Keep reference to the video stream so we can stop it later
+        // Keep reference to the stream for manual cleanup if needed
         scannerStream = videoEl.srcObject;
+        
+        // Ensure it's playing
+        if (videoEl.paused) {
+          await videoEl.play().catch(e => console.warn("Auto-play blocked, waiting for user interaction", e));
+        }
 
       } catch (err) {
-        console.error('Error al iniciar escáner:', err);
-        let msg = 'Cámara no disponible.';
+        console.error('Error detallado del escáner:', err);
+        let msg = 'Error al acceder a la cámara.';
+        
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-          msg = 'Permiso de cámara denegado. Habilita el acceso en la configuración de tu navegador.';
+          msg = 'Permiso denegado. Habilita el acceso en la configuración de tu navegador.';
         } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-          msg = 'No se encontró ninguna cámara en este dispositivo.';
+          msg = 'No se detectó cámara en este dispositivo.';
         } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-          msg = 'La cámara está siendo usada por otra aplicación.';
+          msg = 'La cámara está bloqueada o en uso por otra app.';
+        } else if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+          msg = 'El escáner requiere una conexión segura (HTTPS).';
         }
+        
         showToast(msg, 'error');
-        closeScanner();
+        statusEl.textContent = msg;
+        statusEl.style.color = 'var(--danger)';
+        
+        // Wait a bit before closing so user can read the error
+        setTimeout(closeScanner, 3000);
       }
     }
 
     function closeScanner() {
       document.getElementById('scannerOverlay').classList.remove('show');
 
-      // Stop ZXing controls
-      if (scannerControls) {
-        try { scannerControls.stop(); } catch(e) { /* ignore */ }
-        scannerControls = null;
-      }
-
-      // Stop and release camera stream
-      if (scannerStream) {
-        scannerStream.getTracks().forEach(track => track.stop());
-        scannerStream = null;
-      }
-
-      // Reset the reader
       if (codeReader) {
-        try { codeReader.reset(); } catch(e) { /* ignore */ }
-        codeReader = null;
+        try {
+          codeReader.reset(); // This stops the camera and decoding
+        } catch(e) {
+          console.error("Error al resetear reader:", e);
+        }
+      }
+
+      // Fallback manual stop for tracks
+      if (scannerStream) {
+        try {
+          scannerStream.getTracks().forEach(track => track.stop());
+        } catch(e) {}
+        scannerStream = null;
       }
 
       // Clear video element
       const videoEl = document.getElementById('scannerVideo');
       if (videoEl) {
+        videoEl.pause();
         videoEl.srcObject = null;
       }
     }
