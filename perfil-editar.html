@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 
 <head>
@@ -12,7 +12,7 @@
   <div class="page">
     <!-- Header -->
     <div class="app-header fade-up">
-      <button class="back-btn" onclick="location.href='perfil.html'">
+      <button class="back-btn" onclick="location.href = 'perfil.html'">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -21,14 +21,32 @@
       <h1>Editar Perfil</h1>
     </div>
 
-    <div class="view-content" style="padding-top: 20px;">
-      <div class="profile-hero fade-up" style="background: none; padding: 20px 0; height: auto; box-shadow: none;">
-        <div class="avatar-lg" id="avatarLg">?</div>
-        <p style="margin-top: 10px; color: var(--gray-400); font-size: 13px;">Toca la foto para cambiarla</p>
+    <div class="view-content" style="padding-top: 20px">
+      <div class="profile-hero fade-up" style="
+            background: none;
+            padding: 20px 0;
+            height: auto;
+            box-shadow: none;
+          ">
+        <div class="avatar-lg" id="avatarLg" onclick="document.getElementById('fotoInput').click()"
+          style="cursor: pointer; position: relative">
+          <span id="avatarText">?</span>
+          <img id="avatarImg" style="
+                display: none;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                object-fit: cover;
+              " />
+        </div>
+        <input type="file" id="fotoInput" accept="image/*" style="display: none" onchange="previewImage(event)" />
+        <p style="margin-top: 10px; color: var(--gray-400); font-size: 13px">
+          Toca la foto para cambiarla
+        </p>
       </div>
 
       <form id="editProfileForm" onsubmit="handleSave(event)" class="fade-up delay-1"
-        style="display: flex; flex-direction: column; gap: 20px;">
+        style="display: flex; flex-direction: column; gap: 20px">
         <div class="input-group">
           <label>Nombre Completo</label>
           <div class="input-wrap">
@@ -37,7 +55,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <input type="text" id="nombreInput" class="input-field" placeholder="Tu nombre">
+            <input type="text" id="nombreInput" class="input-field" placeholder="Tu nombre" />
           </div>
         </div>
 
@@ -50,11 +68,13 @@
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             <input type="email" id="emailInput" class="input-field" disabled
-              style="background: var(--gray-50); cursor: not-allowed;">
+              style="background: var(--gray-50); cursor: not-allowed" />
           </div>
         </div>
 
-        <button type="submit" class="btn-primary" id="saveBtn" style="margin-top: 10px;">Guardar Cambios</button>
+        <button type="submit" class="btn-primary" id="saveBtn" style="margin-top: 10px">
+          Guardar Cambios
+        </button>
       </form>
     </div>
   </div>
@@ -62,44 +82,133 @@
   <div id="toast" class="toast"></div>
 
   <script src="app.js"></script>
+
   <script>
-    function showToast(msg, type = '') {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2800);
+    // ===== DATOS DEL USUARIO =====
+    const user = mediConnect.getUser();
+    if (!user) {
+      location.href = "index.html";
     }
 
-    const user = mediConnect.getUser();
-    if (!user) { location.href = 'index.html'; }
+    // El código sigue aunque user sea null, pero la página se redirige
+    document.getElementById("nombreInput").value = user?.nombre || "";
+    document.getElementById("emailInput").value = user?.email || "";
 
-    document.getElementById('nombreInput').value = user.nombre;
-    document.getElementById('emailInput').value = user.email;
-    document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
+    // Mostrar foto actual si existe
+    if (user?.avatar_url) {
+      document.getElementById("avatarImg").src = user.avatar_url;
+      document.getElementById("avatarImg").style.display = "block";
+      document.getElementById("avatarText").style.display = "none";
+    } else if (user) {
+      document.getElementById("avatarText").textContent = (user.nombre || "?")
+        .charAt(0)
+        .toUpperCase();
+    }
 
+    // ===== TOAST =====
+    function showToast(msg, type = "") {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = "toast " + type;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+    // ===== VISTA PREVIA DE IMAGEN =====
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("Solo se permiten imágenes", "error");
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        showToast("La imagen debe pesar menos de 2MB", "error");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById("avatarImg").src = e.target.result;
+        document.getElementById("avatarImg").style.display = "block";
+        document.getElementById("avatarText").style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ===== SUBIR IMAGEN A SUPABASE =====
+    async function uploadProfilePhoto(file, userId) {
+      try {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const filename = `${userId}_${Date.now()}_${safeName}`;
+        const uploadUrl = `https://htuagycwflhqxghhotjf.supabase.co/storage/v1/object/avatars/${filename}`;
+
+        console.log("Subiendo imagen...");
+        const r = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            apikey:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
+            "Content-Type": file.type,
+            "x-upsert": "true",
+          },
+          body: file,
+        });
+
+        console.log("Status:", r.status);
+        if (r.ok) {
+          const publicUrl = `https://htuagycwflhqxghhotjf.supabase.co/storage/v1/object/public/avatars/${filename}`;
+          console.log("✅ Subida exitosa");
+          return publicUrl;
+        } else {
+          const err = await r.text();
+          console.error("❌ Error:", err);
+          return null;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        return null;
+      }
+    }
+
+    // ===== GUARDAR CAMBIOS =====
     async function handleSave(e) {
       e.preventDefault();
-      const newName = document.getElementById('nombreInput').value.trim();
-      if (!newName) return showToast('El nombre es requerido', 'error');
+      const newName = document.getElementById("nombreInput").value.trim();
+      if (!newName) return showToast("El nombre es requerido", "error");
 
-      const btn = document.getElementById('saveBtn');
+      const btn = document.getElementById("saveBtn");
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
       try {
-        const ok = await mediConnect.updateUsuario(user.id, { nombre: newName });
+        const fileInput = document.getElementById("fotoInput");
+        let fotoUrl = null;
+
+        if (fileInput.files.length > 0) {
+          fotoUrl = await uploadProfilePhoto(fileInput.files[0], user.id);
+        }
+
+        const updateData = { nombre: newName };
+        if (fotoUrl) updateData.avatar_url = fotoUrl;
+
+        const ok = await mediConnect.updateUsuario(user.id, updateData);
+
         if (ok) {
           user.nombre = newName;
+          if (fotoUrl) user.avatar_url = fotoUrl;
           mediConnect.saveUser(user);
-          showToast('Perfil actualizado ✓', 'success');
-          setTimeout(() => location.href = 'perfil.html', 1500);
+          showToast("Perfil actualizado ✓", "success");
+          setTimeout(() => (location.href = "perfil.html"), 1500);
         } else {
-          showToast('Error al actualizar', 'error');
+          showToast("Error al actualizar", "error");
         }
       } catch (err) {
-        showToast('Error de conexión', 'error');
+        showToast("Error de conexión", "error");
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Guardar Cambios';
+        btn.innerHTML = "Guardar Cambios";
       }
     }
   </script>
