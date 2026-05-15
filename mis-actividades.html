@@ -14,7 +14,7 @@
     <button class="back-btn" onclick="location.href='perfil.html'">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
     </button>
-    <h1 id="pageTitle">Mis Actividades</h1>
+    <h1 id="pageTitle">...</h1>
   </div>
 
   <div class="view-content" id="activitiesList">
@@ -41,6 +41,10 @@
     <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
     </button>
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+      Mapa
+    </a>
     <a href="perfil.html" class="nav-item active">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
       Perfil
@@ -70,13 +74,16 @@
     if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
 
     const title = document.getElementById('pageTitle');
+    
+    if (user.rol === 'donante') title.textContent = "Mis Donaciones";
+    else if (user.rol === 'receptor') title.textContent = "Mis Reservas";
+    else title.textContent = "Historial General";
+
     const donations = await mediConnect.getDonations();
     
     if (user.rol === 'donante') {
-      title.textContent = "Mis Donaciones";
       allItems = donations.filter(d => d.donante_id === user.id);
     } else if (user.rol === 'receptor') {
-      title.textContent = "Mis Reservas";
       allItems = donations.filter(d => d.receptor_id === user.id);
     } else {
       title.textContent = "Historial General";
@@ -99,7 +106,7 @@
     }
 
     list.innerHTML = items.map((d, i) => `
-      <div class="med-card">
+      <div class="med-card" style="cursor:pointer;" onclick="location.href='detalle.html?id=${d.id}'">
         <div class="med-img" style="background:${ICON_COLORS[i % ICON_COLORS.length]}">
           ${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}
         </div>

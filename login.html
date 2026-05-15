@@ -1,23 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MediConnect – Iniciar Sesión</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
+  <div class="auth-page page-no-nav">
+    <!-- Hero -->
+    <div class="auth-hero fade-up">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12h3m0 0h3m-3 0V9m0 3v3M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75v10.5A2.25 2.25 0 004.5 19.5z" />
+        </svg>
+      </div>
+      <h1>MediConnect</h1>
+      <p>Conectando salud, salvando vidas.</p>
+    </div>
 
-<h2>Login</h2>
+    <!-- Card -->
+    <div class="auth-card">
+      <!-- Botón de Google -->
+      <div class="google-auth-section fade-up delay-1">
+        <button onclick="signInWithGoogle()" class="google-auth-btn" id="googleAuthBtn">
+          <img src="https://www.google.com/favicon.ico" alt="Google">
+          Continuar con Google
+        </button>
+      </div>
 
-<input type="email" id="email" placeholder="Correo"><br><br>
-<input type="password" id="password" placeholder="Contraseña"><br><br>
+      <!-- Divisor -->
+      <div class="auth-divider fade-up delay-1">
+        <span>o continúa con email</span>
+      </div>
 
-<button onclick="login()">Entrar</button>
+      <!-- Tabs -->
+      <div class="auth-tabs fade-up delay-2">
+        <button class="auth-tab active" onclick="location.href='login.html'">Iniciar Sesión</button>
+        <button class="auth-tab" onclick="location.href='register.html'">Registrarse</button>
+      </div>
 
-<p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
+      <!-- LOGIN FORM -->
+      <div class="form-section visible fade-up delay-2" id="loginForm">
+        <div class="input-group">
+          <label>Email</label>
+          <div class="input-wrap">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+            <input class="input-field" type="email" id="loginEmail" placeholder="correo@ejemplo.com" />
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            <input class="input-field" type="password" id="loginPassword" placeholder="Tu contraseña" />
+          </div>
+        </div>
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Ingresar</button>
+        <p class="register-link">
+          <a href="register.html">¿No tienes cuenta? Regístrate</a>
+        </p>
+      </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="app.js"></script>
+      <p class="footer-text">© 2026 MediConnect. Protegemos tus datos.</p>
+    </div>
+  </div>
 
+  <div id="toast" class="toast"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+
+  <script>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showToast('Ingresa tu email y contraseña', 'error');
+        return;
+      }
+
+      setLoading('loginBtn', true);
+      try {
+        const ok = await mediConnect.login(email, password);
+        if (ok) {
+          const user = mediConnect.getUser();
+          showToast('¡Bienvenido, ' + user.nombre + '!', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 900);
+        } else {
+          showToast('Credenciales incorrectas', 'error');
+        }
+      } catch (e) {
+        showToast('Error al ingresar', 'error');
+      }
+      setLoading('loginBtn', false);
+    }
+
+    async function signInWithGoogle() {
+      const googleBtn = document.getElementById('googleAuthBtn');
+      try {
+        if (googleBtn) {
+          googleBtn.innerHTML = '<span class="spinner"></span> Conectando...';
+          googleBtn.disabled = true;
+        }
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + '/index.html'
+          }
+        });
+        if (error) throw error;
+      } catch (error) {
+        showToast('Error al conectar con Google', 'error');
+        if (googleBtn) {
+          googleBtn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google"> Continuar con Google';
+          googleBtn.disabled = false;
+        }
+      }
+    }
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      if (t) {
+        t.textContent = msg;
+        t.className = 'toast ' + type;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2800);
+      }
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.disabled = loading;
+        btn.innerHTML = loading ? '<span class="spinner"></span>' : 'Ingresar';
+      }
+    }
+
+    // Check if already logged in
+    (async function init() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session?.user || mediConnect.getUser()) {
+        window.location.href = 'dashboard.html';
+      }
+    })();
+  </script>
 </body>
+
 </html>

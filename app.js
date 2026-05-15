@@ -282,6 +282,8 @@ const mediConnect = {
         fecha_vencimiento: donation.fecha_vencimiento,
         estado: donation.estado || 'disponible',
         donante_id: currentUser.id,
+        lat: donation.lat || null,
+        lng: donation.lng || null,
         // imagen_url viene del proceso de subida en donar.html (null si no hay imagen o falló)
         imagen_url: donation.imagen_url || null
       };
@@ -427,6 +429,8 @@ const mediConnect = {
           donante_id: med.donante_id,
           receptor_id: user.id,
           imagen_url: med.imagen_url || null,
+          lat: med.lat || null,
+          lng: med.lng || null,
           created_at: new Date().toISOString()
         };
 

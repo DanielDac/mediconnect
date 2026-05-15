@@ -20,7 +20,8 @@
     </div>
 
     <div class="view-content">
-      <form class="donation-form fade-up delay-1" id="donationForm" onsubmit="handleSubmit(event)" style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="donation-form fade-up delay-1" id="donationForm" style="display: flex; flex-direction: column; gap: 20px;">
+        
         
         <!-- Scanner -->
         <div class="scanner-area fade-up" onclick="openScanner()">
@@ -95,11 +96,26 @@
           </div>
         </div>
 
-        <button class="btn-primary fade-up" id="submitBtn" onclick="submitDonation()" style="margin-top:10px">
+        <!-- Ubicación (Mapa) -->
+        <div class="input-group fade-up delay-5">
+          <label>Ubicación (Escribe tu dirección o toca el mapa)</label>
+          <div class="input-wrap" style="margin-bottom: 12px;">
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+            </svg>
+            <input type="text" id="addressSearch" class="input-field" placeholder="Buscar dirección exacta...">
+          </div>
+          <div id="map" style="width: 100%; height: 200px; border-radius: 12px; background: #e2e8f0; border: 1px solid var(--gray-200);"></div>
+          <p id="ubicacionTexto" style="font-size: 13px; color: var(--gray-600); margin-top: 8px;">Ubicación: No seleccionada</p>
+          <input type="hidden" id="medLat" />
+          <input type="hidden" id="medLng" />
+        </div>
+
+        <button class="btn-primary fade-up delay-6" id="submitBtn" type="button" onclick="submitDonation()" style="margin-top:10px">
           Registrar Donación
         </button>
 
-      </form>
+      </div>
     </div>
   </div>
 
@@ -124,6 +140,10 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+      Mapa
+    </a>
     <a href="perfil.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -167,6 +187,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script src="app.js"></script>
+  <script src="mapa.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBw1zNOC5Wag-1tceI2vs9zKjvHkCiLN1g&libraries=places&callback=initMap" async defer></script>
   <script>
     function showToast(msg, type = '') {
       const t = document.getElementById('toast');
@@ -266,7 +288,7 @@
 
     if (editId) {
       isEditing = true;
-      document.querySelector('.donar-header h1').textContent = "Editar Donación";
+      document.getElementById('formTitle').textContent = "Editar Donación";
       document.getElementById('submitBtn').textContent = "Guardar Cambios";
       loadEditData(editId);
     }
@@ -298,6 +320,26 @@
           img.style.display = 'block';
           existingImageUrl = d.imagen_url;
         }
+
+        // Cargar ubicación en el mapa si existe
+        if (d.lat && d.lng) {
+          const lat = parseFloat(d.lat);
+          const lng = parseFloat(d.lng);
+          document.getElementById('medLat').value = lat;
+          document.getElementById('medLng').value = lng;
+          
+          // Esperar a que el mapa esté listo para poner el marcador
+          const checkMap = setInterval(() => {
+            if (typeof donarMap !== 'undefined' && donarMap !== null) {
+              const loc = { lat, lng };
+              donarMap.setCenter(loc);
+              donarMap.setZoom(16);
+              placeMarkerAndValidate(loc, donarMap, true);
+              clearInterval(checkMap);
+            }
+          }, 200);
+          setTimeout(() => clearInterval(checkMap), 5000); // Timeout seguridad
+        }
       } catch (e) {
         console.error(e);
       }
@@ -311,9 +353,12 @@
       const tipo = document.getElementById('medTipo').value;
       const cant = parseInt(document.getElementById('medCantidad').value);
       const fecha = document.getElementById('medFecha').value;
+      const lat = document.getElementById('medLat').value;
+      const lng = document.getElementById('medLng').value;
 
       if (!nombre) { showToast('Ingresa el nombre del medicamento', 'error'); return; }
-      if (!fecha) { showToast('Ingresa la fecha de vencimiento', 'error'); return; }
+      if (!fecha) { showToast('Por favor, ingresa la fecha de vencimiento', 'error'); return; }
+      if (!lat || !lng) { showToast('Por favor, selecciona la ubicación en el mapa', 'error'); return; }
       if (cant < 1) { showToast('La cantidad debe ser al menos 1', 'error'); return; }
 
       const hoy = new Date();
@@ -332,7 +377,9 @@
         nombre, 
         tipo, 
         cantidad: cant, 
-        fecha_vencimiento: fecha 
+        fecha_vencimiento: fecha,
+        lat: lat ? parseFloat(lat) : null,
+        lng: lng ? parseFloat(lng) : null
       };
       if (!isEditing) {
         donation.donante_id = user.id;
@@ -361,7 +408,12 @@
         if (result) {
           if (isEditing) {
             showToast('¡Donación actualizada!', 'success');
-            setTimeout(() => location.href = 'dashboard.html', 1200);
+            btn.textContent = '¡Cambios Guardados!';
+            btn.style.background = 'var(--success)';
+            setTimeout(() => {
+              btn.textContent = 'Guardar Cambios';
+              btn.style.background = '';
+            }, 3000);
           } else {
             showQR(result.id || ('don-' + Math.random().toString(36).substr(2, 6)));
           }
@@ -410,8 +462,11 @@
       document.getElementById('medCantidad').value = '1';
       document.getElementById('medFecha').value = '';
       document.getElementById('photoPreview').style.display = 'none';
+      // Limpiar mapa si es posible
+      if (typeof marker !== 'undefined' && marker) marker.setMap(null);
+      document.getElementById('ubicacionTexto').textContent = 'Ubicación: No seleccionada';
+      
       showToast('¡Donación registrada exitosamente!', 'success');
-      setTimeout(() => location.href = 'dashboard.html', 1200);
     }
 
     const user = mediConnect.getUser();
