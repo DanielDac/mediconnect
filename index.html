@@ -144,266 +144,266 @@
   <div id="toast" class="toast"></div>
 
   <!-- ===== SCRIPTS ===== -->
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
 
-<script>
-  // ===== INICIALIZAR SUPABASE CLIENT =====
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  console.log('✅ Supabase Client inicializado');
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
 
-  // ===== FUNCIÓN PRINCIPAL: DETECTAR TOKEN DE GOOGLE =====
-  async function handleGoogleRedirect() {
-    // Verificar si hay token en la URL
-    const hasToken = window.location.hash && window.location.hash.includes('access_token');
-    
-    if (!hasToken) {
-      console.log('👋 No hay token en URL, mostrando login normal');
-      return false;
-    }
+  <script>
+    // ===== INICIALIZAR SUPABASE CLIENT =====
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('✅ Supabase Client inicializado');
 
-    console.log('🔑 Token detectado en URL, procesando...');
-    
-    try {
-      // Esperar a que Supabase procese el token
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Obtener la sesión
-      const { data: { session }, error } = await supabaseClient.auth.getSession();
-      
-      if (error) {
-        console.error('❌ Error al obtener sesión:', error);
+    // ===== FUNCIÓN PRINCIPAL: DETECTAR TOKEN DE GOOGLE =====
+    async function handleGoogleRedirect() {
+      // Verificar si hay token en la URL
+      const hasToken = window.location.hash && window.location.hash.includes('access_token');
+
+      if (!hasToken) {
+        console.log('👋 No hay token en URL, mostrando login normal');
         return false;
       }
-      
-      if (!session?.user) {
-        console.log('❌ No se encontró sesión después del redirect');
-        return false;
-      }
-      
-      console.log('✅ Sesión de Google válida');
-      console.log('📧 Email:', session.user.email);
-      console.log('👤 Nombre:', session.user.user_metadata?.full_name);
-      
-      const userEmail = session.user.email;
-      const userName = session.user.user_metadata?.full_name || userEmail.split('@')[0];
-      
-      // Buscar si el usuario ya existe
-      console.log('🔍 Buscando usuario en BD...');
-      const query = `email=eq.${encodeURIComponent(userEmail)}`;
-      const existingUsers = await sb.select('usuarios', query);
-      
-      if (existingUsers && existingUsers.length > 0) {
-        console.log('✅ Usuario encontrado:', existingUsers[0].nombre);
-        mediConnect.saveUser(existingUsers[0]);
-        window.location.href = 'dashboard.html';
-        return true;
-      }
-      
-      // Crear nuevo usuario
-      console.log('🆕 Creando nuevo usuario...');
-      const newUser = {
-        nombre: userName,
-        email: userEmail,
-        password: 'google_' + Date.now(),
-        rol: 'receptor'
-      };
-      
-      console.log('📝 Insertando:', newUser);
-      const createdUser = await sb.insert('usuarios', newUser);
-      console.log('📊 Resultado:', createdUser);
-      
-      if (createdUser && createdUser.id) {
-        console.log('✅ Usuario creado exitosamente');
-        mediConnect.saveUser(createdUser);
-        window.location.href = 'dashboard.html';
-        return true;
-      } else {
-        console.error('❌ No se pudo crear el usuario');
-        return false;
-      }
-      
-    } catch (error) {
-      console.error('❌ Error en handleGoogleRedirect:', error);
-      return false;
-    }
-  }
 
-  // ===== FUNCIÓN SIGN IN WITH GOOGLE =====
-  async function signInWithGoogle() {
-    const googleBtn = document.getElementById('googleAuthBtn');
-    
-    try {
-      if (googleBtn) {
-        googleBtn.innerHTML = '<span class="spinner"></span> Conectando...';
-        googleBtn.disabled = true;
-      }
-      
-      console.log('🚀 Iniciando autenticación con Google...');
-      
-      const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/index.html'
+      console.log('🔑 Token detectado en URL, procesando...');
+
+      try {
+        // Esperar a que Supabase procese el token
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Obtener la sesión
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+        if (error) {
+          console.error('❌ Error al obtener sesión:', error);
+          return false;
         }
+
+        if (!session?.user) {
+          console.log('❌ No se encontró sesión después del redirect');
+          return false;
+        }
+
+        console.log('✅ Sesión de Google válida');
+        console.log('📧 Email:', session.user.email);
+        console.log('👤 Nombre:', session.user.user_metadata?.full_name);
+
+        const userEmail = session.user.email;
+        const userName = session.user.user_metadata?.full_name || userEmail.split('@')[0];
+
+        // Buscar si el usuario ya existe
+        console.log('🔍 Buscando usuario en BD...');
+        const query = `email=eq.${encodeURIComponent(userEmail)}`;
+        const existingUsers = await sb.select('usuarios', query);
+
+        if (existingUsers && existingUsers.length > 0) {
+          console.log('✅ Usuario encontrado:', existingUsers[0].nombre);
+          mediConnect.saveUser(existingUsers[0]);
+          window.location.href = 'dashboard.html';
+          return true;
+        }
+
+        // Crear nuevo usuario
+        console.log('🆕 Creando nuevo usuario...');
+        const newUser = {
+          nombre: userName,
+          email: userEmail,
+          password: 'google_' + Date.now(),
+          rol: 'receptor'
+        };
+
+        console.log('📝 Insertando:', newUser);
+        const createdUser = await sb.insert('usuarios', newUser);
+        console.log('📊 Resultado:', createdUser);
+
+        if (createdUser && createdUser.id) {
+          console.log('✅ Usuario creado exitosamente');
+          mediConnect.saveUser(createdUser);
+          window.location.href = 'dashboard.html';
+          return true;
+        } else {
+          console.error('❌ No se pudo crear el usuario');
+          return false;
+        }
+
+      } catch (error) {
+        console.error('❌ Error en handleGoogleRedirect:', error);
+        return false;
+      }
+    }
+
+    // ===== FUNCIÓN SIGN IN WITH GOOGLE =====
+    async function signInWithGoogle() {
+      const googleBtn = document.getElementById('googleAuthBtn');
+
+      try {
+        if (googleBtn) {
+          googleBtn.innerHTML = '<span class="spinner"></span> Conectando...';
+          googleBtn.disabled = true;
+        }
+
+        console.log('🚀 Iniciando autenticación con Google...');
+
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + '/index.html'
+          }
+        });
+
+        if (error) throw error;
+
+      } catch (error) {
+        console.error('❌ Error:', error.message);
+
+        if (googleBtn) {
+          googleBtn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google"> Continuar con Google';
+          googleBtn.disabled = false;
+        }
+
+        alert('Error al conectar con Google: ' + error.message);
+      }
+    }
+
+    // ===== REDIRECCIÓN POR ROL =====
+    function redirectBasedOnRole(rol) {
+      const pages = {
+        'donante': 'dashboard.html',
+        'receptor': 'dashboard.html',
+        'validador': 'dashboard.html',
+        'administrador': 'dashboard.html'
+      };
+      window.location.href = pages[rol] || 'dashboard.html';
+    }
+
+    // ===== INICIAR: Verificar si venimos de Google =====
+    (async function init() {
+      console.log('🔍 Iniciando verificación...');
+
+      // PRIMERO: Verificar si hay token de Google
+      const googleProcessed = await handleGoogleRedirect();
+      if (googleProcessed) {
+        console.log('✅ Google procesado, redirigiendo...');
+        return;
+      }
+
+      // SEGUNDO: Verificar sesión existente
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session?.user) {
+        console.log('✅ Sesión existente, redirigiendo...');
+        const email = session.user.email;
+        const query = `email=eq.${encodeURIComponent(email)}`;
+        const users = await sb.select('usuarios', query);
+        if (users && users.length > 0) {
+          mediConnect.saveUser(users[0]);
+          redirectBasedOnRole(users[0].rol);
+        }
+        return;
+      }
+
+      // TERCERO: Verificar sesión local
+      const localUser = mediConnect.getUser();
+      if (localUser) {
+        console.log('👤 Sesión local detectada');
+        redirectBasedOnRole(localUser.rol);
+        return;
+      }
+
+      console.log('👋 No hay sesión, mostrando login');
+    })();
+
+    // ===== FUNCIONES DE UI =====
+    let selectedRole = 'donante';
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach((t, i) => {
+        t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
       });
-      
-      if (error) throw error;
-      
-    } catch (error) {
-      console.error('❌ Error:', error.message);
-      
-      if (googleBtn) {
-        googleBtn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google"> Continuar con Google';
-        googleBtn.disabled = false;
+      document.getElementById('loginForm').classList.toggle('visible', tab === 'login');
+      document.getElementById('registerForm').classList.toggle('visible', tab === 'register');
+    }
+
+    function selectRole(el, role) {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      selectedRole = role;
+    }
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      if (t) {
+        t.textContent = msg;
+        t.className = 'toast ' + type;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2800);
       }
-      
-      alert('Error al conectar con Google: ' + error.message);
     }
-  }
 
-  // ===== REDIRECCIÓN POR ROL =====
-  function redirectBasedOnRole(rol) {
-    const pages = {
-      'donante': 'dashboard.html',
-      'receptor': 'dashboard.html',
-      'validador': 'dashboard.html',
-      'administrador': 'dashboard.html'
-    };
-    window.location.href = pages[rol] || 'dashboard.html';
-  }
-
-  // ===== INICIAR: Verificar si venimos de Google =====
-  (async function init() {
-    console.log('🔍 Iniciando verificación...');
-    
-    // PRIMERO: Verificar si hay token de Google
-    const googleProcessed = await handleGoogleRedirect();
-    if (googleProcessed) {
-      console.log('✅ Google procesado, redirigiendo...');
-      return;
-    }
-    
-    // SEGUNDO: Verificar sesión existente
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    if (session?.user) {
-      console.log('✅ Sesión existente, redirigiendo...');
-      const email = session.user.email;
-      const query = `email=eq.${encodeURIComponent(email)}`;
-      const users = await sb.select('usuarios', query);
-      if (users && users.length > 0) {
-        mediConnect.saveUser(users[0]);
-        redirectBasedOnRole(users[0].rol);
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.disabled = loading;
+        btn.innerHTML = loading ? '<span class="spinner"></span>' : btn.dataset.label;
       }
-      return;
-    }
-    
-    // TERCERO: Verificar sesión local
-    const localUser = mediConnect.getUser();
-    if (localUser) {
-      console.log('👤 Sesión local detectada');
-      redirectBasedOnRole(localUser.rol);
-      return;
-    }
-    
-    console.log('👋 No hay sesión, mostrando login');
-  })();
-
-  // ===== FUNCIONES DE UI =====
-  let selectedRole = 'donante';
-
-  function switchTab(tab) {
-    document.querySelectorAll('.auth-tab').forEach((t, i) => {
-      t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
-    });
-    document.getElementById('loginForm').classList.toggle('visible', tab === 'login');
-    document.getElementById('registerForm').classList.toggle('visible', tab === 'register');
-  }
-
-  function selectRole(el, role) {
-    document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    selectedRole = role;
-  }
-
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    if (t) {
-      t.textContent = msg;
-      t.className = 'toast ' + type;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2800);
-    }
-  }
-
-  function setLoading(btnId, loading) {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      btn.disabled = loading;
-      btn.innerHTML = loading ? '<span class="spinner"></span>' : btn.dataset.label;
-    }
-  }
-
-  document.getElementById('loginBtn').dataset.label = 'Ingresar';
-  document.getElementById('registerBtn').dataset.label = 'Crear Cuenta';
-
-  async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    if (!email || !password) { 
-      showToast('Ingresa tu email y contraseña', 'error'); 
-      return; 
     }
 
-    setLoading('loginBtn', true);
-    try {
-      const ok = await mediConnect.login(email, password);
-      if (ok) { 
-        const user = mediConnect.getUser();
-        showToast('¡Bienvenido, ' + user.nombre + '!', 'success'); 
-        setTimeout(() => redirectBasedOnRole(user.rol), 900); 
-      } else { 
-        showToast('Credenciales incorrectas', 'error'); 
+    document.getElementById('loginBtn').dataset.label = 'Ingresar';
+    document.getElementById('registerBtn').dataset.label = 'Crear Cuenta';
+
+    async function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showToast('Ingresa tu email y contraseña', 'error');
+        return;
       }
-    } catch (e) { 
-      showToast('Error al ingresar', 'error'); 
-    }
-    setLoading('loginBtn', false);
-  }
 
-  async function handleRegister() {
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const pass = document.getElementById('regPassword').value;
-    
-    if (!name || !email || !pass) { 
-      showToast('Completa todos los campos', 'error'); 
-      return; 
-    }
-    if (pass.length < 6) { 
-      showToast('Mínimo 6 caracteres', 'error'); 
-      return; 
-    }
-    
-    setLoading('registerBtn', true);
-    try {
-      const ok = await mediConnect.register(name, email, pass, selectedRole);
-      if (ok) { 
-        showToast('¡Cuenta creada!', 'success'); 
-        setTimeout(() => redirectBasedOnRole(selectedRole), 900); 
-      } else { 
-        showToast('Error. ¿El email ya existe?', 'error'); 
+      setLoading('loginBtn', true);
+      try {
+        const ok = await mediConnect.login(email, password);
+        if (ok) {
+          const user = mediConnect.getUser();
+          showToast('¡Bienvenido, ' + user.nombre + '!', 'success');
+          setTimeout(() => redirectBasedOnRole(user.rol), 900);
+        } else {
+          showToast('Credenciales incorrectas', 'error');
+        }
+      } catch (e) {
+        showToast('Error al ingresar', 'error');
       }
-    } catch (e) { 
-      showToast('Error al registrarse', 'error'); 
+      setLoading('loginBtn', false);
     }
-    setLoading('registerBtn', false);
-  }
 
-  console.log('✅ Index.html listo');
-</script>
+    async function handleRegister() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPassword').value;
+
+      if (!name || !email || !pass) {
+        showToast('Completa todos los campos', 'error');
+        return;
+      }
+      if (pass.length < 6) {
+        showToast('Mínimo 6 caracteres', 'error');
+        return;
+      }
+
+      setLoading('registerBtn', true);
+      try {
+        const ok = await mediConnect.register(name, email, pass, selectedRole);
+        if (ok) {
+          showToast('¡Cuenta creada!', 'success');
+          setTimeout(() => redirectBasedOnRole(selectedRole), 900);
+        } else {
+          showToast('Error. ¿El email ya existe?', 'error');
+        }
+      } catch (e) {
+        showToast('Error al registrarse', 'error');
+      }
+      setLoading('registerBtn', false);
+    }
+
+    console.log('✅ Index.html listo');
+  </script>
 </body>
 
 </html>

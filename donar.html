@@ -14,20 +14,26 @@
     <!-- Header -->
     <div class="app-header fade-up">
       <button class="back-btn" onclick="location.href='dashboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
       </button>
       <h1 id="formTitle">Nueva Donación</h1>
     </div>
 
     <div class="view-content">
-      <div class="donation-form fade-up delay-1" id="donationForm" style="display: flex; flex-direction: column; gap: 20px;">
-        
-        
+      <div class="donation-form fade-up delay-1" id="donationForm"
+        style="display: flex; flex-direction: column; gap: 20px;">
+
+
         <!-- Scanner -->
         <div class="scanner-area fade-up" onclick="openScanner()">
           <div class="scanner-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;color:var(--primary)" fill="none"
+              viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
           <span>Escanear Código de Barras</span>
@@ -37,8 +43,10 @@
         <div class="input-group fade-up delay-1">
           <label>Código de Barras</label>
           <div class="input-wrap">
-            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v14.25c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125V4.875zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v14.25c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125V4.875z" />
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v14.25c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125V4.875zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v14.25c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125V4.875z" />
             </svg>
             <input class="input-field" type="text" id="medCodigo" placeholder="Escanear o ingresar código" />
           </div>
@@ -48,8 +56,10 @@
         <div class="input-group fade-up delay-1">
           <label>Nombre del Medicamento</label>
           <div class="input-wrap">
-            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
             </svg>
             <input class="input-field" type="text" id="medNombre" placeholder="Ej. Ibuprofeno 400mg" />
           </div>
@@ -78,8 +88,10 @@
         <div class="input-group fade-up delay-3">
           <label>Fecha de Vencimiento</label>
           <div class="input-wrap">
-            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
             </svg>
             <input class="input-field" type="date" id="medFecha" />
           </div>
@@ -100,18 +112,24 @@
         <div class="input-group fade-up delay-5">
           <label>Ubicación (Escribe tu dirección o toca el mapa)</label>
           <div class="input-wrap" style="margin-bottom: 12px;">
-            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+            <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
             </svg>
             <input type="text" id="addressSearch" class="input-field" placeholder="Buscar dirección exacta...">
           </div>
-          <div id="map" style="width: 100%; height: 200px; border-radius: 12px; background: #e2e8f0; border: 1px solid var(--gray-200);"></div>
-          <p id="ubicacionTexto" style="font-size: 13px; color: var(--gray-600); margin-top: 8px;">Ubicación: No seleccionada</p>
+          <div id="map"
+            style="width: 100%; height: 200px; border-radius: 12px; background: #e2e8f0; border: 1px solid var(--gray-200);">
+          </div>
+          <p id="ubicacionTexto" style="font-size: 13px; color: var(--gray-600); margin-top: 8px;">Ubicación: No
+            seleccionada</p>
           <input type="hidden" id="medLat" />
           <input type="hidden" id="medLng" />
         </div>
 
-        <button class="btn-primary fade-up delay-6" id="submitBtn" type="button" onclick="submitDonation()" style="margin-top:10px">
+        <button class="btn-primary fade-up delay-6" id="submitBtn" type="button" onclick="submitDonation()"
+          style="margin-top:10px">
           Registrar Donación
         </button>
 
@@ -141,7 +159,10 @@
       </svg>
     </button>
     <a href="mapa.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
       Mapa
     </a>
     <a href="perfil.html" class="nav-item">
@@ -171,13 +192,16 @@
     <div class="modal" id="scannerModal" style="padding: 15px; text-align: left; max-width: 400px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
         <h2 style="font-size: 1.1rem; margin:0; font-family: var(--font-title); font-weight: 700;">Escanear Código</h2>
-        <button class="btn-secondary" style="padding: 6px 12px; margin:0; width: auto; font-size: 13px;" onclick="closeScanner()">Cerrar</button>
+        <button class="btn-secondary" style="padding: 6px 12px; margin:0; width: auto; font-size: 13px;"
+          onclick="closeScanner()">Cerrar</button>
       </div>
-      <div class="scanner-container" style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 250px;">
+      <div class="scanner-container"
+        style="position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; min-height: 250px;">
         <div id="reader" style="width:100%;"></div>
         <div class="scan-line"></div>
       </div>
-      <p style="margin-top: 15px; font-size: 13px; color: var(--gray-600); text-align: center;">Apunta la cámara al código de barras del medicamento</p>
+      <p style="margin-top: 15px; font-size: 13px; color: var(--gray-600); text-align: center;">Apunta la cámara al
+        código de barras del medicamento</p>
     </div>
   </div>
 
@@ -188,7 +212,9 @@
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <script src="app.js"></script>
   <script src="mapa.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBw1zNOC5Wag-1tceI2vs9zKjvHkCiLN1g&libraries=places&callback=initMap" async defer></script>
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBw1zNOC5Wag-1tceI2vs9zKjvHkCiLN1g&libraries=places&callback=initMap"
+    async defer></script>
   <script>
     function showToast(msg, type = '') {
       const t = document.getElementById('toast');
@@ -200,15 +226,15 @@
 
     function openScanner() {
       document.getElementById('scannerOverlay').classList.add('show');
-      
+
       if (!html5QrcodeScanner) {
         // Inicializar con formatos específicos para mayor velocidad y precisión
-        html5QrcodeScanner = new Html5Qrcode("reader", { 
-          formatsToSupport: [ 
-            Html5QrcodeSupportedFormats.EAN_13, 
-            Html5QrcodeSupportedFormats.EAN_8, 
-            Html5QrcodeSupportedFormats.CODE_128, 
-            Html5QrcodeSupportedFormats.UPC_A, 
+        html5QrcodeScanner = new Html5Qrcode("reader", {
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.UPC_A,
             Html5QrcodeSupportedFormats.UPC_E,
             Html5QrcodeSupportedFormats.QR_CODE
           ]
@@ -216,17 +242,17 @@
       }
 
       // Configuración optimizada para códigos de barras
-      const config = { 
-        fps: 25, 
+      const config = {
+        fps: 25,
         qrbox: { width: 280, height: 160 }, // Más delgado para enfocar mejor las líneas del código
         aspectRatio: 1.0,
         experimentalFeatures: {
           useBarCodeDetectorIfSupported: true // Usa la API nativa del navegador si está disponible
         }
       };
-      
+
       html5QrcodeScanner.start(
-        { 
+        {
           facingMode: "environment",
           focusMode: "continuous" // Intentar forzar auto-enfoque continuo
         },
@@ -243,10 +269,10 @@
     function onScanSuccess(decodedText, decodedResult) {
       // Capturar únicamente el número del código
       const barcodeNumber = decodedText.trim();
-      
+
       document.getElementById('medCodigo').value = barcodeNumber;
       showToast('Código detectado: ' + barcodeNumber, 'success');
-      
+
       // Cerrar escáner después de éxito
       closeScanner();
     }
@@ -301,12 +327,12 @@
           setTimeout(() => location.href = 'dashboard.html', 1500);
           return;
         }
-        
+
         // Verificar que sea el dueño
         const user = mediConnect.getUser();
         if (d.donante_id !== user.id) {
-           location.href = 'dashboard.html';
-           return;
+          location.href = 'dashboard.html';
+          return;
         }
 
         document.getElementById('medCodigo').value = d.codigo_barras || '';
@@ -327,7 +353,7 @@
           const lng = parseFloat(d.lng);
           document.getElementById('medLat').value = lat;
           document.getElementById('medLng').value = lng;
-          
+
           // Esperar a que el mapa esté listo para poner el marcador
           const checkMap = setInterval(() => {
             if (typeof donarMap !== 'undefined' && donarMap !== null) {
@@ -372,11 +398,11 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
 
-      const donation = { 
+      const donation = {
         codigo_barras: codigo,
-        nombre, 
-        tipo, 
-        cantidad: cant, 
+        nombre,
+        tipo,
+        cantidad: cant,
         fecha_vencimiento: fecha,
         lat: lat ? parseFloat(lat) : null,
         lng: lng ? parseFloat(lng) : null
@@ -430,18 +456,18 @@
     function showQR(id) {
       const overlay = document.getElementById('qrOverlay');
       const container = document.getElementById('qrCode');
-      
+
       // Limpiar QR anterior
       container.innerHTML = '';
-      
+
       // Mostrar el ID y enlace
-      document.getElementById('qrId').innerHTML = 
+      document.getElementById('qrId').innerHTML =
         `ID: ${id}<br><a href="detalle.html?id=${id}" style="font-size:12px;color:var(--primary);text-decoration:underline;margin-top:4px;display:inline-block;">Ver detalle →</a>`;
-      
+
       try {
         // Generar nuevo QR funcional para Netlify
         new QRCode(container, {
-          text: `https://lively-salmiakki-0faf02.netlify.app/detalle.html?id=${id}`, 
+          text: `https://lively-salmiakki-0faf02.netlify.app/detalle.html?id=${id}`,
           width: 160,
           height: 160,
           colorDark: "#1F2937",
@@ -451,7 +477,7 @@
       } catch (e) {
         console.error("Error generando QR:", e);
       }
-      
+
       overlay.classList.add('show');
     }
 
@@ -465,7 +491,7 @@
       // Limpiar mapa si es posible
       if (typeof marker !== 'undefined' && marker) marker.setMap(null);
       document.getElementById('ubicacionTexto').textContent = 'Ubicación: No seleccionada';
-      
+
       showToast('¡Donación registrada exitosamente!', 'success');
     }
 

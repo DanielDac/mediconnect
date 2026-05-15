@@ -61,14 +61,14 @@ function initDonarMap() {
 
       const loc = place.geometry.location;
       donarMap.setCenter(loc);
-      
+
       // Zoom inteligente: Si es una calle o dirección, acercamos más.
       // Si es un pueblo o zona, dejamos una vista más amplia.
-      const isPrecise = place.types.includes('street_address') || 
-                        place.types.includes('route') || 
-                        place.types.includes('premise') ||
-                        place.types.includes('sublocality');
-      
+      const isPrecise = place.types.includes('street_address') ||
+        place.types.includes('route') ||
+        place.types.includes('premise') ||
+        place.types.includes('sublocality');
+
       donarMap.setZoom(isPrecise ? 16 : 14);
       placeMarkerAndValidate(loc, donarMap);
     });
@@ -76,7 +76,7 @@ function initDonarMap() {
 
   // Agregar botón de "Mi ubicación actual" como control nativo de Google Maps
   const mapDiv = document.getElementById('map');
-  
+
   if (donarMap && mapDiv) {
     const controlDiv = document.createElement('div');
     const locationBtn = document.createElement('button');
@@ -117,7 +117,7 @@ function initDonarMap() {
           donarMap.setCenter(loc);
           donarMap.setZoom(16);
           placeMarkerAndValidate(loc, donarMap);
-          
+
           locationBtn.innerHTML = originalHTML;
           locationBtn.disabled = false;
         }, (err) => {
@@ -125,10 +125,10 @@ function initDonarMap() {
           showToast('No se pudo obtener tu ubicación. Intenta seleccionar en el mapa.', 'error');
           locationBtn.innerHTML = originalHTML;
           locationBtn.disabled = false;
-        }, { 
+        }, {
           enableHighAccuracy: false, // Menos restrictivo para escritorio
-          timeout: 8000, 
-          maximumAge: 0 
+          timeout: 8000,
+          maximumAge: 0
         });
       } else {
         showToast('Tu navegador no soporta geolocalización', 'error');
@@ -178,23 +178,23 @@ function placeMarkerAndValidate(latLng, map, silent = false) {
         let ubicacionTexto = "Guatemala";
         const adminArea1 = results[0].address_components.find(c => c.types.includes('administrative_area_level_1'));
         const locality = results[0].address_components.find(c => c.types.includes('locality'));
-        
+
         if (locality) {
-            ubicacionTexto = locality.long_name;
+          ubicacionTexto = locality.long_name;
         } else if (adminArea1) {
-            ubicacionTexto = adminArea1.long_name;
+          ubicacionTexto = adminArea1.long_name;
         }
 
         // Guardar coordenadas y mostrar ubicación
         const latVal = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
         const lngVal = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
-        
+
         document.getElementById('medLat').value = latVal;
         document.getElementById('medLng').value = lngVal;
-        
+
         const ubicacionLabel = document.getElementById('ubicacionTexto');
         if (ubicacionLabel) ubicacionLabel.innerText = "Ubicación: " + ubicacionTexto;
-        
+
         if (!silent) {
           showToast('Ubicación seleccionada correctamente', 'success');
         }
@@ -248,7 +248,7 @@ async function loadDonationPins() {
   const donations = await mediConnect.getDonations({ estado: 'disponible' });
 
   const infoWindow = new google.maps.InfoWindow();
-  
+
   // Agrupar donaciones por coordenadas para evitar solapamiento
   const groups = {};
   donations.forEach(d => {
@@ -304,7 +304,7 @@ async function loadDonationPins() {
 
     // Contenido del InfoWindow con lista de medicamentos
     const exactitud = (user.rol === 'admin' || user.rol === 'validador') ? '<br><small style="color:var(--danger)">Ubicación Exacta</small>' : '<br><small style="color:var(--gray-500)">Ubicación Aproximada</small>';
-    
+
     let medsListHTML = groupMeds.map(d => `
       <div style="padding: 10px 0; border-bottom: 1px solid var(--gray-100); last-child { border-bottom: none; }">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
@@ -335,11 +335,11 @@ async function loadDonationPins() {
 }
 
 // Global scope initialization callback for Google Maps API
-window.initMap = function() {
-    if (document.getElementById('map')) {
-        initDonarMap();
-    }
-    if (document.getElementById('map-general')) {
-        initGeneralMap();
-    }
+window.initMap = function () {
+  if (document.getElementById('map')) {
+    initDonarMap();
+  }
+  if (document.getElementById('map-general')) {
+    initGeneralMap();
+  }
 };

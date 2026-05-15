@@ -474,7 +474,7 @@ const mediConnect = {
       if (!user) return { success: false, message: 'Usuario no logueado' };
       const data = { usuario_id: user.id, nombre: user.nombre, email: user.email, estado: 'pendiente' };
       console.log("Enviando solicitud de validador...", data);
-      
+
       const r = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes_validador`, {
         method: 'POST',
         headers: sb.headers,
@@ -488,7 +488,7 @@ const mediConnect = {
           return { success: false, message: 'duplicate' };
         }
         if (err.code === '42P01' || err.code === 'PGRST205') {
-           return { success: false, message: 'Falta la tabla solicitudes_validador' };
+          return { success: false, message: 'Falta la tabla solicitudes_validador' };
         }
         return { success: false, message: err.message || 'Error en la base de datos' };
       }

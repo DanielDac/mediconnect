@@ -1,209 +1,258 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Perfil</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-<div class="page">
-  <!-- Hero -->
-  <div class="profile-hero fade-up">
-    <div class="avatar-lg" id="avatarLg">?</div>
-    <div class="profile-name" id="profileName">...</div>
-    <div class="profile-badge">⭐ Donante Estrella</div>
-  </div>
-
-  <div class="profile-content">
-
-    <!-- Enlace a Mis Actividades -->
-    <div class="profile-section fade-up delay-1">
-      <div class="account-item" onclick="location.href='mis-actividades.html'" id="historyToggleBtn">
-        <div class="account-item-icon" style="background:#F0FDF4;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#16A34A"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
-        </div>
-        <span class="account-item-label" id="historyLabel">Ver mi historial</span>
-        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
-      </div>
+  <div class="page">
+    <!-- Hero -->
+    <div class="profile-hero fade-up">
+      <div class="avatar-lg" id="avatarLg">?</div>
+      <div class="profile-name" id="profileName">...</div>
+      <div class="profile-badge">⭐ Donante Estrella</div>
     </div>
 
-    <!-- Cuenta -->
-    <div class="profile-section fade-up delay-2">
-      <div class="profile-section-title">Cuenta</div>
+    <div class="profile-content">
 
-      <div class="account-item" onclick="location.href='perfil-editar.html'">
-        <div class="account-item-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      <!-- Enlace a Mis Actividades -->
+      <div class="profile-section fade-up delay-1">
+        <div class="account-item" onclick="location.href='mis-actividades.html'" id="historyToggleBtn">
+          <div class="account-item-icon" style="background:#F0FDF4;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#16A34A">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+            </svg>
+          </div>
+          <span class="account-item-label" id="historyLabel">Ver mi historial</span>
+          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg></span>
         </div>
-        <span class="account-item-label">Editar Perfil</span>
-        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
 
-      <div class="account-item" onclick="location.href='notificaciones.html'">
-        <div class="account-item-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+      <!-- Cuenta -->
+      <div class="profile-section fade-up delay-2">
+        <div class="profile-section-title">Cuenta</div>
+
+        <div class="account-item" onclick="location.href='perfil-editar.html'">
+          <div class="account-item-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </div>
+          <span class="account-item-label">Editar Perfil</span>
+          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg></span>
         </div>
-        <span class="account-item-label">Notificaciones</span>
-        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
+
+        <div class="account-item" onclick="location.href='notificaciones.html'">
+          <div class="account-item-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+            </svg>
+          </div>
+          <span class="account-item-label">Notificaciones</span>
+          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg></span>
+        </div>
+
+        <div class="account-item" id="adminPanelBtn" onclick="location.href='admin.html'" style="display:none;">
+          <div class="account-item-icon" style="background:#F5F3FF;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7C3AED">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <span class="account-item-label" style="color:#7C3AED;">Panel Administrativo</span>
+          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="#7C3AED">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg></span>
+        </div>
+
+        <div class="account-item" id="privacyItem" onclick="location.href='privacidad.html'">
+          <div class="account-item-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+          </div>
+          <span class="account-item-label">Privacidad y Datos</span>
+          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg></span>
+        </div>
+
+        <div id="validatorRequestArea"></div>
+
+        <button class="logout-btn" onclick="handleLogout()">
+          Cerrar Sesión
+        </button>
       </div>
 
-      <div class="account-item" id="adminPanelBtn" onclick="location.href='admin.html'" style="display:none;">
-        <div class="account-item-icon" style="background:#F5F3FF;">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7C3AED"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-        </div>
-        <span class="account-item-label" style="color:#7C3AED;">Panel Administrativo</span>
-        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#7C3AED"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
-      </div>
-
-      <div class="account-item" id="privacyItem" onclick="location.href='privacidad.html'">
-        <div class="account-item-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-        </div>
-        <span class="account-item-label">Privacidad y Datos</span>
-        <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
-      </div>
-
-      <div id="validatorRequestArea"></div>
-
-      <button class="logout-btn" onclick="handleLogout()">
-        Cerrar Sesión
-      </button>
     </div>
-
   </div>
-</div>
 
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-    Inicio
-  </a>
-  <a href="buscar.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
-    Buscar
-  </a>
-  <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-  </button>
-  <a href="mapa.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" /></svg>
-    Mapa
-  </a>
-  <a href="perfil.html" class="nav-item active">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-    Perfil
-  </a>
-</nav>
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      Inicio
+    </a>
+    <a href="buscar.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+      </svg>
+      Buscar
+    </a>
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    </button>
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
+      Mapa
+    </a>
+    <a href="perfil.html" class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+      Perfil
+    </a>
+  </nav>
 
-<div id="toast" class="toast"></div>
+  <div id="toast" class="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
-<script>
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-</script>
-<script>
-  function showToast(msg, type='') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
-
-  async function handleLogout() {
-    console.log('🔄 Cerrando sesión...');
-    
-    // Cerrar sesión de Google
-    try {
-      await supabaseClient.auth.signOut();
-      console.log(' Sesión Google cerrada');
-    } catch (e) {
-      console.log('No había sesión de Google');
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+  <script>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  </script>
+  <script>
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
     }
-    
-    // Limpiar localStorage
-    mediConnect.logout();
-    localStorage.clear();
-    
-    // Limpiar cookies
-    document.cookie.split(';').forEach(c => {
-      document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
-    });
-    
-    // Redirigir
-    window.location.replace('index.html');
-  }
-async function loadProfile() {
-    // Verificar sesión de Google primero
-    const { data: { session } } = await supabaseClient.auth.getSession();
-    
-    let user = mediConnect.getUser();
-    
-    // Si hay sesión de Google pero no local, sincronizar
-    if (session?.user && !user) {
-      const email = session.user.email;
-      const query = `email=eq.${encodeURIComponent(email)}`;
-      const users = await sb.select('usuarios', query);
-      if (users && users.length > 0) {
-        mediConnect.saveUser(users[0]);
-        user = users[0];
+
+    async function handleLogout() {
+      console.log('🔄 Cerrando sesión...');
+
+      // Cerrar sesión de Google
+      try {
+        await supabaseClient.auth.signOut();
+        console.log(' Sesión Google cerrada');
+      } catch (e) {
+        console.log('No había sesión de Google');
       }
-    }
-    
-    if (!user) { 
-      window.location.href = 'index.html'; 
-      return; 
-    }
 
-    // Mostrar nombre y avatar
-    document.getElementById('profileName').textContent = user.nombre || 'Usuario';
-    
-    // Si hay avatar de Google, mostrarlo
-    if (session?.user?.user_metadata?.avatar_url) {
-      document.getElementById('avatarLg').innerHTML = 
-        `<img src="${session.user.user_metadata.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-    } else {
-      document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
+      // Limpiar localStorage
+      mediConnect.logout();
+      localStorage.clear();
+
+      // Limpiar cookies
+      document.cookie.split(';').forEach(c => {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+
+      // Redirigir
+      window.location.replace('index.html');
     }
+    async function loadProfile() {
+      // Verificar sesión de Google primero
+      const { data: { session } } = await supabaseClient.auth.getSession();
 
-    const badgeEl = document.querySelector('.profile-badge');
-    const historyLabel = document.getElementById('historyLabel');
-    const privacyItem = document.getElementById('privacyItem');
-    const adminItem = document.getElementById('adminPanelBtn');
+      let user = mediConnect.getUser();
 
-    if (user.rol === 'validador') {
-      badgeEl.innerHTML = '🛡️ VALIDADOR OFICIAL';
-      historyLabel.textContent = "Ver mi historial";
-      if (privacyItem) privacyItem.style.display = 'none';
-      if (adminItem) {
-        adminItem.style.display = 'flex';
-        adminItem.querySelector('.account-item-label').textContent = "Panel Administrativo";
+      // Si hay sesión de Google pero no local, sincronizar
+      if (session?.user && !user) {
+        const email = session.user.email;
+        const query = `email=eq.${encodeURIComponent(email)}`;
+        const users = await sb.select('usuarios', query);
+        if (users && users.length > 0) {
+          mediConnect.saveUser(users[0]);
+          user = users[0];
+        }
       }
-    } 
-    else if (user.rol === 'receptor') {
-      badgeEl.innerHTML = '📦 RECEPTOR';
-      historyLabel.textContent = "Mis Reservas";
-      if (privacyItem) privacyItem.style.display = 'flex';
-      if (adminItem) adminItem.style.display = 'none';
-    } 
-    else {
-      badgeEl.innerHTML = '⭐ DONANTE ESTRELLA';
-      historyLabel.textContent = "Mis Donaciones";
-      if (privacyItem) privacyItem.style.display = 'flex';
-      if (adminItem) adminItem.style.display = 'none';
+
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Mostrar nombre y avatar
+      document.getElementById('profileName').textContent = user.nombre || 'Usuario';
+
+      // Si hay avatar de Google, mostrarlo
+      if (session?.user?.user_metadata?.avatar_url) {
+        document.getElementById('avatarLg').innerHTML =
+          `<img src="${session.user.user_metadata.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+      } else {
+        document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
+      }
+
+      const badgeEl = document.querySelector('.profile-badge');
+      const historyLabel = document.getElementById('historyLabel');
+      const privacyItem = document.getElementById('privacyItem');
+      const adminItem = document.getElementById('adminPanelBtn');
+
+      if (user.rol === 'validador') {
+        badgeEl.innerHTML = '🛡️ VALIDADOR OFICIAL';
+        historyLabel.textContent = "Ver mi historial";
+        if (privacyItem) privacyItem.style.display = 'none';
+        if (adminItem) {
+          adminItem.style.display = 'flex';
+          adminItem.querySelector('.account-item-label').textContent = "Panel Administrativo";
+        }
+      }
+      else if (user.rol === 'receptor') {
+        badgeEl.innerHTML = '📦 RECEPTOR';
+        historyLabel.textContent = "Mis Reservas";
+        if (privacyItem) privacyItem.style.display = 'flex';
+        if (adminItem) adminItem.style.display = 'none';
+      }
+      else {
+        badgeEl.innerHTML = '⭐ DONANTE ESTRELLA';
+        historyLabel.textContent = "Mis Donaciones";
+        if (privacyItem) privacyItem.style.display = 'flex';
+        if (adminItem) adminItem.style.display = 'none';
+      }
+
+      const btnAdd = document.getElementById('addDonationBtn');
+      if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+
+      loadRequests(user);
     }
 
-    const btnAdd = document.getElementById('addDonationBtn');
-    if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
-
-    loadRequests(user);
-  }
-
-  async function loadRequests(user) {
-    if (user.rol === 'validador') return;
-    const area = document.getElementById('validatorRequestArea');
-    area.innerHTML = `
+    async function loadRequests(user) {
+      if (user.rol === 'validador') return;
+      const area = document.getElementById('validatorRequestArea');
+      area.innerHTML = `
       <div class="account-item" onclick="handleValidatorRequest()" id="reqBtn">
         <div class="account-item-icon" style="background:#E0F2FE;">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#0284C7"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
@@ -212,29 +261,30 @@ async function loadProfile() {
         <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></span>
       </div>
     `;
-  }
+    }
 
-  async function handleValidatorRequest() {
-    const result = await mediConnect.requestValidatorRole();
-    if (result && result.success) {
-      showToast('Solicitud enviada correctamente', 'success');
-      document.getElementById('validatorRequestArea').innerHTML = `
+    async function handleValidatorRequest() {
+      const result = await mediConnect.requestValidatorRole();
+      if (result && result.success) {
+        showToast('Solicitud enviada correctamente', 'success');
+        document.getElementById('validatorRequestArea').innerHTML = `
         <p style="font-size:12px; color:var(--gray-400); text-align:center; padding:10px;">Tu solicitud está en revisión.</p>
       `;
-    } else {
-      if (result && result.message === 'duplicate') {
-        showToast('Ya tienes una solicitud pendiente', 'warning');
-        document.getElementById('validatorRequestArea').innerHTML = `
+      } else {
+        if (result && result.message === 'duplicate') {
+          showToast('Ya tienes una solicitud pendiente', 'warning');
+          document.getElementById('validatorRequestArea').innerHTML = `
           <p style="font-size:12px; color:var(--gray-400); text-align:center; padding:10px;">Tu solicitud ya está en revisión.</p>
         `;
-      } else {
-        const msg = (result && result.message) ? result.message : 'Error al enviar solicitud';
-        showToast(msg, 'error');
+        } else {
+          const msg = (result && result.message) ? result.message : 'Error al enviar solicitud';
+          showToast(msg, 'error');
+        }
       }
     }
-  }
 
-  loadProfile();
-</script>
+    loadProfile();
+  </script>
 </body>
+
 </html>
