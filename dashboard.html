@@ -203,6 +203,7 @@
     // ===== Cargar dashboard (tu código original mejorado) =====
     async function loadDashboard() {
       const user = mediConnect.getUser();
+      const { data: { session } } = await supabaseClient.auth.getSession();
       if (!user) {
         window.location.href = 'index.html';
         return;
@@ -212,7 +213,17 @@
       const roleUpper = role.charAt(0).toUpperCase() + role.slice(1);
 
       document.getElementById('greeting').textContent = 'Hola, ' + user.nombre.split(' ')[0];
-      document.getElementById('avatarLetter').textContent = user.nombre.charAt(0).toUpperCase();
+
+      // Avatar: mostrar foto o letra
+      const avatarBD = user.avatar_url;
+      const avatarGoogle = session?.user?.user_metadata?.avatar_url;
+
+      if (avatarBD || avatarGoogle) {
+        document.getElementById('avatarEl').innerHTML =
+          `<img src="${avatarBD || avatarGoogle}" style="width:100%;height:100%;border-radius:12px;object-fit:cover;">`;
+      } else {
+        document.getElementById('avatarLetter').textContent = user.nombre.charAt(0).toUpperCase();
+      }
       document.getElementById('roleBadgeContainer').innerHTML = `
       <span class="role-badge ${role.toLowerCase()}">
         <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
@@ -263,16 +274,21 @@
       const histList = document.getElementById('historialList');
       const histSection = document.getElementById('historialSection');
       let allMeds = [];
-
-      if (role === 'donante') {
-        document.getElementById('listTitle').textContent = "Mis Donaciones Activas";
-        allMeds = await mediConnect.getDonations({ donante_id: user.id });
-      } else if (role === 'validador') {
-        document.getElementById('listTitle').textContent = "Acciones Pendientes";
-        allMeds = await mediConnect.getDonations();
-      } else {
-        document.getElementById('listTitle').textContent = "Mis Reservas Activas";
-        allMeds = await mediConnect.getDonations({ receptor_id: user.id });
+      try {
+        if (role === 'donante') {
+          document.getElementById('listTitle').textContent = "Mis Donaciones Activas";
+          allMeds = await mediConnect.getDonations({ donante_id: user.id });
+        } else if (role === 'validador') {
+          document.getElementById('listTitle').textContent = "Acciones Pendientes";
+          allMeds = await mediConnect.getDonations();
+        } else {
+          document.getElementById('listTitle').textContent = "Mis Reservas Activas";
+          allMeds = await mediConnect.getDonations({ receptor_id: user.id });
+        }
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
+        list.innerHTML = '<p style="color:var(--danger);text-align:center;padding:40px 0;font-size:14px;font-weight:600;">Error al conectar con el servidor</p>';
+        return;
       }
 
       // Filtrar Activos vs Historial

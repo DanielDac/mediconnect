@@ -1165,10 +1165,12 @@ select.input-field {
   }
 }
 
-#reader video {
+#reader video, #scannerVideo {
   object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
+  min-height: 250px;
+  background: #000;
 }
 
 #reader__scan_region {
@@ -1449,4 +1451,68 @@ select.input-field {
 
 .register-link a:hover {
   text-decoration: underline;
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.show .modal {
+  transform: scale(1) translateY(0);
+}
+
+.modal h3 {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--gray-800);
+}
+
+.modal p {
+  font-size: 14px;
+  color: var(--gray-400);
+  margin-bottom: 20px;
+}
+
+.modal .btn-primary {
+  margin-bottom: 10px;
+}
+
+.modal .btn-secondary {
+  border: none;
+  color: var(--gray-400);
+}
+
+.modal .btn-secondary:hover {
+  background: var(--gray-100);
+  color: var(--gray-600);
 }

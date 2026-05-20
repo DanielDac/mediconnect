@@ -235,10 +235,13 @@ const mediConnect = {
     try {
       console.log("Obteniendo donaciones...");
 
-      // Se agrega select=*,usuarios(nombre) para hacer JOIN con la tabla usuarios
-      // Supabase PostgREST resuelve el JOIN automáticamente usando la FK donante_id → usuarios.id
-      // Usamos el nombre de la relación explícita (donante_id) para evitar ambigüedad con receptor_id
-      let query = 'select=*,usuarios!donante_id(nombre)';
+      // Consulta básica para asegurar compatibilidad
+      let query = 'select=*';
+      
+      // Intentamos traer el nombre del donante si es posible
+      if (!filters.skipJoin) {
+        query = 'select=*,usuarios!donante_id(nombre)';
+      }
 
       if (filters.estado) query += `&estado=eq.${filters.estado}`;
       if (filters.tipo) query += `&tipo=eq.${encodeURIComponent(filters.tipo)}`;
@@ -246,7 +249,10 @@ const mediConnect = {
       if (filters.donante_id) query += `&donante_id=eq.${filters.donante_id}`;
 
       console.log("Query final a Supabase:", query);
-      const data = await sb.select('donaciones', query);
+      const data = await sb.select('donaciones', query).catch(err => {
+        console.warn("Fallo el join, reintentando consulta simple...", err);
+        return sb.select('donaciones', 'select=*');
+      });
       console.log("Donaciones crudas desde Supabase (con join):", data);
 
       // Mapear para que cada donación tenga el campo "donante" con el nombre del usuario

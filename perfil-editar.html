@@ -23,7 +23,11 @@
 
     <div class="view-content" style="padding-top: 20px;">
       <div class="profile-hero fade-up" style="background: none; padding: 20px 0; height: auto; box-shadow: none;">
-        <div class="avatar-lg" id="avatarLg">?</div>
+        <div class="avatar-lg" id="avatarLg" onclick="document.getElementById('fotoInput').click()" style="cursor: pointer; position: relative;">
+          <span id="avatarText">?</span>
+          <img id="avatarImg" style="display: none; width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+        </div>
+        <input type="file" id="fotoInput" accept="image/*" style="display: none;" onchange="previewImage(event)" />
         <p style="margin-top: 10px; color: var(--gray-400); font-size: 13px;">Toca la foto para cambiarla</p>
       </div>
 
@@ -63,18 +67,65 @@
 
   <script src="app.js"></script>
   <script>
+    const user = mediConnect.getUser();
+    if (!user) { location.href = 'index.html'; }
+
+    // Inicializar datos
+    document.getElementById('nombreInput').value = user.nombre;
+    document.getElementById('emailInput').value = user.email;
+    
+    if (user.avatar_url) {
+      document.getElementById('avatarImg').src = user.avatar_url;
+      document.getElementById('avatarImg').style.display = 'block';
+      document.getElementById('avatarText').style.display = 'none';
+    } else {
+      document.getElementById('avatarText').textContent = user.nombre.charAt(0).toUpperCase();
+    }
+
     function showToast(msg, type = '') {
       const t = document.getElementById('toast');
       t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2800);
     }
 
-    const user = mediConnect.getUser();
-    if (!user) { location.href = 'index.html'; }
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('avatarImg').src = e.target.result;
+        document.getElementById('avatarImg').style.display = 'block';
+        document.getElementById('avatarText').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
 
-    document.getElementById('nombreInput').value = user.nombre;
-    document.getElementById('emailInput').value = user.email;
-    document.getElementById('avatarLg').textContent = user.nombre.charAt(0).toUpperCase();
+    async function uploadProfilePhoto(file, userId) {
+      try {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filename = `${userId}_${Date.now()}_${safeName}`;
+        const uploadUrl = `${SUPABASE_URL}/storage/v1/object/avatars/${filename}`;
+
+        const r = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Content-Type': file.type,
+            'x-upsert': 'true'
+          },
+          body: file
+        });
+
+        if (r.ok) {
+          return `${SUPABASE_URL}/storage/v1/object/public/avatars/${filename}`;
+        }
+        return null;
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
 
     async function handleSave(e) {
       e.preventDefault();
@@ -86,9 +137,20 @@
       btn.innerHTML = '<span class="spinner"></span>';
 
       try {
-        const ok = await mediConnect.updateUsuario(user.id, { nombre: newName });
+        const fileInput = document.getElementById('fotoInput');
+        let fotoUrl = null;
+
+        if (fileInput.files.length > 0) {
+          fotoUrl = await uploadProfilePhoto(fileInput.files[0], user.id);
+        }
+
+        const updateData = { nombre: newName };
+        if (fotoUrl) updateData.avatar_url = fotoUrl;
+
+        const ok = await mediConnect.updateUsuario(user.id, updateData);
         if (ok) {
           user.nombre = newName;
+          if (fotoUrl) user.avatar_url = fotoUrl;
           mediConnect.saveUser(user);
           showToast('Perfil actualizado ✓', 'success');
           setTimeout(() => location.href = 'perfil.html', 1500);
@@ -104,5 +166,4 @@
     }
   </script>
 </body>
-
 </html>
