@@ -1165,7 +1165,8 @@ select.input-field {
   }
 }
 
-#reader video, #scannerVideo {
+#reader video,
+#scannerVideo {
   object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
@@ -1188,7 +1189,7 @@ select.input-field {
   cursor: pointer !important;
 }
 
-/* ===== AUTH PAGES (Restored) ===== */
+/* ===== AUTH PAGES ===== */
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -1383,7 +1384,7 @@ select.input-field {
 
 .role-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 20px;
 }
@@ -1451,42 +1452,6 @@ select.input-field {
 
 .register-link a:hover {
   text-decoration: underline;
-}
-
-/* ===== MODAL ===== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.modal-overlay.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.modal {
-  background: var(--white);
-  border-radius: 20px;
-  padding: 28px 24px;
-  width: 100%;
-  max-width: 360px;
-  text-align: center;
-  transform: scale(0.9) translateY(20px);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.modal-overlay.show .modal {
-  transform: scale(1) translateY(0);
 }
 
 .modal h3 {
