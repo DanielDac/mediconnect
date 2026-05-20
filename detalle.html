@@ -296,17 +296,17 @@
         <!-- Hero con nombre e imagen -->
         <div class="detalle-hero fade-up" style="${d.imagen_url ? 'padding:0;overflow:hidden;height:200px;position:relative;' : ''}">
           ${d.imagen_url
-            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;">
+          ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;">
                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent, rgba(0,0,0,0.8));padding:20px;color:white;">
                  <h2 style="margin:0;">${d.nombre}</h2>
                  <p style="margin:4px 0 0;opacity:0.8;">${d.tipo}</p>
                </div>`
-            : `<div class="detalle-emoji" style="margin-left:24px;">${emoji}</div>
+          : `<div class="detalle-emoji" style="margin-left:24px;">${emoji}</div>
                <div class="detalle-hero-info">
                  <h2>${d.nombre}</h2>
                  <p>${d.tipo}</p>
                </div>`
-          }
+        }
         </div>
 
         <!-- Tarjeta con campos -->
@@ -372,7 +372,57 @@
         <div class="id-badge fade-up">
           🔍 ID de trazabilidad: ${d.id}
         </div>
+
+        <!-- Acciones según rol -->
+        <div id="detalleActions" class="fade-up" style="margin-top: 20px;"></div>
       `;
+
+      // Lógica de botones según rol
+      const user = mediConnect.getUser();
+      if (user && user.rol === 'receptor' && d.estado === 'disponible') {
+        const actionsArea = document.getElementById('detalleActions');
+        actionsArea.innerHTML = `
+          <div style="background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--gray-100);">
+            <h3 style="font-size: 15px; margin-bottom: 12px; font-weight: 700;">¿Necesitas este medicamento?</h3>
+            ${d.cantidad > 1 ? `
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-100);">
+                <span style="font-size: 13px; color: var(--gray-600);">Cantidad a reservar:</span>
+                <input type="number" id="reserveQty" value="1" min="1" max="${d.cantidad}" 
+                       style="width:70px; padding:8px; border:1.5px solid var(--gray-200); border-radius:8px; font-weight:700; text-align:center; font-family: var(--font-main);">
+              </div>
+            ` : '<input type="hidden" id="reserveQty" value="1">'}
+            <button class="btn-primary" onclick="reservar('${d.id}')">Reservar Medicamento</button>
+          </div>
+        `;
+      }
+    }
+
+    async function reservar(id) {
+      const qtyInput = document.getElementById('reserveQty');
+      const qty = qtyInput ? parseInt(qtyInput.value) : 1;
+
+      if (qty < 1) { showToast('La cantidad debe ser al menos 1', 'error'); return; }
+
+      const btn = document.querySelector('#detalleActions .btn-primary');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+
+      try {
+        const ok = await mediConnect.reserveDonation(id, qty);
+        if (ok) {
+          showToast('¡Reserva realizada con éxito!', 'success');
+          setTimeout(() => location.href = 'dashboard.html', 1500);
+        } else {
+          showToast('Error al procesar la reserva', 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      } catch (e) {
+        showToast('Error de conexión', 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
     }
 
     // Renderiza el estado de error
@@ -388,6 +438,13 @@
 
     // Punto de entrada: leer el ?id= de la URL y cargar la donación
     async function cargarDetalle() {
+      const user = mediConnect.getUser();
+      if (!user) { location.href = 'index.html'; return; }
+
+      // Ocultar botón "+" si no es donante
+      const btnAdd = document.querySelector('.nav-btn-center');
+      if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
       console.log("ID recibido desde URL:", id);
