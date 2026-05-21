@@ -235,10 +235,13 @@ const mediConnect = {
     try {
       console.log("Obteniendo donaciones...");
 
-      // Se agrega select=*,usuarios(nombre) para hacer JOIN con la tabla usuarios
-      // Supabase PostgREST resuelve el JOIN automáticamente usando la FK donante_id → usuarios.id
-      // Usamos el nombre de la relación explícita (donante_id) para evitar ambigüedad con receptor_id
-      let query = 'select=*,usuarios!donante_id(nombre)';
+      // Consulta básica para asegurar compatibilidad
+      let query = 'select=*';
+      
+      // Intentamos traer el nombre del donante si es posible
+      if (!filters.skipJoin) {
+        query = 'select=*,usuarios!donante_id(nombre)';
+      }
 
       if (filters.estado) query += `&estado=eq.${filters.estado}`;
       if (filters.tipo) query += `&tipo=eq.${encodeURIComponent(filters.tipo)}`;
@@ -246,7 +249,10 @@ const mediConnect = {
       if (filters.donante_id) query += `&donante_id=eq.${filters.donante_id}`;
 
       console.log("Query final a Supabase:", query);
-      const data = await sb.select('donaciones', query);
+      const data = await sb.select('donaciones', query).catch(err => {
+        console.warn("Fallo el join, reintentando consulta simple...", err);
+        return sb.select('donaciones', 'select=*');
+      });
       console.log("Donaciones crudas desde Supabase (con join):", data);
 
       // Mapear para que cada donación tenga el campo "donante" con el nombre del usuario
@@ -282,6 +288,8 @@ const mediConnect = {
         fecha_vencimiento: donation.fecha_vencimiento,
         estado: donation.estado || 'disponible',
         donante_id: currentUser.id,
+        lat: donation.lat || null,
+        lng: donation.lng || null,
         // imagen_url viene del proceso de subida en donar.html (null si no hay imagen o falló)
         imagen_url: donation.imagen_url || null
       };
@@ -427,6 +435,8 @@ const mediConnect = {
           donante_id: med.donante_id,
           receptor_id: user.id,
           imagen_url: med.imagen_url || null,
+          lat: med.lat || null,
+          lng: med.lng || null,
           created_at: new Date().toISOString()
         };
 
@@ -470,7 +480,7 @@ const mediConnect = {
       if (!user) return { success: false, message: 'Usuario no logueado' };
       const data = { usuario_id: user.id, nombre: user.nombre, email: user.email, estado: 'pendiente' };
       console.log("Enviando solicitud de validador...", data);
-      
+
       const r = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes_validador`, {
         method: 'POST',
         headers: sb.headers,
@@ -484,7 +494,7 @@ const mediConnect = {
           return { success: false, message: 'duplicate' };
         }
         if (err.code === '42P01' || err.code === 'PGRST205') {
-           return { success: false, message: 'Falta la tabla solicitudes_validador' };
+          return { success: false, message: 'Falta la tabla solicitudes_validador' };
         }
         return { success: false, message: err.message || 'Error en la base de datos' };
       }

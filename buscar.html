@@ -1,118 +1,290 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Buscar</title>
-  <link rel="stylesheet" href="style.css"/>
-
-</head>
-<body>
-<div class="page">
-  <!-- Header -->
-  <div class="app-header fade-up" style="flex-direction: column; align-items: flex-start;">
-    <h1>Buscar</h1>
-    <div class="search-box" style="margin-top: 12px;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
-      <input type="text" id="searchInput" placeholder="¿Qué necesitas hoy?" oninput="filterMeds()"/>
-    </div>
-  </div>
-
-  <div class="view-content">
-    <!-- Filter chips -->
-    <div class="filter-chips">
-      <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
-      <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
-      <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
-      <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
-      <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
-      <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
-    </div>
-
-    <!-- Results -->
-    <div class="results-list" id="resultsList"></div>
-  </div>
-</div>
-
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-    Inicio
-  </a>
-  <a href="buscar.html" class="nav-item active">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
-    Buscar
-  </a>
-  <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-  </button>
-  <a href="perfil.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-    Perfil
-  </a>
-</nav>
-
-<!-- Detail Modal -->
-<div class="modal-overlay" id="detailOverlay">
-  <div class="modal detail-modal" id="detailModal"></div>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<script src="app.js"></script>
-<script>
-  const MEDICINE_EMOJIS = {'Antibiótico':'💊','Antiinflamatorio':'🩹','Antidiabético':'💉','Analgésico':'🔴','Vitamina':'🍋','default':'💊'};
-  let allDonations = [];
-  let currentFilter = 'Todos';
-
-  function showToast(msg, type='') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
-
-  function setFilter(el, filter) {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    currentFilter = filter;
-    filterMeds();
-  }
-
-  function filterMeds() {
-    const q = document.getElementById('searchInput').value.trim();
-    const qLower = q.toLowerCase();
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Estilos Premium para el Modal de Detalle Local */
+    .detail-modal {
+      text-align: left !important;
+      max-width: 390px !important;
+      padding: 0 !important;
+      overflow: hidden;
+      border-radius: 20px !important;
+    }
+    .dm-hero {
+      background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+      height: 180px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      color: white;
+      padding: 24px;
+      gap: 16px;
+    }
+    .dm-hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+    .dm-hero-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+      padding: 20px 24px;
+      color: white;
+      text-align: left;
+      z-index: 2;
+    }
+    .dm-hero-overlay h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      color: white;
+      font-family: var(--font-title);
+      word-break: break-all;
+    }
+    .dm-hero-overlay p {
+      font-size: 13px;
+      margin: 4px 0 0;
+      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+    .dm-hero-emoji {
+      font-size: 52px;
+      line-height: 1;
+      z-index: 2;
+    }
+    .dm-hero-info {
+      text-align: left;
+      flex: 1;
+      z-index: 2;
+    }
+    .dm-hero-info h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      font-family: var(--font-title);
+      word-break: break-all;
+    }
+    .dm-hero-info p {
+      font-size: 13px;
+      margin: 4px 0 0;
+      opacity: 0.9;
+      font-weight: 600;
+    }
+    .dm-body {
+      padding: 24px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 14px;
+    }
+    .detail-row:last-of-type {
+      border-bottom: none;
+    }
+    .detail-row span:first-child {
+      color: var(--gray-400);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .detail-row span:first-child svg {
+      width: 16px;
+      height: 16px;
+      color: var(--gray-400);
+    }
+    .detail-row span:last-child {
+      color: var(--gray-800);
+      font-weight: 700;
+    }
+    .dm-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
     
-    // Si parece un ID de trazabilidad (UUID largo), buscamos coincidencia exacta por ID
-    if (q.length > 30) {
-      const foundById = allDonations.find(d => d.id === q);
-      if (foundById) {
-        renderList([foundById]);
-        return;
+    /* Soporte Responsivo para Dispositivos Móviles, Tablets y Orientación Horizontal (Capacitor/Cordova) */
+    #detailOverlay {
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    @media (max-height: 600px) {
+      #detailOverlay {
+        align-items: flex-start;
+      }
+      .detail-modal {
+        margin: 20px auto;
       }
     }
-
-    let filtered = allDonations.filter(d => d.estado !== 'entregado');
-    if (currentFilter !== 'Todos') filtered = filtered.filter(d => d.tipo === currentFilter);
-    if (q) filtered = filtered.filter(d => d.nombre.toLowerCase().includes(qLower) || d.tipo.toLowerCase().includes(qLower));
-    renderList(filtered);
-  }
-
-  function renderList(list) {
-    const el = document.getElementById('resultsList');
-    if (!list.length) {
-      el.innerHTML = `<div class="empty-state"><div>🔍</div><p>No se encontraron medicamentos</p><span>Intenta con otro término o categoría</span></div>`;
-      return;
+    @media (max-width: 380px) {
+      .detail-modal {
+        border-radius: 16px !important;
+      }
+      .dm-hero {
+        height: 150px;
+        padding: 16px;
+      }
+      .dm-hero-overlay, .dm-hero-info {
+        padding: 16px;
+      }
+      .dm-body {
+        padding: 16px;
+      }
+      .dm-actions {
+        flex-direction: column;
+        gap: 8px;
+      }
     }
-    el.innerHTML = list.map(d => `
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Header -->
+    <div class="app-header fade-up" style="flex-direction: column; align-items: flex-start;">
+      <h1>Buscar</h1>
+      <div class="search-box" style="margin-top: 12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="¿Qué necesitas hoy?" oninput="filterMeds()" />
+      </div>
+    </div>
+
+    <div class="view-content">
+      <!-- Filter chips -->
+      <div class="filter-chips">
+        <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
+        <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
+        <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
+        <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
+        <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
+        <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
+      </div>
+
+      <!-- Results -->
+      <div class="results-list" id="resultsList"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      Inicio
+    </a>
+    <a href="buscar.html" class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+      </svg>
+      Buscar
+    </a>
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    </button>
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
+      Mapa
+    </a>
+    <a href="perfil.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+      Perfil
+    </a>
+  </nav>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailOverlay">
+    <div class="modal detail-modal" id="detailModal"></div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBw1zNOC5Wag-1tceI2vs9zKjvHkCiLN1g&libraries=places"></script>
+  <script src="app.js"></script>
+  <script>
+    const MEDICINE_EMOJIS = { 'Antibiótico': '💊', 'Antiinflamatorio': '🩹', 'Antidiabético': '💉', 'Analgésico': '🔴', 'Vitamina': '🍋', 'default': '💊' };
+    let allDonations = [];
+    let currentFilter = 'Todos';
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function setFilter(el, filter) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = filter;
+      filterMeds();
+    }
+
+    function filterMeds() {
+      const q = document.getElementById('searchInput').value.trim();
+      const qLower = q.toLowerCase();
+
+      // Si parece un ID de trazabilidad (UUID largo), buscamos coincidencia exacta por ID
+      if (q.length > 30) {
+        const foundById = allDonations.find(d => d.id === q);
+        if (foundById) {
+          renderList([foundById]);
+          return;
+        }
+      }
+
+      let filtered = allDonations.filter(d => d.estado !== 'entregado');
+      if (currentFilter !== 'Todos') filtered = filtered.filter(d => d.tipo === currentFilter);
+      if (q) filtered = filtered.filter(d => d.nombre.toLowerCase().includes(qLower) || d.tipo.toLowerCase().includes(qLower));
+      renderList(filtered);
+    }
+
+    function renderList(list) {
+      const el = document.getElementById('resultsList');
+      if (!list.length) {
+        el.innerHTML = `<div class="empty-state"><div>🔍</div><p>No se encontraron medicamentos</p><span>Intenta con otro término o categoría</span></div>`;
+        return;
+      }
+      el.innerHTML = list.map(d => `
       <div class="med-card-full fade-up">
         <div class="med-img" style="${d.imagen_url ? 'padding:0;overflow:hidden;background:#f1f5f9;' : ''}">
           ${d.imagen_url
-            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" 
+          ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" 
                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
-            : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
-          }
+          : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
+        }
         </div>
         <div class="med-info">
           <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -125,84 +297,232 @@
             ${d.donante || 'Donante anónimo'}
           </div>
           <div style="margin-top:10px">
-            <button class="btn-detail" onclick='showDetail(${JSON.stringify(d).replace(/'/g,"&#39;")})'>Ver Detalle</button>
+            <button class="btn-detail" onclick='showDetail(${JSON.stringify(d).replace(/'/g, "&#39;")})'>Ver Detalle</button>
           </div>
         </div>
       </div>
     `).join('');
-  }
-
-  function showDetail(d) {
-    const overlay = document.getElementById('detailOverlay');
-    const modal = document.getElementById('detailModal');
-    const user = mediConnect.getUser();
-    const statusMap = { disponible:'badge-success', reservado:'badge-warning', aprobado:'badge-blue', entregado:'badge-blue', rechazado:'badge-danger' };
-    modal.innerHTML = `
-      <div class="dm-header">
-        <div class="dm-icon">${MEDICINE_EMOJIS[d.tipo]||MEDICINE_EMOJIS.default}</div>
-        <div>
-          <h2>${d.nombre}</h2>
-          <div class="dm-type">${d.tipo}</div>
-        </div>
-      </div>
-      <div class="detail-row"><span>Cantidad</span><span>${d.cantidad} unidades</span></div>
-      ${d.estado === 'disponible' && d.cantidad > 1 && user.rol === 'receptor' ? `
-        <div class="detail-row">
-          <span>¿Cuántas necesitas?</span>
-          <input type="number" id="reserveQty" value="1" min="1" max="${d.cantidad}" 
-                 style="width:60px; padding:4px; border:1px solid var(--gray-200); border-radius:6px; font-weight:700; text-align:center;">
-        </div>
-      ` : ''}
-      <div class="detail-row"><span>Vencimiento</span><span>${d.fecha_vencimiento}</span></div>
-      <div class="detail-row"><span>Donante</span><span>${d.donante || 'Anónimo'}</span></div>
-      <div class="detail-row"><span>Estado</span><span><span class="badge ${statusMap[d.estado]||'badge-blue'}">${d.estado}</span></span></div>
-      <div class="dm-actions">
-        <button class="btn-secondary" onclick="closeDetail()" style="flex:1">Cerrar</button>
-        ${d.estado === 'disponible' && user.rol === 'receptor' ? `<button class="btn-primary" onclick="reservar('${d.id}')" style="flex:1">Reservar</button>` : ''}
-      </div>
-    `;
-    overlay.classList.add('show');
-  }
-
-  function closeDetail() {
-    document.getElementById('detailOverlay').classList.remove('show');
-  }
-
-  async function reservar(id) {
-    const qtyInput = document.getElementById('reserveQty');
-    const qty = qtyInput ? parseInt(qtyInput.value) : null;
-
-    const ok = await mediConnect.reserveDonation(id, qty);
-    if (qty && ok) {
-      showToast(`¡Has reservado ${qty} unidades!`, 'success');
-      closeDetail();
-      load();
-    } else if (ok) {
-      showToast('¡Medicamento reservado!', 'success');
-      closeDetail();
-      load();
-    } else {
-      showToast('Error al reservar', 'error');
     }
-  }
 
-  document.getElementById('detailOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeDetail();
-  });
+    function showDetail(d) {
+      const overlay = document.getElementById('detailOverlay');
+      const modal = document.getElementById('detailModal');
+      const user = mediConnect.getUser();
+      const statusMap = { disponible: 'badge-success', reservado: 'badge-warning', aprobado: 'badge-blue', entregado: 'badge-blue', rechazado: 'badge-danger' };
+      
+      // Mostrar imagen real si existe (cargada de forma 100% eficiente desde el listado sin llamadas extra)
+      const hasImage = d.imagen_url && d.imagen_url.trim() !== '';
+      const headerIconContent = hasImage 
+        ? `<img src="${d.imagen_url}" alt="${d.nombre}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+           <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
+        : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default);
 
-  async function load() {
-    const user = mediConnect.getUser();
-    if (!user) { location.href = 'index.html'; return; }
+      modal.innerHTML = `
+      ${hasImage 
+        ? `<div class="dm-hero">
+             <img src="${d.imagen_url}" alt="${d.nombre}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+             <div class="dm-hero-overlay">
+               <h2>${d.nombre}</h2>
+               <p>${d.tipo}</p>
+             </div>
+           </div>`
+        : `<div class="dm-hero">
+             <div class="dm-hero-emoji">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</div>
+             <div class="dm-hero-info">
+               <h2>${d.nombre}</h2>
+               <p>${d.tipo}</p>
+             </div>
+           </div>`
+      }
+      
+      <div class="dm-body">
+        <div class="detail-row">
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/>
+            </svg>
+            Cantidad
+          </span>
+          <span>${d.cantidad} unidades</span>
+        </div>
+        ${d.estado === 'disponible' && d.cantidad > 1 && user.rol === 'receptor' ? `
+          <div class="detail-row">
+            <span>¿Cuántas necesitas?</span>
+            <input type="number" id="reserveQty" value="1" min="1" max="${d.cantidad}" 
+                   style="width:60px; padding:4px; border:1px solid var(--gray-200); border-radius:6px; font-weight:700; text-align:center;">
+          </div>
+        ` : ''}
+        <div class="detail-row">
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/>
+            </svg>
+            Vencimiento
+          </span>
+          <span>${d.fecha_vencimiento}</span>
+        </div>
+        <div class="detail-row">
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+            </svg>
+            Donante
+          </span>
+          <span>${d.donante || 'Anónimo'}</span>
+        </div>
+        <div class="detail-row">
+          <span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Estado
+          </span>
+          <span><span class="badge ${statusMap[d.estado] || 'badge-blue'}">${d.estado}</span></span>
+        </div>
+        
+        ${(user.rol === 'receptor' || user.rol === 'validador' || user.rol === 'admin') ? `
+        <!-- Ubicación del Medicamento con Mapa Interactivo (Premium) -->
+        <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; color: var(--gray-600); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+            </svg>
+            <span>Ubicación de entrega</span>
+          </div>
+          <div id="modalMap" style="width: 100%; height: 130px; border-radius: 12px; background: #e2e8f0; border: 1px solid var(--gray-200); position: relative; overflow: hidden; box-shadow: var(--shadow-sm);"></div>
+          <div id="modalLocationText" style="font-size: 12px; color: var(--gray-600); text-align: left; line-height: 1.4; font-weight: 500;">Cargando dirección...</div>
+          
+          <!-- Botón de "Cómo llegar" (Google Maps Directions) -->
+          <a id="btnGetDirections" href="#" target="_blank" class="btn-primary" style="display: none; align-items: center; justify-content: center; gap: 8px; font-size: 13px; padding: 11px 14px; border-radius: 12px; text-decoration: none; font-weight: 700; font-family: var(--font-main); box-shadow: var(--shadow-sm); transition: background 0.2s; margin-top: 4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width: 16px; height: 16px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+            </svg>
+            Cómo llegar (Google Maps)
+          </a>
+        </div>
+        ` : ''}
 
-    // Ocultar botón "+" si no es donante
-    const btnAdd = document.getElementById('addDonationBtn');
-    if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+        <div class="dm-actions">
+          <button class="btn-secondary" onclick="closeDetail()" style="flex:1">Cerrar</button>
+          ${d.estado === 'disponible' && user.rol === 'receptor' ? `<button class="btn-primary" onclick="reservar('${d.id}')" style="flex:1">Reservar</button>` : ''}
+        </div>
+      </div>
+      `;
+      overlay.classList.add('show');
 
-    allDonations = await mediConnect.getDonations({ estado: 'disponible' });
-    filterMeds();
-  }
+      // Inicializar el mini mapa local de la donación solo para receptor, validador y admin
+      const isPrivilegedUser = (user.rol === 'receptor' || user.rol === 'validador' || user.rol === 'admin');
+      if (d.lat && d.lng && isPrivilegedUser) {
+        setTimeout(() => {
+          const mapEl = document.getElementById('modalMap');
+          if (!mapEl) return;
 
-  load();
-</script>
+          const latLng = { lat: parseFloat(d.lat), lng: parseFloat(d.lng) };
+          const miniMap = new google.maps.Map(mapEl, {
+            center: latLng,
+            zoom: 14,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: false,
+            zoomControl: false,
+            keyboardShortcuts: false,
+            styles: [
+              {
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [{ visibility: "off" }]
+              }
+            ]
+          });
+
+          new google.maps.Marker({
+            position: latLng,
+            map: miniMap,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: '#2563EB',
+              fillOpacity: 0.9,
+              strokeColor: '#FFFFFF',
+              strokeWeight: 2,
+            }
+          });
+
+          // Activar botón de "Cómo llegar" con ruta directa
+          const btnDirections = document.getElementById('btnGetDirections');
+          if (btnDirections) {
+            btnDirections.href = `https://www.google.com/maps/dir/?api=1&destination=${parseFloat(d.lat)},${parseFloat(d.lng)}`;
+            btnDirections.style.display = 'flex';
+          }
+
+          // Obtener dirección textual de forma amigable (geocodificación inversa)
+          if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latLng }, (results, status) => {
+              const textEl = document.getElementById('modalLocationText');
+              if (textEl) {
+                if (status === 'OK' && results[0]) {
+                  textEl.textContent = Math.round(parseFloat(d.lat) * 4000) === Math.round(15.783471 * 4000)
+                    ? "Guatemala"
+                    : results[0].formatted_address;
+                } else {
+                  textEl.textContent = `Coordenadas: ${parseFloat(d.lat).toFixed(5)}, ${parseFloat(d.lng).toFixed(5)}`;
+                }
+              }
+            });
+          }
+        }, 120);
+      } else if (isPrivilegedUser) {
+        setTimeout(() => {
+          const mapEl = document.getElementById('modalMap');
+          const textEl = document.getElementById('modalLocationText');
+          if (mapEl) mapEl.style.display = 'none';
+          if (textEl) textEl.textContent = 'Ubicación no especificada por el donante.';
+        }, 50);
+      }
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+    }
+
+    async function reservar(id) {
+      const qtyInput = document.getElementById('reserveQty');
+      const qty = qtyInput ? parseInt(qtyInput.value) : null;
+
+      const ok = await mediConnect.reserveDonation(id, qty);
+      if (qty && ok) {
+        showToast(`¡Has reservado ${qty} unidades!`, 'success');
+        closeDetail();
+        load();
+      } else if (ok) {
+        showToast('¡Medicamento reservado!', 'success');
+        closeDetail();
+        load();
+      } else {
+        showToast('Error al reservar', 'error');
+      }
+    }
+
+    document.getElementById('detailOverlay').addEventListener('click', function (e) {
+      if (e.target === this) closeDetail();
+    });
+
+    async function load() {
+      const user = mediConnect.getUser();
+      if (!user) { location.href = 'index.html'; return; }
+
+      // Ocultar botón "+" si no es donante
+      const btnAdd = document.getElementById('addDonationBtn');
+      if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+
+      allDonations = await mediConnect.getDonations({ estado: 'disponible' });
+      filterMeds();
+    }
+
+    load();
+  </script>
 </body>
+
 </html>

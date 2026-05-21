@@ -1,21 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Panel Admin</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
   <style>
     .admin-header {
       background: var(--white);
       padding: 52px 20px 16px;
       border-bottom: 1px solid var(--gray-100);
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .admin-header h1 { font-family: var(--font-title); font-size: 20px; font-weight: 800; color: var(--gray-800); }
-    
-    .admin-content { padding: 20px; }
-    
+
+    .admin-header h1 {
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--gray-800);
+    }
+
+    .admin-content {
+      padding: 20px;
+    }
+
     .req-card {
       background: var(--white);
       border-radius: 16px;
@@ -23,40 +34,123 @@
       margin-bottom: 16px;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--gray-100);
-      display: flex; flex-direction: column; gap: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .req-user { display: flex; align-items: center; gap: 12px; }
-    .req-avatar { width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
-    .req-info h3 { font-size: 15px; font-weight: 700; color: var(--gray-800); }
-    .req-info p { font-size: 12px; color: var(--gray-400); }
-    
-    .req-actions { display: flex; gap: 8px; }
-    .btn-approve { background: #10B981; color: white; border: none; padding: 10px; border-radius: 10px; flex: 1; font-weight: 700; font-size: 13px; cursor: pointer; transition: opacity 0.2s; }
-    .btn-reject { background: var(--gray-100); color: var(--gray-600); border: none; padding: 10px; border-radius: 10px; flex: 1; font-weight: 700; font-size: 13px; cursor: pointer; }
-    .btn-approve:hover, .btn-reject:hover { opacity: 0.8; }
+
+    .req-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .req-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .req-info h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    .req-info p {
+      font-size: 12px;
+      color: var(--gray-400);
+    }
+
+    .req-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-approve {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      flex: 1;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-reject {
+      background: var(--gray-100);
+      color: var(--gray-600);
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      flex: 1;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-approve:hover,
+    .btn-reject:hover {
+      opacity: 0.8;
+    }
 
     /* Modal Access */
     #accessModal {
-      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 480px; height: 100%;
-      background: var(--gray-800); z-index: 1000;
-      display: flex; align-items: center; justify-content: center; padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 100%;
+      background: var(--gray-800);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+
     .access-box {
-      background: var(--white); width: 100%; max-width: 320px;
-      padding: 30px 24px; border-radius: 24px; text-align: center;
+      background: var(--white);
+      width: 100%;
+      max-width: 320px;
+      padding: 30px 24px;
+      border-radius: 24px;
+      text-align: center;
       box-shadow: var(--shadow-lg);
     }
-    .access-box h2 { font-family: var(--font-title); margin-bottom: 10px; }
-    .access-box p { font-size: 14px; color: var(--gray-400); margin-bottom: 20px; }
+
+    .access-box h2 {
+      font-family: var(--font-title);
+      margin-bottom: 10px;
+    }
+
+    .access-box p {
+      font-size: 14px;
+      color: var(--gray-400);
+      margin-bottom: 20px;
+    }
   </style>
 </head>
+
 <body>
   <div id="accessModal">
     <div class="access-box">
       <h2>Acceso Maestro</h2>
       <p>Introduce la clave de administrador para continuar.</p>
-      <input type="password" id="masterKey" class="input-field" placeholder="Clave Maestra" style="margin-bottom:16px; text-align:center;">
+      <input type="password" id="masterKey" class="input-field" placeholder="Clave Maestra"
+        style="margin-bottom:16px; text-align:center;">
       <button class="btn-primary" onclick="verifyKey()">Entrar al Panel</button>
       <button class="btn-secondary" style="margin-top:10px;" onclick="location.href='dashboard.html'">Cancelar</button>
     </div>
@@ -65,7 +159,10 @@
   <div class="page" id="adminPage" style="display:none;">
     <div class="app-header fade-up">
       <button class="back-btn" onclick="location.href='perfil.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
       </button>
       <h1>Administración</h1>
     </div>
@@ -81,7 +178,7 @@
   <script>
     const MASTER_PASSWORD = 'admin123'; // Clave por defecto (Cámbiala en producción)
 
-    function showToast(msg, type='') {
+    function showToast(msg, type = '') {
       const t = document.getElementById('toast');
       t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2800);
@@ -101,7 +198,7 @@
     async function loadRequests() {
       const list = await mediConnect.getValidatorRequests();
       const container = document.getElementById('requestsList');
-      
+
       if (list.length === 0) {
         container.innerHTML = `<div style="text-align:center; margin-top:60px;">
           <div style="font-size:40px; margin-bottom:10px;">✅</div>
@@ -129,7 +226,7 @@
 
     async function process(reqId, status, userId) {
       if (!confirm(`¿Estás seguro de ${status === 'aprobado' ? 'aprobar' : 'rechazar'} esta solicitud?`)) return;
-      
+
       const ok = await mediConnect.processValidatorRequest(reqId, status, userId);
       if (ok) {
         showToast(`Usuario ${status}`, 'success');
@@ -140,4 +237,5 @@
     }
   </script>
 </body>
+
 </html>
