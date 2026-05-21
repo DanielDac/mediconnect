@@ -26,7 +26,7 @@ const sb = {
       throw error;
     }
   },
-  async insert(table, body) {
+async insert(table, body) {
     try {
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
         method: 'POST', headers: sb.headers, body: JSON.stringify(body)
@@ -34,18 +34,18 @@ const sb = {
       if (!r.ok) {
         const err = await r.json();
         console.error(`Error al insertar en la tabla ${table}:`, err);
-        throw new Error(err.message || 'Error al insertar');
+        return null; // ← Cambiado
       }
       const data = await r.json();
       return Array.isArray(data) ? data[0] : data;
     } catch (error) {
       console.error("Error de conexión (insert):", error);
-      throw error;
+      return null; // ← Cambiado
     }
   },
   async update(table, id, body) {
     try {
-      console.log(`Intentando UPDATE en ${table} para ID: ${id}`, body);
+      //// console.log(`Intentando UPDATE en ${table} para ID: ${id}`, body);
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
         method: 'PATCH',
         headers: sb.headers,
@@ -58,7 +58,7 @@ const sb = {
         return false;
       }
 
-      console.log("UPDATE exitoso (Status 204/200)");
+      //// console.log("UPDATE exitoso (Status 204/200)");
       return true;
     } catch (error) {
       console.error("Error de conexión (update):", error);
@@ -67,7 +67,7 @@ const sb = {
   },
   async delete(table, id) {
     try {
-      console.log(`Intentando DELETE en ${table} para ID: ${id}`);
+      //// console.log(`Intentando DELETE en ${table} para ID: ${id}`);
       const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
         method: 'DELETE',
         headers: this.headers
@@ -83,17 +83,17 @@ const sb = {
   // Devuelve la URL pública si tiene éxito, o null si falla (nunca bloquea el flujo).
   async uploadImage(file) {
     try {
-      console.log("──── INICIO SUBIDA DE IMAGEN ────");
-      console.log("Archivo:", file);
-      console.log("Nombre:", file.name, "| Tipo:", file.type, "| Tamaño:", file.size, "bytes");
+      //// console.log("──── INICIO SUBIDA DE IMAGEN ────");
+      //// console.log("Archivo:", file);
+      //// console.log("Nombre:", file.name, "| Tipo:", file.type, "| Tamaño:", file.size, "bytes");
 
       // Nombre de archivo único para evitar colisiones en el bucket
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const filename = `${Date.now()}_${safeName}`;
       const uploadUrl = `${SUPABASE_URL}/storage/v1/object/medicamentos/${filename}`;
 
-      console.log("URL de subida:", uploadUrl);
-      console.log("apikey usada (primeros 20 chars):", SUPABASE_KEY.substring(0, 20) + '...');
+      //// console.log("URL de subida:", uploadUrl);
+      //// console.log("apikey usada (primeros 20 chars):", SUPABASE_KEY.substring(0, 20) + '...');
 
       const r = await fetch(uploadUrl, {
         method: 'POST',
@@ -106,15 +106,15 @@ const sb = {
         body: file
       });
 
-      console.log("Respuesta status:", r.status, r.statusText);
+      //// console.log("Respuesta status:", r.status, r.statusText);
 
       // Leer el cuerpo como texto primero para no perderlo si no es JSON
       const rawText = await r.text();
-      console.log("Respuesta raw:", rawText);
+      //// console.log("Respuesta raw:", rawText);
 
       let responseBody = {};
       try { responseBody = JSON.parse(rawText); } catch (_) { responseBody = { raw: rawText }; }
-      console.log("Respuesta body (parseado):", responseBody);
+      //// console.log("Respuesta body (parseado):", responseBody);
 
       if (!r.ok) {
         console.error("──── ERROR EN SUBIDA DE IMAGEN ────");
@@ -130,8 +130,8 @@ const sb = {
 
       // URL pública del objeto (el bucket debe estar marcado como público en Supabase)
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/medicamentos/${filename}`;
-      console.log("──── IMAGEN SUBIDA EXITOSAMENTE ────");
-      console.log("URL imagen:", publicUrl);
+      // console.log("──── IMAGEN SUBIDA EXITOSAMENTE ────");
+      // console.log("URL imagen:", publicUrl);
       return publicUrl;
     } catch (error) {
       console.error("Error de conexión al subir imagen:", error);
@@ -141,16 +141,16 @@ const sb = {
 
   // Función de diagnóstico: ejecutar desde la consola del navegador → sb.testStorage()
   async testStorage() {
-    console.log("=== TEST DE ACCESO A SUPABASE STORAGE ===");
-    console.log("URL:", SUPABASE_URL);
-    console.log("Key (primeros 30):", SUPABASE_KEY.substring(0, 30) + '...');
+    // console.log("=== TEST DE ACCESO A SUPABASE STORAGE ===");
+    // console.log("URL:", SUPABASE_URL);
+    // console.log("Key (primeros 30):", SUPABASE_KEY.substring(0, 30) + '...');
 
     // Test 1: listar buckets
     const r1 = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
     });
     const buckets = await r1.json().catch(() => r1.text());
-    console.log("Buckets disponibles (status", r1.status + "):", buckets);
+    // console.log("Buckets disponibles (status", r1.status + "):", buckets);
 
     // Test 2: listar objetos del bucket medicamentos
     const r2 = await fetch(`${SUPABASE_URL}/storage/v1/object/list/medicamentos`, {
@@ -159,9 +159,9 @@ const sb = {
       body: JSON.stringify({ prefix: '', limit: 5 })
     });
     const objs = await r2.json().catch(() => r2.text());
-    console.log("Objetos en bucket 'medicamentos' (status", r2.status + "):", objs);
+    // console.log("Objetos en bucket 'medicamentos' (status", r2.status + "):", objs);
 
-    console.log("=== FIN TEST ===");
+    // console.log("=== FIN TEST ===");
     return { buckets, objetos: objs };
   }
 };
@@ -174,16 +174,16 @@ const mediConnect = {
   },
   saveUser(user) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
-    console.log("Usuario guardado en sesión:", user);
+
   },
   logout() {
     localStorage.removeItem(USER_KEY);
-    console.log("Sesión cerrada.");
+    // console.log("Sesión cerrada.");
   },
 
   async updateUsuario(id, data) {
     try {
-      console.log(`Actualizando usuario ${id}...`, data);
+      // console.log(`Actualizando usuario ${id}...`, data);
       const ok = await sb.update('usuarios', id, data);
       return ok;
     } catch (error) {
@@ -194,14 +194,14 @@ const mediConnect = {
 
   async login(email, password) {
     try {
-      console.log(`Intentando login para el email: ${email}`);
+      // console.log(`Intentando login para el email: ${email}`);
       // Consultar usuario por email y password
       const query = `email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}`;
       const rows = await sb.select('usuarios', query);
 
       if (rows && rows.length > 0) {
         this.saveUser(rows[0]);
-        console.log("Login exitoso. Rol detectado:", rows[0].rol);
+        // console.log("Login exitoso. Rol detectado:", rows[0].rol);
         return true;
       }
       console.warn("Credenciales incorrectas o usuario no encontrado.");
@@ -214,26 +214,25 @@ const mediConnect = {
 
   async register(nombre, email, password, rol) {
     try {
-      console.log(`Registrando nuevo usuario: ${nombre}`);
+      // console.log(`Registrando nuevo usuario: ${nombre}`);
       const userBody = { nombre, email, password, rol };
       const user = await sb.insert('usuarios', userBody);
 
       if (user) {
         this.saveUser(user);
-        console.log("Registro exitoso.");
-        return true;
+        // console.log("Registro exitoso.");
+        return { success: true, user: user, message: "Cuenta creada exitosamente" };
       }
-      return false;
+      return { success: false, message: "El email ya está registrado" };
     } catch (error) {
       console.error("Error al registrarse:", error);
-      alert("Error al crear cuenta. Verifica la conexión.");
-      return false;
+      return { success: false, message: "Error de conexión" };
     }
   },
 
   async getDonations(filters = {}) {
     try {
-      console.log("Obteniendo donaciones...");
+      // console.log("Obteniendo donaciones...");
 
       // Consulta básica para asegurar compatibilidad
       let query = 'select=*';
@@ -248,12 +247,12 @@ const mediConnect = {
       if (filters.receptor_id) query += `&receptor_id=eq.${filters.receptor_id}`;
       if (filters.donante_id) query += `&donante_id=eq.${filters.donante_id}`;
 
-      console.log("Query final a Supabase:", query);
+      // console.log("Query final a Supabase:", query);
       const data = await sb.select('donaciones', query).catch(err => {
         console.warn("Fallo el join, reintentando consulta simple...", err);
         return sb.select('donaciones', 'select=*');
       });
-      console.log("Donaciones crudas desde Supabase (con join):", data);
+      // console.log("Donaciones crudas desde Supabase (con join):", data);
 
       // Mapear para que cada donación tenga el campo "donante" con el nombre del usuario
       const mapped = (data || []).map(d => ({
@@ -261,7 +260,7 @@ const mediConnect = {
         donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
       }));
 
-      console.log("Donaciones mapeadas (con donante):", mapped);
+      // console.log("Donaciones mapeadas (con donante):", mapped);
       return mapped;
     } catch (error) {
       console.error("Error al obtener donaciones:", error);
@@ -272,7 +271,7 @@ const mediConnect = {
 
   async addDonation(donation) {
     try {
-      console.log("Registrando nueva donación...");
+      // console.log("Registrando nueva donación...");
       const currentUser = this.getUser();
 
       if (!currentUser || currentUser.rol !== 'donante') {
@@ -293,11 +292,11 @@ const mediConnect = {
         // imagen_url viene del proceso de subida en donar.html (null si no hay imagen o falló)
         imagen_url: donation.imagen_url || null
       };
-      console.log("imagen_url a guardar:", newDonation.imagen_url);
+      // console.log("imagen_url a guardar:", newDonation.imagen_url);
 
       const result = await sb.insert('donaciones', newDonation);
       if (result) {
-        console.log("Donación registrada correctamente:", result);
+        // console.log("Donación registrada correctamente:", result);
         return result;
       }
       throw new Error("No se devolvió respuesta al insertar");
@@ -313,7 +312,7 @@ const mediConnect = {
       const user = this.getUser();
       if (!user) return false;
 
-      console.log(`Actualizando estado de donación ${id} a ${estado}...`);
+      // console.log(`Actualizando estado de donación ${id} a ${estado}...`);
 
       const updateData = { estado };
       if (newQuantity !== null) updateData.cantidad = newQuantity;
@@ -322,7 +321,7 @@ const mediConnect = {
       if (estado === 'rechazado') {
         const currentMed = await this.getDonationById(id);
         if (currentMed && currentMed.estado === 'reservado') {
-          console.log("Detectado rechazo de reserva. Intentando restaurar stock...");
+          // console.log("Detectado rechazo de reserva. Intentando restaurar stock...");
 
           // Buscar si hay una donación disponible del mismo donante para el mismo producto
           const query = `donante_id=eq.${currentMed.donante_id}&nombre=eq.${encodeURIComponent(currentMed.nombre)}&tipo=eq.${encodeURIComponent(currentMed.tipo)}&estado=eq.disponible&fecha_vencimiento=eq.${currentMed.fecha_vencimiento}`;
@@ -331,7 +330,7 @@ const mediConnect = {
           if (results && results.length > 0) {
             const original = results[0];
             const newQty = parseInt(original.cantidad) + parseInt(currentMed.cantidad);
-            console.log(`Restaurando stock: ${original.cantidad} + ${currentMed.cantidad} = ${newQty}`);
+            // console.log(`Restaurando stock: ${original.cantidad} + ${currentMed.cantidad} = ${newQty}`);
 
             // A. Sumar al original
             await this.updateDonationStatus(original.id, 'disponible', newQty); // Usar una versión que actualice cantidad
@@ -348,7 +347,7 @@ const mediConnect = {
       }
 
       const ok = await sb.update('donaciones', id, updateData);
-      if (ok) console.log("Estado actualizado exitosamente.");
+      if (ok) // console.log("Estado actualizado exitosamente.");
       return ok;
     } catch (error) {
       console.error("Error al actualizar la donación:", error);
@@ -361,7 +360,7 @@ const mediConnect = {
       const user = this.getUser();
       if (!user || user.rol !== 'donante') return false;
 
-      console.log(`Actualizando donación ${id}...`, donation);
+      // console.log(`Actualizando donación ${id}...`, donation);
       const ok = await sb.update('donaciones', id, donation);
       return ok;
     } catch (error) {
@@ -375,7 +374,7 @@ const mediConnect = {
       const user = this.getUser();
       if (!user || user.rol !== 'donante') return false;
 
-      console.log(`Eliminando donación ${id}...`);
+      // console.log(`Eliminando donación ${id}...`);
       const r = await fetch(`${SUPABASE_URL}/rest/v1/donaciones?id=eq.${id}`, {
         method: 'DELETE',
         headers: sb.headers
@@ -413,14 +412,14 @@ const mediConnect = {
 
       if (toReserve === available) {
         // Reserva total: solo actualizar estado
-        console.log(`Reservando total (${toReserve}) de donación ${id} por el usuario ${user.id}...`);
+        // console.log(`Reservando total (${toReserve}) de donación ${id} por el usuario ${user.id}...`);
         return await sb.update('donaciones', id, {
           estado: 'reservado',
           receptor_id: user.id
         });
       } else {
         // Reserva parcial:
-        console.log(`Reservando parcial (${toReserve} de ${available}) de donación ${id}...`);
+        // console.log(`Reservando parcial (${toReserve} de ${available}) de donación ${id}...`);
 
         // A. Actualizar el original con lo que queda
         await sb.update('donaciones', id, { cantidad: available - toReserve });
@@ -451,10 +450,10 @@ const mediConnect = {
   // Obtiene una donación por su ID con JOIN a usuarios para obtener el nombre del donante
   async getDonationById(id) {
     try {
-      console.log(`Buscando donación con id: ${id}`);
+      // console.log(`Buscando donación con id: ${id}`);
       const query = `select=*,usuarios!donante_id(nombre)&id=eq.${id}`;
       const data = await sb.select('donaciones', query);
-      console.log("Donación cruda por ID (con join):", data);
+      // console.log("Donación cruda por ID (con join):", data);
 
       if (data && data.length > 0) {
         const d = data[0];
@@ -462,7 +461,7 @@ const mediConnect = {
           ...d,
           donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
         };
-        console.log("Donación mapeada por ID:", mapped);
+        // console.log("Donación mapeada por ID:", mapped);
         return mapped;
       }
 
@@ -479,7 +478,7 @@ const mediConnect = {
       const user = this.getUser();
       if (!user) return { success: false, message: 'Usuario no logueado' };
       const data = { usuario_id: user.id, nombre: user.nombre, email: user.email, estado: 'pendiente' };
-      console.log("Enviando solicitud de validador...", data);
+      // console.log("Enviando solicitud de validador...", data);
 
       const r = await fetch(`${SUPABASE_URL}/rest/v1/solicitudes_validador`, {
         method: 'POST',
@@ -517,7 +516,7 @@ const mediConnect = {
 
   async processValidatorRequest(requestId, status, userId) {
     try {
-      console.log(`Procesando solicitud ${requestId} con estado ${status} para usuario ${userId}`);
+      // console.log(`Procesando solicitud ${requestId} con estado ${status} para usuario ${userId}`);
 
       // 1. Actualizar la solicitud
       const okReq = await sb.update('solicitudes_validador', requestId, { estado: status });
@@ -535,3 +534,44 @@ const mediConnect = {
     }
   }
 };
+
+// ===== CIERRE DE SESIÓN POR INACTIVIDAD =====
+const INACTIVITY_TIME = 15 * 60 * 1000;
+
+let inactivityTimer;
+
+function startInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  localStorage.setItem('session_expiry', Date.now() + INACTIVITY_TIME);
+  inactivityTimer = setTimeout(() => {
+    mediConnect.logout();
+    localStorage.clear();
+    alert('Tu sesión ha sido cerrada por inactividad.');
+    window.location.href = 'index.html';
+  }, INACTIVITY_TIME);
+}
+
+['click', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach((event) => {
+  document.addEventListener(event, () => {
+    if (mediConnect.getUser()) startInactivityTimer();
+  });
+});
+
+const originalSaveUser = mediConnect.saveUser;
+mediConnect.saveUser = function(user) {
+  originalSaveUser.call(this, user);
+  startInactivityTimer();
+};
+
+(function checkSessionExpiry() {
+  const expiry = localStorage.getItem('session_expiry');
+  if (expiry && Date.now() > parseInt(expiry)) {
+    mediConnect.logout();
+    localStorage.clear();
+    if (!window.location.pathname.includes('index.html')) {
+      window.location.href = 'index.html';
+    }
+  } else if (mediConnect.getUser()) {
+    startInactivityTimer();
+  }
+})();

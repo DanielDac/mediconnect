@@ -98,7 +98,6 @@
       </div>
 
       <div class="profile-badge">
-        ⭐ Donante Estrella
       </div>
     </div>
 
@@ -285,8 +284,9 @@
           </div>
 
           <span class="account-item-label">
-            Notificaciones
-          </span>
+  Notificaciones
+  <span id="notifBadge" style="display:none;background:#EF4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:11px;font-weight:700;text-align:center;line-height:20px;margin-left:8px;">0</span>
+</span>
 
           <span class="account-item-arrow">
             ›
@@ -403,7 +403,7 @@
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -415,12 +415,13 @@
       </svg>
       Mapa
     </a>
-    <a href="perfil.html" class="nav-item active">
+    <a href="perfil.html" class="nav-item active" style="position:relative;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
+      <span id="navNotifDot" style="position:absolute;top:2px;right:6px;width:8px;height:8px;background:#EF4444;border-radius:50%;display:none;"></span>
     </a>
   </nav>
 
@@ -593,6 +594,7 @@
 
         document.getElementById('adminPanelBtn')
           .style.display = 'flex';
+          checkNotificaciones();
       }
     }
 
@@ -835,6 +837,23 @@
         }, 700);
       }
     }
+
+    async function checkNotificaciones() {
+  try {
+    const user = mediConnect.getUser();
+    if (!user) return;
+    const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false`;
+    const pendientes = await sb.select('notificaciones', query);
+    const hay = pendientes && pendientes.length > 0;
+    const count = pendientes ? pendientes.length : 0;
+    
+    const badge = document.getElementById('notifBadge');
+    if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline-block' : 'none'; }
+    
+    const navDot = document.getElementById('navNotifDot');
+    if (navDot) navDot.style.display = hay ? 'block' : 'none';
+  } catch(e) {}
+}
 
     // ===== INIT =====
 
