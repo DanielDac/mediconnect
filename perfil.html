@@ -136,7 +136,22 @@
                 d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
           </div>
-          <span class="account-item-label">Notificaciones</span>
+          <span class="account-item-label">
+            Notificaciones
+            <span id="notifBadge" style="
+                  display: none;
+                  background: #ef4444;
+                  color: white;
+                  border-radius: 50%;
+                  width: 20px;
+                  height: 20px;
+                  font-size: 11px;
+                  font-weight: 700;
+                  text-align: center;
+                  line-height: 20px;
+                  margin-left: 8px;
+                ">0</span>
+          </span>
           <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
               stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -221,17 +236,27 @@
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href = 'donar.html'">
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href = 'donar.html'" style="display: none">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
-    <a href="perfil.html" class="nav-item active">
+    <a href="perfil.html" class="nav-item" style="position: relative">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
+      <span id="navNotifDot" style="
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: none;
+          "></span>
     </a>
   </nav>
 
@@ -280,6 +305,8 @@
       window.location.replace("index.html");
     }
     async function loadProfile() {
+      document.getElementById("profileName").textContent = "Cargando...";
+      document.querySelector(".profile-badge").innerHTML = "...";
       // Verificar sesión de Google primero
       const {
         data: { session },
@@ -363,10 +390,41 @@
       }
 
       const btnAdd = document.getElementById("addDonationBtn");
-      if (btnAdd && user.rol !== "donante") btnAdd.style.display = "none";
+      if (btnAdd) {
+        btnAdd.style.display = user.rol === "donante" ? "flex" : "none";
+      }
 
       configurarBotones(user);
+      document.querySelector(".page").classList.add("loaded");
+      checkNotificaciones();
     }
+
+    async function checkNotificaciones() {
+      try {
+        const user = mediConnect.getUser();
+        if (!user) return;
+
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false`;
+        const pendientes = await sb.select("notificaciones", query);
+        const hayPendientes = pendientes && pendientes.length > 0;
+        const count = pendientes ? pendientes.length : 0;
+
+        // Badge en Notificaciones del perfil
+        const badge = document.getElementById("notifBadge");
+        if (badge) {
+          badge.textContent = count;
+          badge.style.display = count > 0 ? "inline-block" : "none";
+        }
+
+        // Punto en nav de Perfil
+        const navDot = document.getElementById("navNotifDot");
+        if (navDot) {
+          navDot.style.display = hayPendientes ? "block" : "none";
+        }
+      } catch (e) { }
+    }
+    // Llamar en loadProfile()
+
 
     // ===== CONFIGURAR BOTONES SEGÚN ROL =====
     function configurarBotones(user) {
@@ -541,33 +599,38 @@
       }
     }
 
-   async function cancelarSolicitud(tipo, solicitudId) {
-  if (!confirm('¿Estás seguro de cancelar tu solicitud?')) return;
+    async function cancelarSolicitud(tipo, solicitudId) {
+      if (!confirm("¿Estás seguro de cancelar tu solicitud?")) return;
 
-  try {
-    const tabla = tipo === 'donante' ? 'solicitudes_donante' : 'solicitudes_validador';
-    
-    // Usar DELETE directamente
-    const url = `https://htuagycwflhqxghhotjf.supabase.co/rest/v1/${tabla}?id=eq.${solicitudId}`;
-    const r = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw'
+      try {
+        const tabla =
+          tipo === "donante"
+            ? "solicitudes_donante"
+            : "solicitudes_validador";
+
+        // Usar DELETE directamente
+        const url = `https://htuagycwflhqxghhotjf.supabase.co/rest/v1/${tabla}?id=eq.${solicitudId}`;
+        const r = await fetch(url, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            apikey:
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
+          },
+        });
+
+        if (r.ok) {
+          showToast("Solicitud cancelada", "success");
+          setTimeout(() => location.reload(), 500);
+        } else {
+          showToast("Error al cancelar", "error");
+        }
+      } catch (error) {
+        showToast("Error de conexión", "error");
       }
-    });
-
-    if (r.ok) {
-      showToast('Solicitud cancelada', 'success');
-      setTimeout(() => location.reload(), 500);
-    } else {
-      showToast('Error al cancelar', 'error');
     }
-  } catch (error) {
-    showToast('Error de conexión', 'error');
-  }
-}
   </script>
 </body>
 

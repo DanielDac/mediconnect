@@ -21,40 +21,140 @@
       <h1>Notificaciones</h1>
     </div>
 
-    <div class="view-content" style="padding-top: 20px; display: flex; flex-direction: column; gap: 12px;">
-      <div class="fade-up delay-1"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">¡Bienvenido a MediConnect!</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">Hoy</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu cuenta ha sido creada exitosamente.
-          Explora las medicinas disponibles.</p>
-      </div>
-
-      <div class="fade-up delay-2"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Seguridad al día</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">Ayer</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Recuerda verificar siempre la fecha de
-          vencimiento antes de consumir.</p>
-      </div>
-
-      <div class="fade-up delay-3"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); opacity: 0.7;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Perfil verificado</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">2 may</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu correo ha sido validado correctamente.
-        </p>
-      </div>
+    <div class="view-content" id="notifContainer"
+      style="padding-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+      <!-- Se llena con JavaScript -->
     </div>
+
+  </div>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    const user = mediConnect.getUser();
+    if (!user) { location.href = 'index.html'; }
+
+    async function cargarNotificaciones() {
+      const container = document.querySelector('.view-content');
+
+      try {
+        // Cargar notificaciones: personales (usuario_id) + generales (usuario_id NULL)
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&order=created_at.desc&limit=20`;
+        let notificaciones = [];
+
+        try {
+          notificaciones = await sb.select('notificaciones', query);
+        } catch (e) {
+          // Si la tabla no existe, mostrar notificaciones de ejemplo
+          console.log('Tabla notificaciones no encontrada, mostrando demo');
+          mostrarDemo();
+          return;
+        }
+
+        if (!notificaciones || notificaciones.length === 0) {
+          container.innerHTML = `
+          <div style="text-align:center;padding:40px 20px;color:var(--gray-400);">
+            <p style="font-size:40px;margin-bottom:12px;">🔔</p>
+            <p style="font-weight:600;">No tienes notificaciones</p>
+            <p style="font-size:13px;">Las notificaciones del admin aparecerán aquí.</p>
+          </div>`;
+          return;
+        }
+
+        // Renderizar notificaciones
+        container.innerHTML = notificaciones.map((n, i) => `
+  <div class="fade-up delay-${i + 1}" 
+       onclick="marcarLeida('${n.id}')"
+       style="padding:16px;background:var(--white);border-radius:var(--radius);
+              box-shadow:var(--shadow-sm);${!n.leida ? 'border-left:4px solid var(--primary);' : 'opacity:0.7;'};
+              position:relative;cursor:pointer;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <h3 style="font-size:14px;font-weight:700;color:var(--gray-800);">
+        ${!n.leida ? '🔵 ' : ''}${escapeHtml(n.titulo)}
+      </h3>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:10px;color:var(--gray-400);">${formatearFecha(n.created_at)}</span>
+        <button onclick="event.stopPropagation(); eliminarNotificacion('${n.id}')" style="
+          background:none;border:none;color:#EF4444;cursor:pointer;font-size:14px;padding:2px 4px;
+        " title="Eliminar">🗑️</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--gray-500);margin-top:4px;">${escapeHtml(n.mensaje)}</p>
+  </div>
+`).join('');
+
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarDemo();
+      }
+    }
+
+    function mostrarDemo() {
+      // Notificaciones de ejemplo mientras se crea la tabla
+      const container = document.querySelector('.view-content');
+      container.innerHTML = `
+      <div class="fade-up delay-1"
+        style="padding:16px;background:var(--white);border-radius:var(--radius);border-left:4px solid var(--primary);box-shadow:var(--shadow-sm);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <h3 style="font-size:14px;font-weight:700;color:var(--gray-800);">🔵 ¡Bienvenido a MediConnect!</h3>
+          <span style="font-size:10px;color:var(--gray-400);">Hoy</span>
+        </div>
+        <p style="font-size:12px;color:var(--gray-500);margin-top:4px;">Tu cuenta ha sido creada exitosamente.</p>
+      </div>
+      <div class="fade-up delay-2"
+        style="padding:16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);opacity:0.7;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <h3 style="font-size:14px;font-weight:700;color:var(--gray-800);">Seguridad al día</h3>
+          <span style="font-size:10px;color:var(--gray-400);">Ayer</span>
+        </div>
+        <p style="font-size:12px;color:var(--gray-500);margin-top:4px;">Recuerda verificar la fecha de vencimiento.</p>
+      </div>
+    `;
+    }
+
+    async function marcarLeida(id) {
+      try {
+        await sb.update('notificaciones', id, { leida: true });
+        cargarNotificaciones(); // Recargar
+      } catch (e) {
+        console.log('No se pudo marcar como leída');
+      }
+    }
+
+    function formatearFecha(fecha) {
+      if (!fecha) return '';
+      const d = new Date(fecha);
+      const ahora = new Date();
+      const diff = Math.floor((ahora - d) / (1000 * 60 * 60 * 24));
+
+      if (diff === 0) return 'Hoy';
+      if (diff === 1) return 'Ayer';
+      return d.toLocaleDateString('es-GT', { day: '2-digit', month: 'short' });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[char]));
+    }
+
+    async function eliminarNotificacion(id) {
+      if (!confirm('¿Eliminar esta notificación?')) return;
+
+      try {
+        // Usar sb.delete de app.js (ya tiene los headers correctos)
+        const ok = await sb.delete('notificaciones', id);
+
+        if (ok) {
+          cargarNotificaciones(); // Recargar
+        }
+      } catch (e) {
+        console.log('Error al eliminar:', e);
+      }
+    }
+
+    cargarNotificaciones();
+  </script>
 </body>
 
 </html>
