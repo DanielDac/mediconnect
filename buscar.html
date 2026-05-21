@@ -1,235 +1,354 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Buscar</title>
-  <link rel="stylesheet" href="style.css"/>
-
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-<div class="page">
-  <!-- Header -->
-  <div class="app-header fade-up" style="flex-direction: column; align-items: flex-start;">
-    <h1>Buscar</h1>
-    <div class="search-box" style="margin-top: 12px;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
-      <input type="text" id="searchInput" placeholder="¿Qué necesitas hoy?" oninput="filterMeds()"/>
+  <div class="page">
+    <!-- Header -->
+    <div class="app-header fade-up" style="flex-direction: column; align-items: flex-start;">
+      <h1>Buscar</h1>
+      <div class="search-box" style="margin-top: 12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="¿Qué necesitas hoy?" oninput="filterMeds()" />
+      </div>
+    </div>
+
+    <div class="view-content">
+      <!-- Filter chips -->
+      <div class="filter-chips">
+        <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
+        <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
+        <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
+        <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
+        <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
+        <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
+      </div>
+
+      <!-- Results -->
+      <div class="results-list" id="resultsList"></div>
     </div>
   </div>
 
-  <div class="view-content">
-    <!-- Filter chips -->
-    <div class="filter-chips">
-      <button class="chip active" onclick="setFilter(this,'Todos')">Todos</button>
-      <button class="chip" onclick="setFilter(this,'Antibiótico')">Antibiótico</button>
-      <button class="chip" onclick="setFilter(this,'Antiinflamatorio')">Antiinflamatorio</button>
-      <button class="chip" onclick="setFilter(this,'Antidiabético')">Antidiabético</button>
-      <button class="chip" onclick="setFilter(this,'Analgésico')">Analgésico</button>
-      <button class="chip" onclick="setFilter(this,'Vitamina')">Vitamina</button>
-    </div>
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      Inicio
+    </a>
 
-    <!-- Results -->
-    <div class="results-list" id="resultsList"></div>
+    <a href="buscar.html" class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
+      </svg>
+      Buscar
+    </a>
+
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+    </button>
+
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
+      Mapa
+    </a>
+
+    <a href="perfil.html" class="nav-item" style="position: relative;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+      Perfil
+      <span id="navNotifDot" style="
+        position: absolute;
+        top: 2px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        background: #EF4444;
+        border-radius: 50%;
+        display: none;
+      "></span>
+    </a>
+  </nav>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detailOverlay">
+    <div class="modal detail-modal" id="detailModal"></div>
   </div>
-</div>
 
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <a href="dashboard.html" class="nav-item">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-    Inicio
-  </a>
-  <a href="buscar.html" class="nav-item active">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z"/></svg>
-    Buscar
-  </a>
-  <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-  </button>
-  <a href="perfil.html" class="nav-item" style="position: relative;">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-    Perfil
-    <span id="navNotifDot" style="
-    position: absolute;
-    top: 2px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
-    background: #EF4444;
-    border-radius: 50%;
-    display: none;
-  "></span>
-  </a>
-</nav>
+  <div id="toast" class="toast"></div>
 
-<!-- Detail Modal -->
-<div class="modal-overlay" id="detailOverlay">
-  <div class="modal detail-modal" id="detailModal"></div>
-</div>
+  <script src="app.js"></script>
 
-<div id="toast" class="toast"></div>
+  <script>
+    const MEDICINE_EMOJIS = {
+      'Antibiótico': '💊',
+      'Antiinflamatorio': '🩹',
+      'Antidiabético': '💉',
+      'Analgésico': '🔴',
+      'Vitamina': '🍋',
+      'default': '💊'
+    };
 
-<script src="app.js"></script>
-<script>
-  async function checkNotificaciones() {
-  try {
-    const user = mediConnect.getUser();
-    if (!user) return;
+    let allDonations = [];
+    let currentFilter = 'Todos';
 
-    const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false`;
-    const pendientes = await sb.select('notificaciones', query);
-    const hayPendientes = pendientes && pendientes.length > 0;
+    async function checkNotificaciones() {
+      try {
+        const user = mediConnect.getUser();
+        if (!user) return;
 
-    // Punto en nav de Perfil
-    const navDot = document.getElementById('navNotifDot');
-    if (navDot) {
-      navDot.style.display = hayPendientes ? 'block' : 'none';
-    }
-  } catch(e) {}
-}
-  const MEDICINE_EMOJIS = {'Antibiótico':'💊','Antiinflamatorio':'🩹','Antidiabético':'💉','Analgésico':'🔴','Vitamina':'🍋','default':'💊'};
-  let allDonations = [];
-  let currentFilter = 'Todos';
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false`;
+        const pendientes = await sb.select('notificaciones', query);
+        const hayPendientes = pendientes && pendientes.length > 0;
 
-  function showToast(msg, type='') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + type; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-  }
-
-  function setFilter(el, filter) {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    currentFilter = filter;
-    filterMeds();
-  }
-
-  function filterMeds() {
-    const q = document.getElementById('searchInput').value.trim();
-    const qLower = q.toLowerCase();
-    
-    // Si parece un ID de trazabilidad (UUID largo), buscamos coincidencia exacta por ID
-    if (q.length > 30) {
-      const foundById = allDonations.find(d => d.id === q);
-      if (foundById) {
-        renderList([foundById]);
-        return;
+        const navDot = document.getElementById('navNotifDot');
+        if (navDot) {
+          navDot.style.display = hayPendientes ? 'block' : 'none';
+        }
+      } catch (e) {
+        console.warn('No se pudieron verificar notificaciones:', e);
       }
     }
 
-    let filtered = allDonations.filter(d => d.estado !== 'entregado');
-    if (currentFilter !== 'Todos') filtered = filtered.filter(d => d.tipo === currentFilter);
-    if (q) filtered = filtered.filter(d => d.nombre.toLowerCase().includes(qLower) || d.tipo.toLowerCase().includes(qLower));
-    renderList(filtered);
-  }
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      t.classList.add('show');
 
-  function renderList(list) {
-    const el = document.getElementById('resultsList');
-    if (!list.length) {
-      el.innerHTML = `<div class="empty-state"><div>🔍</div><p>No se encontraron medicamentos</p><span>Intenta con otro término o categoría</span></div>`;
-      return;
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 2800);
     }
-    el.innerHTML = list.map(d => `
-      <div class="med-card-full fade-up">
-        <div class="med-img" style="${d.imagen_url ? 'padding:0;overflow:hidden;background:#f1f5f9;' : ''}">
-          ${d.imagen_url
-            ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" 
-                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-               <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
-            : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
+
+    function setFilter(el, filter) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = filter;
+      filterMeds();
+    }
+
+    function filterMeds() {
+      const q = document.getElementById('searchInput').value.trim();
+      const qLower = q.toLowerCase();
+
+      if (q.length > 30) {
+        const foundById = allDonations.find(d => d.id === q);
+        if (foundById) {
+          renderList([foundById]);
+          return;
+        }
+      }
+
+      let filtered = allDonations.filter(d => d.estado !== 'entregado');
+
+      if (currentFilter !== 'Todos') {
+        filtered = filtered.filter(d => d.tipo === currentFilter);
+      }
+
+      if (q) {
+        filtered = filtered.filter(d =>
+          d.nombre.toLowerCase().includes(qLower) ||
+          d.tipo.toLowerCase().includes(qLower)
+        );
+      }
+
+      renderList(filtered);
+    }
+
+    function renderList(list) {
+      const el = document.getElementById('resultsList');
+
+      if (!list.length) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <div>🔍</div>
+            <p>No se encontraron medicamentos</p>
+            <span>Intenta con otro término o categoría</span>
+          </div>
+        `;
+        return;
+      }
+
+      el.innerHTML = list.map(d => `
+        <div class="med-card-full fade-up">
+          <div class="med-img" style="${d.imagen_url ? 'padding:0;overflow:hidden;background:#f1f5f9;' : ''}">
+            ${d.imagen_url
+              ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                 <span style="display:none;">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</span>`
+              : (MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default)
+            }
+          </div>
+
+          <div class="med-info">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <h3>${d.nombre}</h3>
+              <span class="med-qty">${d.cantidad} un.</span>
+            </div>
+
+            <p>${d.tipo}</p>
+
+            <div class="med-location">
+              <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none"
+                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              ${d.donante || 'Donante anónimo'}
+            </div>
+
+            <div style="margin-top:10px">
+              <button class="btn-detail" onclick='showDetail(${JSON.stringify(d).replace(/'/g, "&#39;")})'>
+                Ver Detalle
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showDetail(d) {
+      const overlay = document.getElementById('detailOverlay');
+      const modal = document.getElementById('detailModal');
+      const user = mediConnect.getUser();
+
+      const statusMap = {
+        disponible: 'badge-success',
+        reservado: 'badge-warning',
+        aprobado: 'badge-blue',
+        entregado: 'badge-blue',
+        rechazado: 'badge-danger'
+      };
+
+      modal.innerHTML = `
+        <div class="dm-header">
+          <div class="dm-icon">${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}</div>
+          <div>
+            <h2>${d.nombre}</h2>
+            <div class="dm-type">${d.tipo}</div>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span>Cantidad</span>
+          <span>${d.cantidad} unidades</span>
+        </div>
+
+        ${d.estado === 'disponible' && d.cantidad > 1 && user.rol === 'receptor' ? `
+          <div class="detail-row">
+            <span>¿Cuántas necesitas?</span>
+            <input type="number" id="reserveQty" value="1" min="1" max="${d.cantidad}"
+              style="width:60px; padding:4px; border:1px solid var(--gray-200); border-radius:6px; font-weight:700; text-align:center;">
+          </div>
+        ` : ''}
+
+        <div class="detail-row">
+          <span>Vencimiento</span>
+          <span>${d.fecha_vencimiento}</span>
+        </div>
+
+        <div class="detail-row">
+          <span>Donante</span>
+          <span>${d.donante || 'Anónimo'}</span>
+        </div>
+
+        <div class="detail-row">
+          <span>Estado</span>
+          <span>
+            <span class="badge ${statusMap[d.estado] || 'badge-blue'}">${d.estado}</span>
+          </span>
+        </div>
+
+        <div class="dm-actions">
+          <button class="btn-secondary" onclick="closeDetail()" style="flex:1">Cerrar</button>
+          ${d.estado === 'disponible' && user.rol === 'receptor'
+            ? `<button class="btn-primary" onclick="reservar('${d.id}')" style="flex:1">Reservar</button>`
+            : ''
           }
         </div>
-        <div class="med-info">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <h3>${d.nombre}</h3>
-            <span class="med-qty">${d.cantidad} un.</span>
-          </div>
-          <p>${d.tipo}</p>
-          <div class="med-location">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-            ${d.donante || 'Donante anónimo'}
-          </div>
-          <div style="margin-top:10px">
-            <button class="btn-detail" onclick='showDetail(${JSON.stringify(d).replace(/'/g,"&#39;")})'>Ver Detalle</button>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
+      `;
 
-  function showDetail(d) {
-    const overlay = document.getElementById('detailOverlay');
-    const modal = document.getElementById('detailModal');
-    const user = mediConnect.getUser();
-    const statusMap = { disponible:'badge-success', reservado:'badge-warning', aprobado:'badge-blue', entregado:'badge-blue', rechazado:'badge-danger' };
-    modal.innerHTML = `
-      <div class="dm-header">
-        <div class="dm-icon">${MEDICINE_EMOJIS[d.tipo]||MEDICINE_EMOJIS.default}</div>
-        <div>
-          <h2>${d.nombre}</h2>
-          <div class="dm-type">${d.tipo}</div>
-        </div>
-      </div>
-      <div class="detail-row"><span>Cantidad</span><span>${d.cantidad} unidades</span></div>
-      ${d.estado === 'disponible' && d.cantidad > 1 && user.rol === 'receptor' ? `
-        <div class="detail-row">
-          <span>¿Cuántas necesitas?</span>
-          <input type="number" id="reserveQty" value="1" min="1" max="${d.cantidad}" 
-                 style="width:60px; padding:4px; border:1px solid var(--gray-200); border-radius:6px; font-weight:700; text-align:center;">
-        </div>
-      ` : ''}
-      <div class="detail-row"><span>Vencimiento</span><span>${d.fecha_vencimiento}</span></div>
-      <div class="detail-row"><span>Donante</span><span>${d.donante || 'Anónimo'}</span></div>
-      <div class="detail-row"><span>Estado</span><span><span class="badge ${statusMap[d.estado]||'badge-blue'}">${d.estado}</span></span></div>
-      <div class="dm-actions">
-        <button class="btn-secondary" onclick="closeDetail()" style="flex:1">Cerrar</button>
-        ${d.estado === 'disponible' && user.rol === 'receptor' ? `<button class="btn-primary" onclick="reservar('${d.id}')" style="flex:1">Reservar</button>` : ''}
-      </div>
-    `;
-    overlay.classList.add('show');
-  }
-
-  function closeDetail() {
-    document.getElementById('detailOverlay').classList.remove('show');
-  }
-
-  async function reservar(id) {
-    const qtyInput = document.getElementById('reserveQty');
-    const qty = qtyInput ? parseInt(qtyInput.value) : null;
-
-    const ok = await mediConnect.reserveDonation(id, qty);
-    if (qty && ok) {
-      showToast(`¡Has reservado ${qty} unidades!`, 'success');
-      closeDetail();
-      load();
-    } else if (ok) {
-      showToast('¡Medicamento reservado!', 'success');
-      closeDetail();
-      load();
-    } else {
-      showToast('Error al reservar', 'error');
+      overlay.classList.add('show');
     }
-  }
 
-  document.getElementById('detailOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeDetail();
-  });
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('show');
+    }
 
-  async function load() {
-    const user = mediConnect.getUser();
-    if (!user) { location.href = 'index.html'; return; }
+    async function reservar(id) {
+      const qtyInput = document.getElementById('reserveQty');
+      const qty = qtyInput ? parseInt(qtyInput.value) : null;
 
-    // Ocultar botón "+" si no es donante
-    const btnAdd = document.getElementById('addDonationBtn');
-    if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+      const ok = await mediConnect.reserveDonation(id, qty);
 
-    allDonations = await mediConnect.getDonations({ estado: 'disponible' });
-    filterMeds();
-    checkNotificaciones();
-  }
+      if (qty && ok) {
+        showToast(`¡Has reservado ${qty} unidades!`, 'success');
+        closeDetail();
+        load();
+      } else if (ok) {
+        showToast('¡Medicamento reservado!', 'success');
+        closeDetail();
+        load();
+      } else {
+        showToast('Error al reservar', 'error');
+      }
+    }
 
-  load();
-</script>
+    document.getElementById('detailOverlay').addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeDetail();
+      }
+    });
+
+    async function load() {
+      const user = mediConnect.getUser();
+
+      if (!user) {
+        location.href = 'index.html';
+        return;
+      }
+
+      const btnAdd = document.getElementById('addDonationBtn');
+      if (btnAdd && user.rol !== 'donante') {
+        btnAdd.style.display = 'none';
+      }
+
+      allDonations = await mediConnect.getDonations({ estado: 'disponible' });
+
+      filterMeds();
+      checkNotificaciones();
+    }
+
+    load();
+  </script>
 </body>
+
 </html>

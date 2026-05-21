@@ -10,121 +10,120 @@
 
 <body>
   <div class="page">
-    <!-- Header -->
     <div class="app-header fade-up">
-      <div class="header-greeting" style="flex: 1">
+      <div class="header-greeting" style="flex:1">
         <h2 id="greeting">Hola, ...</h2>
         <div id="roleBadgeContainer"></div>
       </div>
+
       <div class="avatar" id="avatarEl" onclick="location.href='perfil.html'" style="position: relative;">
-  <span id="avatarLetter">?</span>
-  <span id="notifDot" style="
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 12px;
-    height: 12px;
-    background: #EF4444;
-    border: 2px solid white;
-    border-radius: 50%;
-    display: none;
-  "></span>
-</div>
+        <span id="avatarLetter">?</span>
+        <span id="notifDot" style="
+          position: absolute;
+          top: -2px;
+          right: -2px;
+          width: 12px;
+          height: 12px;
+          background: #EF4444;
+          border: 2px solid white;
+          border-radius: 50%;
+          display: none;
+        "></span>
+      </div>
     </div>
 
     <div class="dash-content">
-      <!-- Stats -->
-      <div class="stats-container fade-up delay-1" id="statsContainer">
-        <!-- Dinámico -->
-      </div>
+      <div class="stats-container fade-up delay-1" id="statsContainer"></div>
 
-      <!-- Actividad Reciente -->
       <div class="fade-up delay-2">
         <div class="section-header">
           <h2 id="listTitle">Actividad Reciente</h2>
           <a href="buscar.html">Ver todo</a>
         </div>
-        <div class="activity-list" id="activityList" style="display: flex; flex-direction: column; gap: 12px">
-          <!-- Skeleton -->
+
+        <div class="activity-list" id="activityList" style="display:flex;flex-direction:column;gap:12px">
           <div class="med-card">
             <div class="med-img skeleton"></div>
             <div class="med-info">
-              <div class="skeleton" style="height: 14px; width: 70%; margin-bottom: 6px"></div>
-              <div class="skeleton" style="height: 11px; width: 45%"></div>
+              <div class="skeleton" style="height:14px;width:70%;margin-bottom:6px"></div>
+              <div class="skeleton" style="height:11px;width:45%"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Historial -->
-      <div class="section fade-up delay-3" id="historialSection" style="display: none">
+      <div class="section fade-up delay-3" id="historialSection" style="display:none">
         <div class="section-header">
           <h2 class="section-title">Historial Reciente</h2>
         </div>
-        <div id="historialList" style="display: flex; flex-direction: column; gap: 12px">
-          <!-- Se llena dinámicamente -->
-        </div>
+        <div id="historialList" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
 
-      <!-- Invite Banner -->
-      <div class="invite-banner fade-up delay-3" style="
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-align: center;
-            border: 1px solid var(--gray-100);
-            box-shadow: var(--shadow-sm);
-          ">
-        <h3 style="font-size: 16px; margin-bottom: 4px">
-          ¡Invita a un amigo!
-        </h3>
-        <p style="font-size: 13px; color: var(--gray-400); margin-bottom: 16px">
+      <div class="invite-banner fade-up delay-3"
+        style="background:var(--white);border-radius:var(--radius);padding:20px;text-align:center;border:1px solid var(--gray-100);box-shadow:var(--shadow-sm)">
+        <h3 style="font-size:16px;margin-bottom:4px">¡Invita a un amigo!</h3>
+        <p style="font-size:13px;color:var(--gray-400);margin-bottom:16px">
           Ayuda a crecer nuestra red de donantes.
         </p>
-        <button class="btn-primary" onclick="shareApp()" style="padding: 10px 20px; font-size: 14px">
+        <button class="btn-primary" onclick="shareApp()" style="padding:10px 20px;font-size:14px">
           Compartir App
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <a href="dashboard.html" class="nav-item active">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
       </svg>
       Inicio
     </a>
+
     <a href="buscar.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display: none;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
+
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
+      Mapa
+    </a>
+
     <a href="perfil.html" class="nav-item" style="position: relative;">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
       <span id="navNotifDot" style="
-    position: absolute;
-    top: 2px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
-    background: #EF4444;
-    border-radius: 50%;
-    display: none;
-  "></span>
+        position: absolute;
+        top: 2px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        background: #EF4444;
+        border-radius: 50%;
+        display: none;
+      "></span>
     </a>
   </nav>
 
@@ -132,41 +131,45 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
+
   <script>
-    // Inicializar Supabase Client (SUPABASE_URL y SUPABASE_KEY ya existen en app.js)
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    //console.log("✅ Dashboard: supabaseClient listo");
 
     const MEDICINE_EMOJIS = {
       Antibiótico: "💊",
       Antiinflamatorio: "🩹",
       Antidiabético: "💉",
       Analgésico: "🔴",
-      default: "💊",
+      Vitamina: "🍋",
+      default: "💊"
     };
-    const STATUS_MAP = {
+
+    const STATUS_CLASS = {
       disponible: "badge-success",
       reservado: "badge-warning",
-      entregado: "badge-blue",
+      aprobado: "badge-blue",
+      entregado: "badge-success",
       pendiente: "badge-warning",
-      rechazado: "badge-danger",
+      rechazado: "badge-danger"
     };
 
     function showToast(msg, type = "") {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = "toast " + type;
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2800);
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.className = `toast ${type}`;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2800);
     }
 
     function shareApp() {
+      const data = {
+        title: "MediConnect",
+        text: "¡Únete a MediConnect y ayuda a conectar donaciones de medicamentos!",
+        url: window.location.origin
+      };
+
       if (navigator.share) {
-        navigator.share({
-          title: "MediConnect",
-          text: "¡Únete a MediConnect y ayuda a conectar donaciones de medicamentos!",
-          url: window.location.origin,
-        });
+        navigator.share(data);
       } else {
         navigator.clipboard
           .writeText(window.location.origin)
@@ -174,373 +177,383 @@
       }
     }
 
-    // ===== FUNCIÓN PRINCIPAL: Verificar sesión al cargar =====
     async function initDashboard() {
-      //console.log("🔍 Verificando sesión...");
-
-      // 1. PRIMERO: Verificar sesión de Google (Supabase Auth)
       const {
-        data: { session },
+        data: { session }
       } = await supabaseClient.auth.getSession();
 
       if (session?.user) {
-        //console.log("✅ Sesión de Google detectada:", session.user.email);
-
-        const userEmail = session.user.email;
-        const userName =
-          session.user.user_metadata?.full_name || userEmail.split("@")[0];
-
-        // Buscar si el usuario ya existe en la tabla 'usuarios'
-        const query = `email=eq.${encodeURIComponent(userEmail)}`;
-        const existingUsers = await sb.select("usuarios", query);
-
-        if (existingUsers && existingUsers.length > 0) {
-          // Usuario existente - guardar en localStorage
-          mediConnect.saveUser(existingUsers[0]);
-         // console.log("👤 Usuario existente cargado:",existingUsers[0].nombre,);
-        } else {
-          // Primera vez con Google - crear usuario automáticamente
-          //console.log("🆕 Creando nuevo usuario desde Google...");
-          const newUser = {
-            nombre: userName,
-            email: userEmail,
-            password: "google_" + Math.random().toString(36).substring(2),
-            rol: "receptor",
-          };
-
-          const createdUser = await sb.insert("usuarios", newUser);
-          if (createdUser) {
-            mediConnect.saveUser(createdUser);
-            //console.log("✅ Nuevo usuario creado:", createdUser.nombre);
-          } else {
-            console.error("❌ No se pudo crear el usuario");
-            showToast("Error al crear usuario", "error");
-            return;
-          }
-        }
-
-        // Cargar dashboard
-        loadDashboard(session);
+        await syncGoogleUser(session.user);
+        await loadDashboard();
         return;
       }
 
-      // 2. SEGUNDO: Verificar sesión local (email/password)
-      const user = mediConnect.getUser();
-
-      if (user) {
-       // console.log("✅ Sesión local detectada:", user.nombre);
-        loadDashboard();
+      if (mediConnect.getUser()) {
+        await loadDashboard();
         return;
       }
 
-
-      // 3. No hay sesión - redirigir al login
-      console.log("❌ No hay sesión, redirigiendo al login...");
-      window.location.href = "index.html";
+      location.href = "index.html";
     }
 
-    // ===== Cargar dashboard (tu código original mejorado) =====
+    async function syncGoogleUser(authUser) {
+      const email = authUser.email;
+      const nombre = authUser.user_metadata?.full_name || email.split("@")[0];
+
+      const users = await sb.select("usuarios", `email=eq.${encodeURIComponent(email)}`);
+
+      if (users && users.length > 0) {
+        const user = users[0];
+
+        if (!user.avatar_url && authUser.user_metadata?.avatar_url) {
+          await sb.update("usuarios", user.id, {
+            avatar_url: authUser.user_metadata.avatar_url
+          });
+
+          user.avatar_url = authUser.user_metadata.avatar_url;
+        }
+
+        mediConnect.saveUser(user);
+        return;
+      }
+
+      const newUser = {
+        nombre,
+        email,
+        password: "google_" + Math.random().toString(36).substring(2),
+        rol: "receptor",
+        avatar_url: authUser.user_metadata?.avatar_url || null
+      };
+
+      const created = await sb.insert("usuarios", newUser);
+
+      if (!created) {
+        showToast("Error al crear usuario", "error");
+        throw new Error("No se pudo crear el usuario");
+      }
+
+      mediConnect.saveUser(created);
+    }
 
     async function loadDashboard() {
-      document.getElementById('roleBadgeContainer').innerHTML = '';
-      document.getElementById('greeting').textContent = 'Cargando...';
+      document.getElementById("roleBadgeContainer").innerHTML = "";
+      document.getElementById("greeting").textContent = "Cargando...";
+
       const user = mediConnect.getUser();
 
       if (!user) {
-        window.location.href = "index.html";
+        location.href = "index.html";
         return;
       }
 
-      // Obtener sesión de Google
       const {
-        data: { session },
+        data: { session }
       } = await supabaseClient.auth.getSession();
 
       const role = user.rol || "receptor";
+
+      renderUserHeader(user, role, session);
+      renderStats(role);
+
+      const donations = await getDashboardDonations(user, role);
+      const { active, history } = splitDonationsByRole(donations, role);
+
+      renderDonationList(active, role);
+      renderHistoryList(history, role);
+      updateStats(active.length, history.length);
+      checkNotificacionesPendientes();
+
+      document.querySelector(".page").classList.add("loaded");
+    }
+
+    function renderUserHeader(user, role, session) {
+      const firstName = user.nombre?.split(" ")[0] || "Usuario";
       const roleUpper = role.charAt(0).toUpperCase() + role.slice(1);
+      const avatarUrl = user.avatar_url || session?.user?.user_metadata?.avatar_url;
 
-      document.getElementById("greeting").textContent =
-        "Hola, " + user.nombre.split(" ")[0];
+      document.getElementById("greeting").textContent = `Hola, ${firstName}`;
 
-      // Avatar: mostrar foto o letra
-      const avatarBD = user.avatar_url;
-      const avatarGoogle = session?.user?.user_metadata?.avatar_url;
+      const avatarEl = document.getElementById("avatarEl");
+      const avatarLetter = document.getElementById("avatarLetter");
 
-     if (avatarBD || avatarGoogle) {
-  // Ocultar la letra
-  document.getElementById("avatarLetter").style.display = "none";
-  
-  // Crear imagen sin borrar el puntito
-  const img = document.createElement("img");
-  img.src = avatarBD || avatarGoogle;
-  img.style.cssText = "width:100%;height:100%;border-radius:12px;object-fit:cover;position:absolute;top:0;left:0;";
-  img.id = "avatarImg";
-  
-  // Eliminar imagen anterior si existe
-  const oldImg = document.getElementById("avatarImg");
-  if (oldImg) oldImg.remove();
-  
-  // Insertar imagen al inicio del avatarEl
-  const avatarEl = document.getElementById("avatarEl");
-  avatarEl.insertBefore(img, avatarEl.firstChild);
-}
-     else {
-        document.getElementById("avatarLetter").textContent = user.nombre
-          .charAt(0)
-          .toUpperCase();
+      const oldImg = document.getElementById("avatarImg");
+      if (oldImg) oldImg.remove();
+
+      if (avatarUrl) {
+        avatarLetter.style.display = "none";
+
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.id = "avatarImg";
+        img.alt = firstName;
+        img.style.cssText = "width:100%;height:100%;border-radius:12px;object-fit:cover;position:absolute;top:0;left:0;";
+
+        avatarEl.insertBefore(img, avatarEl.firstChild);
+      } else {
+        avatarLetter.style.display = "inline";
+        avatarLetter.textContent = firstName.charAt(0).toUpperCase();
       }
 
       document.getElementById("roleBadgeContainer").innerHTML = `
-      <span class="role-badge ${role.toLowerCase()}">
-     <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
-     ${roleUpper}
-     </span>
-    `;
+        <span class="role-badge ${role.toLowerCase()}">${roleUpper}</span>
+      `;
 
-      // Ocultar botón "+" si no es donante
       const btnAdd = document.getElementById("addDonationBtn");
       if (btnAdd) {
         btnAdd.style.display = role === "donante" ? "flex" : "none";
       }
+    }
 
-      // Stats Dinámicos
-      const statsContainer = document.getElementById("statsContainer");
-      let statsHTML = "";
-      if (role === "donante") {
-        statsHTML = `
+    function renderStats(role) {
+      const stats = {
+        donante: [
+          ["stat1", "0", "Mis Donaciones"],
+          ["stat2", "0", "Entregados"]
+        ],
+        validador: [
+          ["stat1", "0", "Por Validar"],
+          ["stat2", "0", "Revisados"]
+        ],
+        receptor: [
+          ["stat1", "0", "Mis Reservas"]
+        ]
+      };
+
+      const items = stats[role] || stats.receptor;
+
+      document.getElementById("statsContainer").innerHTML = items.map(item => `
         <div class="stat-card">
-          <div class="icon-wrap" style="background:#ECFDF5;color:#10B981"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
-          <h4 id="stat1">0</h4><p>Mis Donaciones</p>
+          <div class="icon-wrap">💊</div>
+          <h4 id="${item[0]}">${item[1]}</h4>
+          <p>${item[2]}</p>
         </div>
-        <div class="stat-card">
-          <div class="icon-wrap" style="background:#EFF6FF;color:#3B82F6"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-          <h4 id="stat2">0</h4><p>Entregados</p>
-        </div>
-      `;
-      } else if (role === "validador") {
-        statsHTML = `
-        <div class="stat-card">
-          <div class="icon-wrap" style="background:#FFFBEB;color:#F59E0B"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
-          <h4 id="stat1">0</h4><p>Por Validar</p>
-        </div>
-        <div class="stat-card">
-          <div class="icon-wrap" style="background:#F3F4F6;color:#4B5563"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></div>
-          <h4 id="stat2">0</h4><p>Revisados</p>
-        </div>
-      `;
-      } else {
-        statsHTML = `
-        <div class="stat-card">
-          <div class="icon-wrap" style="background:#F5F3FF;color:#8B5CF6"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg></div>
-          <h4 id="stat1">0</h4><p>Mis Reservas</p>
-        </div>
-      `;
+      `).join("");
+    }
+
+    async function getDashboardDonations(user, role) {
+      const title = document.getElementById("listTitle");
+
+      try {
+        if (role === "donante") {
+          title.textContent = "Mis Donaciones Activas";
+          return await mediConnect.getDonations({ donante_id: user.id });
+        }
+
+        if (role === "validador") {
+          title.textContent = "Acciones Pendientes";
+          return await mediConnect.getDonations();
+        }
+
+        title.textContent = "Mis Reservas Activas";
+        return await mediConnect.getDonations({ receptor_id: user.id });
+      } catch (error) {
+        console.error(error);
+        document.getElementById("activityList").innerHTML = `
+          <p style="color:var(--danger);text-align:center;padding:40px 0;font-size:14px;font-weight:600">
+            Error al conectar con el servidor
+          </p>
+        `;
+        return [];
       }
-      statsContainer.innerHTML = statsHTML;
+    }
 
+    function splitDonationsByRole(donations, role) {
+      if (role === "validador") {
+        return {
+          active: donations.filter(d => ["reservado", "aprobado"].includes(d.estado)),
+          history: donations.filter(d => ["entregado", "rechazado"].includes(d.estado))
+        };
+      }
+
+      return {
+        active: donations.filter(d => !["entregado", "rechazado"].includes(d.estado)),
+        history: donations.filter(d => ["entregado", "rechazado"].includes(d.estado))
+      };
+    }
+
+    function renderDonationList(items, role) {
       const list = document.getElementById("activityList");
-      const histList = document.getElementById("historialList");
-      const histSection = document.getElementById("historialSection");
-      let allMeds = [];
 
-      if (role === "donante") {
-        document.getElementById("listTitle").textContent =
-          "Mis Donaciones Activas";
-        allMeds = await mediConnect.getDonations({ donante_id: user.id });
-      } else if (role === "validador") {
-        document.getElementById("listTitle").textContent =
-          "Acciones Pendientes";
-        allMeds = await mediConnect.getDonations();
-      } else {
-        document.getElementById("listTitle").textContent =
-          "Mis Reservas Activas";
-        allMeds = await mediConnect.getDonations({ receptor_id: user.id });
+      list.innerHTML = items.length
+        ? items.map(item => renderMedCard(item, role)).join("")
+        : `
+          <p style="color:var(--gray-400);text-align:center;padding:40px 0;font-size:14px;font-weight:600">
+            No hay acciones pendientes
+          </p>
+        `;
+    }
+
+    function renderHistoryList(items, role) {
+      const section = document.getElementById("historialSection");
+      const list = document.getElementById("historialList");
+
+      if (!items.length) {
+        section.style.display = "none";
+        list.innerHTML = "";
+        return;
       }
 
-      // Filtrar Activos vs Historial
-      let activeMeds = [];
-      let historyMeds = [];
+      section.style.display = "block";
+      list.innerHTML = items.map(item => renderMedCard(item, role, true)).join("");
+    }
 
-      if (role === "donante" || role === "receptor") {
-        activeMeds = allMeds.filter(
-          (d) => d.estado !== "entregado" && d.estado !== "rechazado",
-        );
-        historyMeds = allMeds.filter(
-          (d) => d.estado === "entregado" || d.estado === "rechazado",
-        );
-      } else if (role === "validador") {
-        activeMeds = allMeds.filter(
-          (d) => d.estado === "reservado" || d.estado === "aprobado",
-        );
-        historyMeds = allMeds.filter(
-          (d) => d.estado === "entregado" || d.estado === "rechazado",
-        );
-      }
+    function updateStats(active, history) {
+      const stat1 = document.getElementById("stat1");
+      const stat2 = document.getElementById("stat2");
 
-
-
-      // Renderizar Activos
-      if (activeMeds.length === 0) {
-        list.innerHTML =
-          '<p style="color:var(--gray-400);text-align:center;padding:40px 0;font-size:14px;font-weight:600;">No hay acciones pendientes</p>';
-      } else {
-        list.innerHTML = activeMeds
-          .map((d) => renderMedCard(d, role))
-          .join("");
-      }
-
-      // Renderizar Historial
-      if (historyMeds.length > 0) {
-        histSection.style.display = "block";
-        histList.innerHTML = historyMeds
-          .map((d) => renderMedCard(d, role, true))
-          .join("");
-      } else {
-        histSection.style.display = "none";
-      }
-
-      // Stats
-      if (document.getElementById("stat1")) {
-        document.getElementById("stat1").textContent = activeMeds.length;
-      }
-      if (document.getElementById("stat2")) {
-        document.getElementById("stat2").textContent = historyMeds.length;
-      }
-      document.querySelector('.page').classList.add('loaded');
-    
-      checkNotificacionesPendientes();
+      if (stat1) stat1.textContent = active;
+      if (stat2) stat2.textContent = history;
     }
 
     function renderMedCard(d, role, isHistory = false) {
-      const statusMap = {
-        disponible: "badge-success",
-        reservado: "badge-warning",
-        aprobado: "badge-blue",
-        entregado: "badge-success",
-        rechazado: "badge-danger",
-      };
-
-      let actionsHTML = "";
-      if (!isHistory) {
-        if (role === "donante" && d.estado === "disponible") {
-          actionsHTML = `
-          <div style="display:flex; gap:4px; margin-top:4px;">
-            <button onclick="event.stopPropagation(); location.href='donar.html?edit=${d.id}'" style="background:var(--primary); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Editar</button>
-            <button onclick="event.stopPropagation(); deleteMed('${d.id}')" style="background:var(--danger); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Eliminar</button>
-          </div>
-        `;
-        } else if (role === "validador") {
-          if (d.estado === "reservado") {
-            actionsHTML = `
-            <div style="display:flex; gap:4px; margin-top:4px;">
-              <button onclick="event.stopPropagation(); updateMedStatus('${d.id}', 'aprobado')" style="background:var(--success); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Aprobar</button>
-              <button onclick="event.stopPropagation(); updateMedStatus('${d.id}', 'rechazado')" style="background:var(--danger); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Rechazar</button>
-            </div>
-          `;
-          } else if (d.estado === "aprobado") {
-            actionsHTML = `
-            <div style="display:flex; gap:4px; margin-top:4px;">
-              <button onclick="event.stopPropagation(); updateMedStatus('${d.id}', 'entregado')" style="background:var(--primary); border:none; color:white; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:800; cursor:pointer;">Marcar Entregado</button>
-            </div>
-          `;
-          }
-        }
-      }
+      const img = d.imagen_url
+        ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`
+        : MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default;
 
       return `
-      <div class="med-card ${isHistory ? "history-card" : ""}" style="${isHistory ? "opacity:0.7; filter:grayscale(0.5);" : ""}" onclick="location.href='buscar.html'">
-        <div class="med-img">
-          ${d.imagen_url
-          ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`
-          : MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default
-        }
-        </div>
-        <div class="med-info">
-          <h3>${d.nombre}</h3>
-          <p>${d.tipo} · ${d.cantidad} un.</p>
-          <div class="med-meta">
-            Vence: ${d.fecha_vencimiento}
+        <div class="med-card ${isHistory ? "history-card" : ""}"
+             style="${isHistory ? "opacity:.7;filter:grayscale(.5);" : ""}cursor:pointer"
+             onclick="location.href='detalle.html?id=${d.id}'">
+
+          <div class="med-img">${img}</div>
+
+          <div class="med-info">
+            <h3>${d.nombre}</h3>
+            <p>${d.tipo} · ${d.cantidad} un.</p>
+            <div class="med-meta">Vence: ${d.fecha_vencimiento}</div>
+          </div>
+
+          <div class="med-badge-wrap" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <span class="badge ${STATUS_CLASS[d.estado] || "badge-blue"}">${d.estado}</span>
+            ${renderActions(d, role, isHistory)}
           </div>
         </div>
-        <div class="med-badge-wrap" style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
-          <span class="badge ${statusMap[d.estado] || "badge-blue"}">${d.estado}</span>
-          ${actionsHTML}
-        </div>
-      </div>
-    `;
+      `;
+    }
+
+    function renderActions(d, role, isHistory) {
+      if (isHistory) return "";
+
+      if (role === "donante" && d.estado === "disponible") {
+        return `
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button onclick="event.stopPropagation();location.href='donar.html?edit=${d.id}'"
+              style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Editar
+            </button>
+
+            <button onclick="event.stopPropagation();deleteMed('${d.id}')"
+              style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Eliminar
+            </button>
+          </div>
+        `;
+      }
+
+      if (role === "validador" && d.estado === "reservado") {
+        return `
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','aprobado')"
+              style="background:var(--success);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Aprobar
+            </button>
+
+            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','rechazado')"
+              style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Rechazar
+            </button>
+          </div>
+        `;
+      }
+
+      if (role === "validador" && d.estado === "aprobado") {
+        return `
+          <div style="display:flex;gap:4px;margin-top:4px">
+            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','entregado')"
+              style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Marcar Entregado
+            </button>
+          </div>
+        `;
+      }
+
+      return "";
     }
 
     async function updateMedStatus(id, newStatus) {
       try {
         const ok = await mediConnect.updateDonationStatus(id, newStatus);
-        if (ok) {
-          let msg = "Estado actualizado";
-          if (newStatus === "aprobado") msg = "Medicamento aprobado ✓";
-          if (newStatus === "rechazado") msg = "Medicamento rechazado ✗";
-          if (newStatus === "entregado") msg = "Entrega confirmada ✓";
-          showToast(msg, "success");
-          loadDashboard();
-        } else {
+
+        if (!ok) {
           showToast("Error al actualizar", "error");
+          return;
         }
-      } catch (e) {
-        console.error(e);
+
+        const messages = {
+          aprobado: "Medicamento aprobado ✓",
+          rechazado: "Medicamento rechazado ✗",
+          entregado: "Entrega confirmada ✓"
+        };
+
+        showToast(messages[newStatus] || "Estado actualizado", "success");
+        await loadDashboard();
+      } catch (error) {
+        console.error(error);
         showToast("Error de conexión", "error");
       }
     }
 
     async function deleteMed(id) {
-      if (!confirm("¿Estás seguro de que deseas eliminar esta donación?"))
-        return;
+      if (!confirm("¿Estás seguro de que deseas eliminar esta donación?")) return;
+
       try {
         const ok = await mediConnect.deleteDonation(id);
-        if (ok) {
-          showToast("Donación eliminada", "success");
-          loadDashboard();
-        } else {
+
+        if (!ok) {
           showToast("No se pudo eliminar", "error");
+          return;
         }
-      } catch (e) {
+
+        showToast("Donación eliminada", "success");
+        await loadDashboard();
+      } catch (error) {
+        console.error(error);
         showToast("Error de conexión", "error");
       }
     }
 
-    // Cerrar sesión (actualizado para Google)
     async function cerrarSesion() {
       try {
         await supabaseClient.auth.signOut();
-        console.log("🔒 Sesión de Google cerrada");
-      } catch (e) {
-        console.log("No había sesión de Google");
+      } catch (error) {
+        console.warn("No había sesión activa de Google");
       }
+
       mediConnect.logout();
-      window.location.href = "index.html";
+      location.href = "index.html";
     }
 
-    // ===== INICIAR DASHBOARD =====
+    async function checkNotificacionesPendientes() {
+      try {
+        const user = mediConnect.getUser();
+        if (!user) return;
+
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false&limit=1`;
+        const pendientes = await sb.select("notificaciones", query);
+        const hayPendientes = pendientes && pendientes.length > 0;
+
+        const dotAvatar = document.getElementById("notifDot");
+        if (dotAvatar) dotAvatar.style.display = hayPendientes ? "block" : "none";
+
+        const navDot = document.getElementById("navNotifDot");
+        if (navDot) navDot.style.display = hayPendientes ? "block" : "none";
+      } catch (e) {
+        console.warn("No se pudieron verificar notificaciones:", e);
+      }
+    }
+
     initDashboard();
-
-async function checkNotificacionesPendientes() {
-  try {
-    const user = mediConnect.getUser();
-    if (!user) return;
-    
-    const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false&limit=1`;
-    const pendientes = await sb.select('notificaciones', query);
-    const hayPendientes = pendientes && pendientes.length > 0;
-    
-    // Punto en avatar del dashboard
-    const dotAvatar = document.getElementById('notifDot');
-    if (dotAvatar) dotAvatar.style.display = hayPendientes ? 'block' : 'none';
-    
-    // Punto en nav de Perfil
-    const navDot = document.getElementById('navNotifDot');
-    if (navDot) navDot.style.display = hayPendientes ? 'block' : 'none';
-    
-  } catch(e) {}
-}
   </script>
-
 </body>
 
 </html>

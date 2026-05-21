@@ -5,56 +5,136 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MediConnect – Perfil</title>
+
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .2);
+      transform: scale(.9) translateY(20px);
+      transition: all .3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #1F2937;
+    }
+
+    .modal p {
+      font-size: 14px;
+      color: #6B7280;
+      margin-bottom: 24px;
+    }
+
+    .modal textarea {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .modal .btn-primary {
+      margin-bottom: 8px;
+    }
+
+    .modal .btn-secondary {
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
+
   <div class="page">
-    <!-- Hero -->
+
     <div class="profile-hero fade-up">
       <div class="avatar-lg" id="avatarLg">?</div>
-      <div class="profile-name" id="profileName">...</div>
-      <div class="profile-badge">⭐ Donante Estrella</div>
+
+      <div class="profile-name" id="profileName">
+        ...
+      </div>
+
+      <div class="profile-badge">
+        ⭐ Donante Estrella
+      </div>
     </div>
 
     <div class="profile-content">
-      <!-- Enlace a Mis Actividades -->
+
       <div class="profile-section fade-up delay-1">
-        <div class="account-item" onclick="location.href = 'mis-actividades.html'" id="historyToggleBtn">
-          <div class="account-item-icon" style="background: #f0fdf4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#16A34A">
+        <div class="account-item" onclick="location.href='mis-actividades.html'" id="historyToggleBtn">
+          <div class="account-item-icon" style="background:#F0FDF4;">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="#16A34A">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
             </svg>
           </div>
-          <span class="account-item-label" id="historyLabel">Ver mi historial</span>
-          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke-width="2.5" stroke="currentColor">
+
+          <span class="account-item-label" id="historyLabel">
+            Ver mi historial
+          </span>
+
+          <span class="account-item-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg></span>
+            </svg>
+          </span>
         </div>
       </div>
-      <!-- Modal Solicitar Donante -->
-      <div class="modal-overlay" id="modalDonante" style="display: none">
+
+      <div class="modal-overlay" id="modalDonante">
         <div class="modal">
           <h3>🩺 Solicitar ser Donante</h3>
-          <p style="
-                color: var(--gray-400);
-                font-size: 13px;
-                margin-bottom: 16px;
-              ">
+
+          <p style="color:var(--gray-400);font-size:13px;margin-bottom:16px">
             Cuéntanos por qué quieres ser donante
           </p>
 
-          <div class="input-group" style="margin-bottom: 12px">
+          <div class="input-group" style="margin-bottom:12px">
             <label>Motivo</label>
             <textarea id="motivoDonante" class="input-field no-icon" rows="3"
               placeholder="Ej: Tengo medicamentos que quiero donar para ayudar a quienes los necesitan..."></textarea>
           </div>
 
-          <div class="input-group" style="margin-bottom: 16px">
+          <div class="input-group" style="margin-bottom:16px">
             <label>Tipo de medicamentos (opcional)</label>
-            <select id="tipoMedicamentos" class="input-field no-icon" style="appearance: auto; padding-left: 14px">
+            <select id="tipoMedicamentos" class="input-field no-icon" style="appearance:auto;padding-left:14px">
               <option value="">-- Selecciona --</option>
               <option value="antibioticos">💊 Antibióticos</option>
               <option value="antiinflamatorios">🩹 Antiinflamatorios</option>
@@ -70,31 +150,28 @@
           <button class="btn-primary" onclick="enviarSolicitudDonante()">
             Enviar Solicitud
           </button>
+
           <button class="btn-secondary" onclick="cerrarModalDonante()">
             Cancelar
           </button>
         </div>
       </div>
 
-      <!-- Modal Solicitar Validador -->
-      <div class="modal-overlay" id="modalValidador" style="display: none">
+      <div class="modal-overlay" id="modalValidador">
         <div class="modal">
           <h3>🛡️ Solicitar ser Validador</h3>
-          <p style="
-                color: var(--gray-400);
-                font-size: 13px;
-                margin-bottom: 16px;
-              ">
+
+          <p style="color:var(--gray-400);font-size:13px;margin-bottom:16px">
             Solo personal médico puede validar donaciones
           </p>
 
-          <div class="input-group" style="margin-bottom: 12px">
+          <div class="input-group" style="margin-bottom:12px">
             <label>Experiencia en salud</label>
             <textarea id="experienciaValidador" class="input-field no-icon" rows="2"
               placeholder="Ej: Soy médico general con 5 años de experiencia..."></textarea>
           </div>
 
-          <div class="input-group" style="margin-bottom: 12px">
+          <div class="input-group" style="margin-bottom:12px">
             <label>Motivo</label>
             <textarea id="motivoValidador" class="input-field no-icon" rows="2"
               placeholder="¿Por qué quieres ser validador?"></textarea>
@@ -103,115 +180,117 @@
           <button class="btn-primary" onclick="enviarSolicitudValidador()">
             Enviar Solicitud
           </button>
+
           <button class="btn-secondary" onclick="cerrarModalValidador()">
             Cancelar
           </button>
         </div>
       </div>
 
-      <!-- Cuenta -->
       <div class="profile-section fade-up delay-2">
-        <div class="profile-section-title">Cuenta</div>
-
-        <div class="account-item" onclick="location.href = 'perfil-editar.html'">
-          <div class="account-item-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-            </svg>
-          </div>
-          <span class="account-item-label">Editar Perfil</span>
-          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke-width="2.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg></span>
+        <div class="profile-section-title">
+          Cuenta
         </div>
 
-        <div class="account-item" onclick="location.href = 'notificaciones.html'">
+        <div class="account-item" onclick="location.href='perfil-editar.html'">
           <div class="account-item-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-            </svg>
+            👤
           </div>
+
+          <span class="account-item-label">
+            Editar Perfil
+          </span>
+
+          <span class="account-item-arrow">
+            ›
+          </span>
+        </div>
+
+        <div class="account-item" onclick="location.href='notificaciones.html'">
+          <div class="account-item-icon">
+            🔔
+          </div>
+
           <span class="account-item-label">
             Notificaciones
             <span id="notifBadge" style="
-                  display: none;
-                  background: #ef4444;
-                  color: white;
-                  border-radius: 50%;
-                  width: 20px;
-                  height: 20px;
-                  font-size: 11px;
-                  font-weight: 700;
-                  text-align: center;
-                  line-height: 20px;
-                  margin-left: 8px;
-                ">0</span>
+              display: none;
+              background: #ef4444;
+              color: white;
+              border-radius: 50%;
+              width: 20px;
+              height: 20px;
+              font-size: 11px;
+              font-weight: 700;
+              text-align: center;
+              line-height: 20px;
+              margin-left: 8px;
+            ">0</span>
           </span>
-          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke-width="2.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg></span>
-        </div>
 
-        <div class="account-item" id="adminPanelBtn" onclick="location.href = 'admin.html'" style="display: none">
-          <div class="account-item-icon" style="background: #f5f3ff">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#7C3AED">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
-          </div>
-          <span class="account-item-label" style="color: #7c3aed">Panel Administrativo</span>
-          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke-width="2.5" stroke="#7C3AED">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg></span>
-        </div>
-
-        <div class="account-item" id="privacyItem" onclick="location.href = 'privacidad.html'">
-          <div class="account-item-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+          <span class="account-item-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
               stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
-          </div>
-          <span class="account-item-label">Privacidad y Datos</span>
-          <span class="account-item-arrow"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-              stroke-width="2.5" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg></span>
-        </div>
-
-        <!-- Solicitar ser Donante (solo visible para Receptor) -->
-        <div class="account-item" onclick="solicitarDonante()" id="btnDonante" style="display: none">
-          <div class="account-item-icon" style="background: #ecfdf5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" width="20" height="20">
-              <path
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </svg>
-          </div>
-          <span class="account-item-label" style="color: #10b981">Solicitar ser Donante</span>
-          <span class="account-item-arrow">›</span>
+          </span>
         </div>
 
-        <!-- Solicitar ser Validador (solo visible para Donante) -->
-        <div class="account-item" onclick="solicitarValidador()" id="btnValidador" style="display: none">
-          <div class="account-item-icon" style="background: #fffbeb">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" width="20" height="20">
-              <path
-                d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
+        <div class="account-item" id="adminPanelBtn" onclick="location.href='admin.html'" style="display:none">
+          <div class="account-item-icon" style="background:#F5F3FF">
+            🛡️
           </div>
-          <span class="account-item-label" style="color: #f59e0b">Solicitar ser Validador</span>
-          <span class="account-item-arrow">›</span>
+
+          <span class="account-item-label" style="color:#7C3AED">
+            Panel Administrativo
+          </span>
+
+          <span class="account-item-arrow">
+            ›
+          </span>
         </div>
 
-        <div id="validatorRequestArea"></div>
+        <div class="account-item" id="privacyItem" onclick="location.href='privacidad.html'">
+          <div class="account-item-icon">
+            🔒
+          </div>
+
+          <span class="account-item-label">
+            Privacidad y Datos
+          </span>
+
+          <span class="account-item-arrow">
+            ›
+          </span>
+        </div>
+
+        <div class="account-item" onclick="solicitarDonante()" id="btnDonante" style="display:none">
+          <div class="account-item-icon" style="background:#ECFDF5">
+            💚
+          </div>
+
+          <span class="account-item-label" style="color:#10B981">
+            Solicitar ser Donante
+          </span>
+
+          <span class="account-item-arrow">
+            ›
+          </span>
+        </div>
+
+        <div class="account-item" onclick="solicitarValidador()" id="btnValidador" style="display:none">
+          <div class="account-item-icon" style="background:#FFFBEB">
+            🛡️
+          </div>
+
+          <span class="account-item-label" style="color:#F59E0B">
+            Solicitar ser Validador
+          </span>
+
+          <span class="account-item-arrow">
+            ›
+          </span>
+        </div>
 
         <button class="logout-btn" onclick="handleLogout()">
           Cerrar Sesión
@@ -220,43 +299,58 @@
     </div>
   </div>
 
-  <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <a href="dashboard.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
       </svg>
       Inicio
     </a>
+
     <a href="buscar.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href = 'donar.html'" style="display: none">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
-    <a href="perfil.html" class="nav-item" style="position: relative">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+
+    <a href="mapa.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+      </svg>
+      Mapa
+    </a>
+
+    <a href="perfil.html" class="nav-item active" style="position: relative">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+        stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
       <span id="navNotifDot" style="
-            position: absolute;
-            top: 2px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-            display: none;
-          "></span>
+        position: absolute;
+        top: 2px;
+        right: 6px;
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        display: none;
+      "></span>
     </a>
   </nav>
 
@@ -264,134 +358,111 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
+
   <script>
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  </script>
-  <script>
-    function showToast(msg, type = "") {
-      const t = document.getElementById("toast");
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+
       t.textContent = msg;
-      t.className = "toast " + type;
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2800);
+      t.className = 'toast ' + type;
+      t.classList.add('show');
+
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 2800);
     }
 
     async function handleLogout() {
-      console.log("🔄 Cerrando sesión...");
-
-      // Cerrar sesión de Google
       try {
         await supabaseClient.auth.signOut();
-        console.log(" Sesión Google cerrada");
-      } catch (e) {
-        console.log("No había sesión de Google");
-      }
+      } catch (e) { }
 
-      // Limpiar localStorage
       mediConnect.logout();
       localStorage.clear();
-
-      // Limpiar cookies
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(
-            /=.*/,
-            "=;expires=" + new Date().toUTCString() + ";path=/",
-          );
-      });
-
-      // Redirigir
-      window.location.replace("index.html");
+      window.location.replace('index.html');
     }
+
+    function solicitarDonante() {
+      document.getElementById('modalDonante').classList.add('show');
+    }
+
+    function cerrarModalDonante() {
+      document.getElementById('modalDonante').classList.remove('show');
+    }
+
+    function solicitarValidador() {
+      document.getElementById('modalValidador').classList.add('show');
+    }
+
+    function cerrarModalValidador() {
+      document.getElementById('modalValidador').classList.remove('show');
+    }
+
     async function loadProfile() {
       document.getElementById("profileName").textContent = "Cargando...";
       document.querySelector(".profile-badge").innerHTML = "...";
-      // Verificar sesión de Google primero
+
       const {
-        data: { session },
+        data: { session }
       } = await supabaseClient.auth.getSession();
+
       let user = mediConnect.getUser();
 
-      // 🔄 SIEMPRE actualizar datos desde la BD
       if (user?.id) {
-        const query = `id=eq.${user.id}`;
-        const usuarios = await sb.select("usuarios", query);
-        if (usuarios && usuarios.length > 0) {
-          user = usuarios[0];
-          mediConnect.saveUser(user); // Actualizar localStorage
-          console.log("✅ Datos actualizados desde BD. Rol:", user.rol);
-        }
-      }
+        const usuarios = await sb.select(
+          'usuarios',
+          `id=eq.${user.id}`
+        );
 
-      // Si hay sesión de Google pero no local
-      if (session?.user && !user) {
-        const email = session.user.email;
-        const query = `email=eq.${encodeURIComponent(email)}`;
-        const users = await sb.select("usuarios", query);
-        if (users && users.length > 0) {
-          mediConnect.saveUser(users[0]);
-          user = users[0];
+        if (usuarios?.length > 0) {
+          user = usuarios[0];
+          mediConnect.saveUser(user);
         }
       }
 
       if (!user) {
-        window.location.href = "index.html";
+        location.href = 'index.html';
         return;
       }
 
-      // Mostrar nombre y avatar
-      document.getElementById("profileName").textContent =
-        user.nombre || "Usuario";
+      document.getElementById('profileName').textContent = user.nombre || 'Usuario';
 
-      // Mostrar avatar (prioridad: BD > Google > inicial)
-      const avatarBD = user.avatar_url; // De la base de datos
-      const avatarGoogle = session?.user?.user_metadata?.avatar_url; // De Google
+      const avatarBD = user.avatar_url;
+      const avatarGoogle = session?.user?.user_metadata?.avatar_url;
 
-      if (avatarBD) {
-        // Foto subida por el usuario
-        document.getElementById("avatarLg").innerHTML =
-          `<img src="${avatarBD}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-      } else if (avatarGoogle) {
-        // Foto de Google
-        document.getElementById("avatarLg").innerHTML =
-          `<img src="${avatarGoogle}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+      if (avatarBD || avatarGoogle) {
+        document.getElementById('avatarLg').innerHTML = `
+          <img src="${avatarBD || avatarGoogle}"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+        `;
       } else {
-        // Sin foto → letra inicial
-        document.getElementById("avatarLg").textContent = user.nombre
-          .charAt(0)
-          .toUpperCase();
+        document.getElementById('avatarLg').innerHTML = `
+          <span style="font-size:32px;font-weight:bold;color:white">
+            ${(user.nombre || 'U').charAt(0).toUpperCase()}
+          </span>
+        `;
       }
 
-      const badgeEl = document.querySelector(".profile-badge");
-      const historyLabel = document.getElementById("historyLabel");
-      const privacyItem = document.getElementById("privacyItem");
-      const adminItem = document.getElementById("adminPanelBtn");
+      const badge = document.querySelector('.profile-badge');
 
-      if (user.rol === "validador") {
-        badgeEl.innerHTML = "🛡️ VALIDADOR OFICIAL";
-        historyLabel.textContent = "Ver mi historial";
-        if (privacyItem) privacyItem.style.display = "none";
-        if (adminItem) {
-          adminItem.style.display = "flex";
-          adminItem.querySelector(".account-item-label").textContent =
-            "Panel Administrativo";
-        }
-      } else if (user.rol === "receptor") {
-        badgeEl.innerHTML = "📦 RECEPTOR";
-        historyLabel.textContent = "Mis Reservas";
-        if (privacyItem) privacyItem.style.display = "flex";
-        if (adminItem) adminItem.style.display = "none";
+      if (user.rol === 'validador') {
+        badge.innerHTML = '🛡️ VALIDADOR OFICIAL';
+      } else if (user.rol === 'receptor') {
+        badge.innerHTML = '📦 RECEPTOR';
       } else {
-        badgeEl.innerHTML = "⭐ DONANTE ESTRELLA";
-        historyLabel.textContent = "Mis Donaciones";
-        if (privacyItem) privacyItem.style.display = "flex";
-        if (adminItem) adminItem.style.display = "none";
+        badge.innerHTML = '⭐ DONANTE ESTRELLA';
       }
 
       const btnAdd = document.getElementById("addDonationBtn");
       if (btnAdd) {
         btnAdd.style.display = user.rol === "donante" ? "flex" : "none";
+      }
+
+      const adminPanelBtn = document.getElementById('adminPanelBtn');
+      if (adminPanelBtn && user.rol === 'validador') {
+        adminPanelBtn.style.display = 'flex';
       }
 
       configurarBotones(user);
@@ -409,228 +480,194 @@
         const hayPendientes = pendientes && pendientes.length > 0;
         const count = pendientes ? pendientes.length : 0;
 
-        // Badge en Notificaciones del perfil
         const badge = document.getElementById("notifBadge");
         if (badge) {
           badge.textContent = count;
           badge.style.display = count > 0 ? "inline-block" : "none";
         }
 
-        // Punto en nav de Perfil
         const navDot = document.getElementById("navNotifDot");
         if (navDot) {
           navDot.style.display = hayPendientes ? "block" : "none";
         }
       } catch (e) { }
     }
-    // Llamar en loadProfile()
 
+    async function configurarBotones(user) {
+      const btnDonante = document.getElementById('btnDonante');
+      const btnValidador = document.getElementById('btnValidador');
 
-    // ===== CONFIGURAR BOTONES SEGÚN ROL =====
-    function configurarBotones(user) {
-      const btnDonante = document.getElementById("btnDonante");
-      const btnValidador = document.getElementById("btnValidador");
-
-      if (btnDonante) btnDonante.style.display = "none";
-      if (btnValidador) btnValidador.style.display = "none";
-
-      if (user.rol === "receptor") {
-        if (btnDonante) btnDonante.style.display = "flex";
-      } else if (user.rol === "donante") {
-        if (btnValidador) btnValidador.style.display = "flex";
+      if (user.rol === 'receptor') {
+        btnDonante.style.display = 'flex';
       }
 
-      // Verificar si ya tiene solicitudes pendientes
+      if (user.rol === 'donante') {
+        btnValidador.style.display = 'flex';
+      }
+
       verificarSolicitudesPendientes(user);
     }
 
-    // ===== MODAL DONANTE =====
-    function solicitarDonante() {
-      document.getElementById("modalDonante").style.display = "flex";
-      document.getElementById("modalDonante").classList.add("show");
-    }
-
-    function cerrarModalDonante() {
-      document.getElementById("modalDonante").style.display = "none";
-      document.getElementById("modalDonante").classList.remove("show");
-    }
-
     async function enviarSolicitudDonante() {
-      const motivo = document.getElementById("motivoDonante").value.trim();
-      const tipoMed = document.getElementById("tipoMedicamentos").value;
+      const motivo = document.getElementById('motivoDonante').value.trim();
+      const tipo = document.getElementById('tipoMedicamentos').value;
       const user = mediConnect.getUser();
 
       if (!motivo) {
-        showToast("Escribe un motivo para tu solicitud", "error");
+        showToast('Escribe un motivo', 'error');
         return;
       }
 
       try {
-        const datos = {
-          usuario_id: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          motivo: motivo,
-          tipo_medicamentos: tipoMed || null,
-          estado: "pendiente",
-        };
+        const ok = await sb.insert(
+          'solicitudes_donante',
+          {
+            usuario_id: user.id,
+            nombre: user.nombre,
+            email: user.email,
+            motivo,
+            tipo_medicamentos: tipo,
+            estado: 'pendiente'
+          }
+        );
 
-        const resultado = await sb.insert("solicitudes_donante", datos);
+        if (ok) {
+          showToast('Solicitud enviada ✓', 'success');
+          cerrarModalDonante();
 
-        if (resultado) {
-          showToast("Solicitud enviada correctamente", "success");
-          cerrarModalDonante();
-          document.getElementById("btnDonante").style.display = "none";
-        } else {
-          showToast("Ya tienes una solicitud pendiente", "warning");
-          cerrarModalDonante();
-          document.getElementById("btnDonante").style.display = "none";
+          setTimeout(() => {
+            location.reload();
+          }, 1200);
         }
-      } catch (error) {
-        console.error("Error:", error);
-        showToast("Ya tienes una solicitud pendiente", "warning");
-        cerrarModalDonante();
+      } catch (e) {
+        showToast('Ya tienes una solicitud pendiente', 'warning');
       }
-    }
-
-    // ===== MODAL VALIDADOR =====
-    function solicitarValidador() {
-      document.getElementById("modalValidador").style.display = "flex";
-      document.getElementById("modalValidador").classList.add("show");
-    }
-
-    function cerrarModalValidador() {
-      document.getElementById("modalValidador").style.display = "none";
-      document.getElementById("modalValidador").classList.remove("show");
     }
 
     async function enviarSolicitudValidador() {
-      const experiencia = document
-        .getElementById("experienciaValidador")
-        .value.trim();
-      const motivo = document.getElementById("motivoValidador").value.trim();
+      const experiencia = document.getElementById('experienciaValidador').value.trim();
+      const motivo = document.getElementById('motivoValidador').value.trim();
       const user = mediConnect.getUser();
 
       if (!motivo) {
-        showToast("Escribe un motivo para tu solicitud", "error");
+        showToast('Escribe un motivo', 'error');
         return;
       }
 
       try {
-        const datos = {
-          usuario_id: user.id,
-          nombre: user.nombre,
-          email: user.email,
-          experiencia: experiencia,
-          motivo: motivo,
-          estado: "pendiente",
-        };
+        const ok = await sb.insert(
+          'solicitudes_validador',
+          {
+            usuario_id: user.id,
+            nombre: user.nombre,
+            email: user.email,
+            experiencia,
+            motivo,
+            estado: 'pendiente'
+          }
+        );
 
-        const resultado = await sb.insert("solicitudes_validador", datos);
+        if (ok) {
+          showToast('Solicitud enviada ✓', 'success');
+          cerrarModalValidador();
 
-        if (resultado) {
-          showToast("Solicitud enviada correctamente", "success");
-          cerrarModalValidador();
-          document.getElementById("btnValidador").style.display = "none";
-        } else {
-          // Mensaje genérico (probablemente duplicado)
-          showToast("Ya tienes una solicitud pendiente", "warning");
-          cerrarModalValidador();
-          document.getElementById("btnValidador").style.display = "none";
+          setTimeout(() => {
+            location.reload();
+          }, 1200);
         }
-      } catch (error) {
-        console.error("Error:", error);
-        showToast("Ya tienes una solicitud pendiente", "warning");
-        cerrarModalValidador();
+      } catch (e) {
+        showToast('Ya tienes una solicitud pendiente', 'warning');
       }
     }
 
-    // ===== CARGAR PERFIL =====
-    loadProfile();
     async function verificarSolicitudesPendientes(user) {
-      const btnDonante = document.getElementById("btnDonante");
-      const btnValidador = document.getElementById("btnValidador");
+      if (user.rol === 'receptor') {
+        const p = await sb.select(
+          'solicitudes_donante',
+          `usuario_id=eq.${user.id}&estado=eq.pendiente`
+        );
 
-      // Verificar solicitud de donante pendiente
-      if (user.rol === "receptor") {
-        const query = `usuario_id=eq.${user.id}&estado=eq.pendiente`;
-        const pendientes = await sb.select("solicitudes_donante", query);
-
-        if (pendientes && pendientes.length > 0) {
-          // Ya tiene solicitud pendiente
-          if (btnDonante) {
-            btnDonante.innerHTML = `
-          <div class="account-item-icon" style="background:#FEF3C7;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" width="20" height="20">
-              <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <span class="account-item-label" style="color:#F59E0B;">Solicitud pendiente - Cancelar</span>
-          <span class="account-item-arrow">›</span>
-        `;
-            btnDonante.onclick = () =>
-              cancelarSolicitud("donante", pendientes[0].id);
-            btnDonante.style.display = "flex";
-          }
+        if (p?.length > 0) {
+          renderBtnPendiente(
+            'btnDonante',
+            'donante',
+            p[0].id
+          );
         }
       }
 
-      // Verificar solicitud de validador pendiente
-      if (user.rol === "donante") {
-        const query = `usuario_id=eq.${user.id}&estado=eq.pendiente`;
-        const pendientes = await sb.select("solicitudes_validador", query);
+      if (user.rol === 'donante') {
+        const p = await sb.select(
+          'solicitudes_validador',
+          `usuario_id=eq.${user.id}&estado=eq.pendiente`
+        );
 
-        if (pendientes && pendientes.length > 0) {
-          if (btnValidador) {
-            btnValidador.innerHTML = `
-          <div class="account-item-icon" style="background:#FEF3C7;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" width="20" height="20">
-              <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </div>
-          <span class="account-item-label" style="color:#F59E0B;">Solicitud pendiente - Cancelar</span>
-          <span class="account-item-arrow">›</span>
-        `;
-            btnValidador.onclick = () =>
-              cancelarSolicitud("validador", pendientes[0].id);
-            btnValidador.style.display = "flex";
-          }
+        if (p?.length > 0) {
+          renderBtnPendiente(
+            'btnValidador',
+            'validador',
+            p[0].id
+          );
         }
       }
     }
 
-    async function cancelarSolicitud(tipo, solicitudId) {
-      if (!confirm("¿Estás seguro de cancelar tu solicitud?")) return;
+    function renderBtnPendiente(id, tipo, sid) {
+      const btn = document.getElementById(id);
+
+      btn.innerHTML = `
+        <div class="account-item-icon" style="background:#FEF3C7">
+          ⚠️
+        </div>
+
+        <span class="account-item-label" style="color:#F59E0B">
+          Solicitud pendiente - Cancelar
+        </span>
+
+        <span class="account-item-arrow">
+          ›
+        </span>
+      `;
+
+      btn.onclick = () => cancelarSolicitud(tipo, sid);
+      btn.style.display = 'flex';
+    }
+
+    async function cancelarSolicitud(tipo, sid) {
+      if (!confirm('¿Estás seguro de cancelar tu solicitud?')) return;
+
+      const tabla =
+        tipo === 'donante'
+          ? 'solicitudes_donante'
+          : 'solicitudes_validador';
 
       try {
-        const tabla =
-          tipo === "donante"
-            ? "solicitudes_donante"
-            : "solicitudes_validador";
-
-        // Usar DELETE directamente
-        const url = `https://htuagycwflhqxghhotjf.supabase.co/rest/v1/${tabla}?id=eq.${solicitudId}`;
-        const r = await fetch(url, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            apikey:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWFneWN3ZmxocXhnaGhvdGpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MTM5MzgsImV4cCI6MjA5MzA4OTkzOH0.i_u0YEuO3DLyhTVjpf0jUNW0ZLnf4p0eG5yCGCzi_Tw",
-          },
-        });
+        const r = await fetch(
+          `${SUPABASE_URL}/rest/v1/${tabla}?id=eq.${sid}`,
+          {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_KEY,
+              'Authorization': 'Bearer ' + SUPABASE_KEY
+            }
+          }
+        );
 
         if (r.ok) {
-          showToast("Solicitud cancelada", "success");
-          setTimeout(() => location.reload(), 500);
+          showToast('Solicitud cancelada', 'success');
+          setTimeout(() => {
+            location.reload();
+          }, 700);
         } else {
-          showToast("Error al cancelar", "error");
+          showToast('Error al cancelar', 'error');
         }
       } catch (error) {
-        showToast("Error de conexión", "error");
+        showToast('Error de conexión', 'error');
       }
     }
+
+    loadProfile();
   </script>
 </body>
 
