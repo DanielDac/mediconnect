@@ -15,8 +15,9 @@
         <div id="roleBadgeContainer"></div>
       </div>
 
-      <div class="avatar" id="avatarEl" onclick="location.href='perfil.html'">
+      <div class="avatar" id="avatarEl" onclick="location.href='perfil.html'" style="position: relative;">
         <span id="avatarLetter">?</span>
+        <span id="notifDot" style="position:absolute;top:-2px;right:-2px;width:12px;height:12px;background:#EF4444;border:2px solid white;border-radius:50%;display:none;"></span>
       </div>
     </div>
 
@@ -69,14 +70,14 @@
       </svg>
       Inicio
     </a>
-    <a href="buscar.html" class="nav-item ">
+    <a href="buscar.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -88,12 +89,13 @@
       </svg>
       Mapa
     </a>
-    <a href="perfil.html" class="nav-item">
+    <a href="perfil.html" class="nav-item" style="position: relative;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
+      <span id="navNotifDot" style="position:absolute;top:2px;right:6px;width:8px;height:8px;background:#EF4444;border-radius:50%;display:none;"></span>
     </a>
   </nav>
   
@@ -136,69 +138,52 @@
         text: "¡Únete a MediConnect y ayuda a conectar donaciones de medicamentos!",
         url: window.location.origin
       };
-
       if (navigator.share) {
         navigator.share(data);
       } else {
-        navigator.clipboard
-          .writeText(window.location.origin)
-          .then(() => showToast("Enlace copiado", "success"));
+        navigator.clipboard.writeText(window.location.origin).then(() => showToast("Enlace copiado", "success"));
       }
     }
 
     async function initDashboard() {
       const { data: { session } } = await supabaseClient.auth.getSession();
-
       if (session?.user) {
         await syncGoogleUser(session.user);
         await loadDashboard();
         return;
       }
-
       if (mediConnect.getUser()) {
         await loadDashboard();
         return;
       }
-
       location.href = "index.html";
     }
 
     async function syncGoogleUser(authUser) {
       const email = authUser.email;
       const nombre = authUser.user_metadata?.full_name || email.split("@")[0];
-
       const users = await sb.select("usuarios", `email=eq.${encodeURIComponent(email)}`);
-
       if (users?.length) {
         mediConnect.saveUser(users[0]);
         return;
       }
-
       const newUser = {
-        nombre,
-        email,
+        nombre, email,
         password: "google_" + Math.random().toString(36).substring(2),
         rol: "receptor",
         avatar_url: authUser.user_metadata?.avatar_url || null
       };
-
       const created = await sb.insert("usuarios", newUser);
-
       if (!created) {
         showToast("Error al crear usuario", "error");
         throw new Error("No se pudo crear el usuario");
       }
-
       mediConnect.saveUser(created);
     }
 
     async function loadDashboard() {
       const user = mediConnect.getUser();
-
-      if (!user) {
-        location.href = "index.html";
-        return;
-      }
+      if (!user) { location.href = "index.html"; return; }
 
       const { data: { session } } = await supabaseClient.auth.getSession();
       const role = user.rol || "receptor";
@@ -212,6 +197,9 @@
       renderDonationList(active, role);
       renderHistoryList(history, role);
       updateStats(active.length, history.length);
+      
+      // Verificar notificaciones pendientes
+      checkNotificacionesPendientes();
     }
 
     function renderUserHeader(user, role, session) {
@@ -222,8 +210,19 @@
       document.getElementById("greeting").textContent = `Hola, ${firstName}`;
 
       if (avatarUrl) {
-        document.getElementById("avatarEl").innerHTML =
-          `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">`;
+        // Mantener el puntito al poner imagen
+        const avatarEl = document.getElementById("avatarEl");
+        const letterSpan = document.getElementById("avatarLetter");
+        if (letterSpan) letterSpan.style.display = "none";
+        
+        const oldImg = document.getElementById("avatarImgDashboard");
+        if (oldImg) oldImg.remove();
+        
+        const img = document.createElement("img");
+        img.id = "avatarImgDashboard";
+        img.src = avatarUrl;
+        img.style.cssText = "width:100%;height:100%;border-radius:12px;object-fit:cover;position:absolute;top:0;left:0;";
+        avatarEl.insertBefore(img, avatarEl.firstChild);
       } else {
         document.getElementById("avatarLetter").textContent = firstName.charAt(0).toUpperCase();
       }
@@ -233,26 +232,16 @@
       `;
 
       const btnAdd = document.getElementById("addDonationBtn");
-      if (btnAdd && role !== "donante") btnAdd.style.display = "none";
+      if (btnAdd) btnAdd.style.display = role === "donante" ? "flex" : "none";
     }
 
     function renderStats(role) {
       const stats = {
-        donante: [
-          ["stat1", "0", "Mis Donaciones"],
-          ["stat2", "0", "Entregados"]
-        ],
-        validador: [
-          ["stat1", "0", "Por Validar"],
-          ["stat2", "0", "Revisados"]
-        ],
-        receptor: [
-          ["stat1", "0", "Mis Reservas"]
-        ]
+        donante: [["stat1", "0", "Mis Donaciones"], ["stat2", "0", "Entregados"]],
+        validador: [["stat1", "0", "Por Validar"], ["stat2", "0", "Revisados"]],
+        receptor: [["stat1", "0", "Mis Reservas"]]
       };
-
       const items = stats[role] || stats.receptor;
-
       document.getElementById("statsContainer").innerHTML = items.map(item => `
         <div class="stat-card">
           <div class="icon-wrap">💊</div>
@@ -264,26 +253,20 @@
 
     async function getDashboardDonations(user, role) {
       const title = document.getElementById("listTitle");
-
       try {
         if (role === "donante") {
           title.textContent = "Mis Donaciones Activas";
           return await mediConnect.getDonations({ donante_id: user.id });
         }
-
         if (role === "validador") {
           title.textContent = "Acciones Pendientes";
           return await mediConnect.getDonations();
         }
-
         title.textContent = "Mis Reservas Activas";
         return await mediConnect.getDonations({ receptor_id: user.id });
       } catch (error) {
         console.error(error);
-        document.getElementById("activityList").innerHTML =
-          `<p style="color:var(--danger);text-align:center;padding:40px 0;font-size:14px;font-weight:600">
-            Error al conectar con el servidor
-          </p>`;
+        document.getElementById("activityList").innerHTML = `<p style="color:var(--danger);text-align:center;padding:40px 0">Error al conectar</p>`;
         return [];
       }
     }
@@ -295,7 +278,6 @@
           history: donations.filter(d => ["entregado", "rechazado"].includes(d.estado))
         };
       }
-
       return {
         active: donations.filter(d => !["entregado", "rechazado"].includes(d.estado)),
         history: donations.filter(d => ["entregado", "rechazado"].includes(d.estado))
@@ -304,23 +286,15 @@
 
     function renderDonationList(items, role) {
       const list = document.getElementById("activityList");
-
       list.innerHTML = items.length
         ? items.map(item => renderMedCard(item, role)).join("")
-        : `<p style="color:var(--gray-400);text-align:center;padding:40px 0;font-size:14px;font-weight:600">
-            No hay acciones pendientes
-          </p>`;
+        : `<p style="color:var(--gray-400);text-align:center;padding:40px 0">No hay acciones pendientes</p>`;
     }
 
     function renderHistoryList(items, role) {
       const section = document.getElementById("historialSection");
       const list = document.getElementById("historialList");
-
-      if (!items.length) {
-        section.style.display = "none";
-        return;
-      }
-
+      if (!items.length) { section.style.display = "none"; return; }
       section.style.display = "block";
       list.innerHTML = items.map(item => renderMedCard(item, role, true)).join("");
     }
@@ -328,7 +302,6 @@
     function updateStats(active, history) {
       const stat1 = document.getElementById("stat1");
       const stat2 = document.getElementById("stat2");
-
       if (stat1) stat1.textContent = active;
       if (stat2) stat2.textContent = history;
     }
@@ -337,20 +310,16 @@
       const img = d.imagen_url
         ? `<img src="${d.imagen_url}" alt="${d.nombre}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`
         : MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default;
-
       return `
         <div class="med-card ${isHistory ? "history-card" : ""}"
              style="${isHistory ? "opacity:.7;filter:grayscale(.5);" : ""}cursor:pointer"
              onclick="location.href='detalle.html?id=${d.id}'">
-
           <div class="med-img">${img}</div>
-
           <div class="med-info">
             <h3>${d.nombre}</h3>
             <p>${d.tipo} · ${d.cantidad} un.</p>
             <div class="med-meta">Vence: ${d.fecha_vencimiento}</div>
           </div>
-
           <div class="med-badge-wrap" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
             <span class="badge ${STATUS_CLASS[d.estado] || "badge-blue"}">${d.estado}</span>
             ${renderActions(d, role, isHistory)}
@@ -361,68 +330,31 @@
 
     function renderActions(d, role, isHistory) {
       if (isHistory) return "";
-
       if (role === "donante" && d.estado === "disponible") {
-        return `
-          <div style="display:flex;gap:4px;margin-top:4px">
-            <button onclick="event.stopPropagation();location.href='donar.html?edit=${d.id}'"
-              style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Editar
-            </button>
-
-            <button onclick="event.stopPropagation();deleteMed('${d.id}')"
-              style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Eliminar
-            </button>
-          </div>
-        `;
+        return `<div style="display:flex;gap:4px;margin-top:4px">
+          <button onclick="event.stopPropagation();location.href='donar.html?edit=${d.id}'" style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">Editar</button>
+          <button onclick="event.stopPropagation();deleteMed('${d.id}')" style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">Eliminar</button>
+        </div>`;
       }
-
       if (role === "validador" && d.estado === "reservado") {
-        return `
-          <div style="display:flex;gap:4px;margin-top:4px">
-            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','aprobado')"
-              style="background:var(--success);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Aprobar
-            </button>
-
-            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','rechazado')"
-              style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Rechazar
-            </button>
-          </div>
-        `;
+        return `<div style="display:flex;gap:4px;margin-top:4px">
+          <button onclick="event.stopPropagation();updateMedStatus('${d.id}','aprobado')" style="background:var(--success);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">Aprobar</button>
+          <button onclick="event.stopPropagation();updateMedStatus('${d.id}','rechazado')" style="background:var(--danger);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">Rechazar</button>
+        </div>`;
       }
-
       if (role === "validador" && d.estado === "aprobado") {
-        return `
-          <div style="display:flex;gap:4px;margin-top:4px">
-            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','entregado')"
-              style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Marcar Entregado
-            </button>
-          </div>
-        `;
+        return `<div style="display:flex;gap:4px;margin-top:4px">
+          <button onclick="event.stopPropagation();updateMedStatus('${d.id}','entregado')" style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">Marcar Entregado</button>
+        </div>`;
       }
-
       return "";
     }
 
     async function updateMedStatus(id, newStatus) {
       try {
         const ok = await mediConnect.updateDonationStatus(id, newStatus);
-
-        if (!ok) {
-          showToast("Error al actualizar", "error");
-          return;
-        }
-
-        const messages = {
-          aprobado: "Medicamento aprobado ✓",
-          rechazado: "Medicamento rechazado ✗",
-          entregado: "Entrega confirmada ✓"
-        };
-
+        if (!ok) { showToast("Error al actualizar", "error"); return; }
+        const messages = { aprobado: "Medicamento aprobado ✓", rechazado: "Medicamento rechazado ✗", entregado: "Entrega confirmada ✓" };
         showToast(messages[newStatus] || "Estado actualizado", "success");
         await loadDashboard();
       } catch (error) {
@@ -433,15 +365,9 @@
 
     async function deleteMed(id) {
       if (!confirm("¿Estás seguro de que deseas eliminar esta donación?")) return;
-
       try {
         const ok = await mediConnect.deleteDonation(id);
-
-        if (!ok) {
-          showToast("No se pudo eliminar", "error");
-          return;
-        }
-
+        if (!ok) { showToast("No se pudo eliminar", "error"); return; }
         showToast("Donación eliminada", "success");
         await loadDashboard();
       } catch (error) {
@@ -450,13 +376,24 @@
       }
     }
 
-    async function cerrarSesion() {
+    async function checkNotificacionesPendientes() {
       try {
-        await supabaseClient.auth.signOut();
-      } catch (error) {
-        console.warn("No había sesión activa de Google");
-      }
+        const user = mediConnect.getUser();
+        if (!user) return;
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false&limit=1`;
+        const pendientes = await sb.select('notificaciones', query);
+        const hay = pendientes && pendientes.length > 0;
+        
+        const dot = document.getElementById('notifDot');
+        if (dot) dot.style.display = hay ? 'block' : 'none';
+        
+        const navDot = document.getElementById('navNotifDot');
+        if (navDot) navDot.style.display = hay ? 'block' : 'none';
+      } catch(e) {}
+    }
 
+    async function cerrarSesion() {
+      try { await supabaseClient.auth.signOut(); } catch (error) {}
       mediConnect.logout();
       location.href = "index.html";
     }
