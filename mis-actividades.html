@@ -6,9 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MediConnect – Mis Actividades</title>
   <link rel="stylesheet" href="style.css">
-</head>
+  </head>
 
 <body>
+
+  <style>
+    .btn-cancel {
+      background: #FEE2E2;
+      color: #DC2626;
+      border: none;
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-cancel:hover {
+      background: #FECACA;
+    }
+  </style>
 
   <div class="page">
     <!-- Header -->
@@ -53,7 +71,7 @@
         </svg>
         Buscar
       </a>
-      <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+      <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
           stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -74,7 +92,19 @@
         Perfil
       </a>
     </nav>
+
+    <!-- Modal confirmar cancelación -->
+    <div class="modal-overlay" id="cancelModal">
+      <div class="modal">
+        <h3>🗑️ Cancelar reserva</h3>
+        <p>¿Estás seguro de qué quieres cancelar esta reserva?<br>El medicamento volverá a estar disponible.</p>
+        <button class="btn-primary" id="confirmCancelBtn" style="background:#DC2626">Sí, cancelar</button>
+        <button class="btn-secondary" onclick="cerrarModalCancel()">Volver</button>
+      </div>
+    </div>
   </div>
+
+  <div id="toast" class="toast"></div>
 
   <script src="app.js"></script>
   <script>
@@ -89,13 +119,15 @@
     const ICON_COLORS = ['#F0FDF4', '#FEF3C7', '#EFF6FF', '#F5F3FF'];
 
     let allItems = [];
+    let currentUser = null;
 
     async function load() {
       const user = mediConnect.getUser();
+      currentUser = user;
       if (!user) { location.href = 'index.html'; return; }
 
       const btnAdd = document.getElementById('addDonationBtn');
-      if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+      if (btnAdd && user.rol === 'donante') btnAdd.style.display = '';
 
       const title = document.getElementById('pageTitle');
 
@@ -130,7 +162,7 @@
       }
 
       list.innerHTML = items.map((d, i) => `
-      <div class="med-card" style="cursor:pointer;" onclick="location.href='detalle.html?id=${d.id}'">
+      <div class="med-card" style="${d.estado === 'reservado' && currentUser?.rol === 'receptor' ? '' : 'cursor:pointer;'}" onclick="${d.estado === 'reservado' && currentUser?.rol === 'receptor' ? '' : `location.href='detalle.html?id=${d.id}'`}">
         <div class="med-img" style="background:${ICON_COLORS[i % ICON_COLORS.length]}">
           ${MEDICINE_EMOJIS[d.tipo] || MEDICINE_EMOJIS.default}
         </div>
@@ -141,10 +173,54 @@
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             ${new Date(d.created_at || Date.now()).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
           </div>
+          ${d.estado === 'reservado' && d.receptor_nombre ? `<div class="med-meta" style="color:var(--primary);margin-top:2px">Reservado por: ${d.receptor_nombre}</div>` : ''}
         </div>
-        <span class="badge ${STATUS_MAP[d.estado] || 'badge-blue'}">${d.estado}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <span class="badge ${STATUS_MAP[d.estado] || 'badge-blue'}">${d.estado}</span>
+          ${d.estado === 'reservado' && currentUser?.rol === 'receptor' ? `<button class="btn-cancel" onclick="event.stopPropagation();cancelarReserva(${d.id},this)">Cancelar</button>` : ''}
+        </div>
       </div>
     `).join('');
+    }
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    let cancelReservaId = null;
+
+    function mostrarModalCancel(id) {
+      cancelReservaId = id;
+      document.getElementById('cancelModal').classList.add('show');
+    }
+
+    function cerrarModalCancel() {
+      document.getElementById('cancelModal').classList.remove('show');
+      cancelReservaId = null;
+    }
+
+    const confirmBtn = document.getElementById('confirmCancelBtn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (!cancelReservaId) return;
+        const id = cancelReservaId;
+        cerrarModalCancel();
+        const result = await mediConnect.cancelReservation(id);
+        if (result.success) {
+          showToast(result.message, 'success');
+          load();
+        } else {
+          showToast(result.message, 'error');
+        }
+      });
+    }
+
+    async function cancelarReserva(id, btn) {
+      mostrarModalCancel(id);
     }
 
     function filterItems() {

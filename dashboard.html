@@ -26,7 +26,7 @@
       <div class="fade-up delay-2">
         <div class="section-header">
           <h2 id="listTitle">Actividad Reciente</h2>
-          <a href="buscar.html">Ver todo</a>
+          <a href="mis-actividades.html">Ver todo</a>
         </div>
 
         <div class="activity-list" id="activityList" style="display:flex;flex-direction:column;gap:12px">
@@ -47,6 +47,16 @@
         <div id="historialList" style="display:flex;flex-direction:column;gap:12px"></div>
       </div>
 
+      <!-- Modal confirmar cancelación -->
+      <div class="modal-overlay" id="cancelModal">
+        <div class="modal">
+          <h3>🗑️ Cancelar reserva</h3>
+          <p>¿Estás seguro de qué quieres cancelar esta reserva?<br>El medicamento volverá a estar disponible.</p>
+          <button class="btn-primary" id="confirmCancelBtn" style="background:#DC2626">Sí, cancelar</button>
+          <button class="btn-secondary" onclick="cerrarModalCancel()">Volver</button>
+        </div>
+      </div>
+
       <div class="invite-banner fade-up delay-3"
         style="background:var(--white);border-radius:var(--radius);padding:20px;text-align:center;border:1px solid var(--gray-100);box-shadow:var(--shadow-sm)">
         <h3 style="font-size:16px;margin-bottom:4px">¡Invita a un amigo!</h3>
@@ -62,21 +72,21 @@
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
+    <a href="dashboard.html" class="nav-item active">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
       </svg>
       Inicio
     </a>
-    <a href="buscar.html" class="nav-item active">
+    <a href="buscar.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'">
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -233,7 +243,7 @@
       `;
 
       const btnAdd = document.getElementById("addDonationBtn");
-      if (btnAdd && role !== "donante") btnAdd.style.display = "none";
+      if (btnAdd && role === "donante") btnAdd.style.display = "";
     }
 
     function renderStats(role) {
@@ -349,6 +359,7 @@
             <h3>${d.nombre}</h3>
             <p>${d.tipo} · ${d.cantidad} un.</p>
             <div class="med-meta">Vence: ${d.fecha_vencimiento}</div>
+            ${d.estado === 'reservado' && d.receptor_nombre ? `<div class="med-meta" style="color:var(--primary);margin-top:2px">Reservado por: ${d.receptor_nombre}</div>` : ''}
           </div>
 
           <div class="med-badge-wrap" style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
@@ -360,7 +371,22 @@
     }
 
     function renderActions(d, role, isHistory) {
-      if (isHistory) return "";
+      if (isHistory) {
+        if (d.estado === 'entregado') {
+          const hasEvidence = localStorage.getItem('evidence_' + d.id) || d.evidencia_url;
+          if (hasEvidence) {
+            return `
+              <div style="display:flex;gap:4px;margin-top:4px">
+                <button onclick="event.stopPropagation();showDeliveryEvidence('${d.id}')"
+                  style="background:var(--success);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+                  Evidencia
+                </button>
+              </div>
+            `;
+          }
+        }
+        return "";
+      }
 
       if (role === "donante" && d.estado === "disponible") {
         return `
@@ -394,12 +420,42 @@
         `;
       }
 
-      if (role === "validador" && d.estado === "aprobado") {
+      if (role === "receptor" && d.estado === "reservado") {
         return `
           <div style="display:flex;gap:4px;margin-top:4px">
-            <button onclick="event.stopPropagation();updateMedStatus('${d.id}','entregado')"
+            <button onclick="event.stopPropagation();cancelReserva('${d.id}',this)"
+              style="background:#FEE2E2;border:none;color:#DC2626;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Cancelar
+            </button>
+          </div>
+        `;
+      }
+
+      if (role === "donante" && d.estado === "aprobado" && d.donante_id === mediConnect.getUser().id) {
+        const hasEvidence = localStorage.getItem('firma_' + d.id) || d.firma_url || localStorage.getItem('evidencia_' + d.id) || d.evidencia_url;
+        if (hasEvidence) {
+          return `
+            <div style="display:flex;gap:4px;margin-top:4px">
+              <span style="font-size:11px;font-weight:700;color:var(--success);padding:4px 0">Evidencia enviada ✓</span>
+            </div>
+          `;
+        }
+        return `
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <button onclick="event.stopPropagation();openEvidenceModal('${d.id}')"
               style="background:var(--primary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
-              Marcar Entregado
+              Entregar ahora
+            </button>
+          </div>
+        `;
+      }
+
+      if (role === "validador" && d.estado === "aprobado") {
+        return `
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <button onclick="event.stopPropagation();showDeliveryEvidence('${d.id}')"
+              style="background:var(--secondary);border:none;color:white;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer">
+              Ver evidencia
             </button>
           </div>
         `;
@@ -429,6 +485,35 @@
         console.error(error);
         showToast("Error de conexión", "error");
       }
+    }
+
+    let cancelReservaId = null;
+
+    function mostrarModalCancel(id) {
+      cancelReservaId = id;
+      document.getElementById('cancelModal').classList.add('show');
+    }
+
+    function cerrarModalCancel() {
+      document.getElementById('cancelModal').classList.remove('show');
+      cancelReservaId = null;
+    }
+
+    document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
+      if (!cancelReservaId) return;
+      const id = cancelReservaId;
+      cerrarModalCancel();
+      const result = await mediConnect.cancelReservation(id);
+      if (result.success) {
+        showToast(result.message, 'success');
+        await loadDashboard();
+      } else {
+        showToast(result.message, 'error');
+      }
+    });
+
+    async function cancelReserva(id, btn) {
+      mostrarModalCancel(id);
     }
 
     async function deleteMed(id) {
@@ -461,7 +546,375 @@
       location.href = "index.html";
     }
 
+    // ===== EVIDENCIA DE ENTREGA =====
+    let sigCanvas = null;
+    let sigCtx = null;
+    let isDrawing = false;
+    let hasDrawn = false;
+    let currentDeliveryId = null;
+    let currentEvidenceType = 'firma';
+    let currentEvidenceViewingId = null;
+
+    function initSignatureCanvas() {
+      sigCanvas = document.getElementById('signatureCanvas');
+      if (!sigCanvas) return;
+      sigCtx = sigCanvas.getContext('2d');
+      
+      const rect = sigCanvas.getBoundingClientRect();
+      sigCanvas.width = rect.width;
+      sigCanvas.height = rect.height;
+
+      sigCtx.strokeStyle = "#2563EB"; 
+      sigCtx.lineWidth = 3;
+      sigCtx.lineCap = "round";
+      sigCtx.lineJoin = "round";
+
+      sigCanvas.addEventListener('mousedown', startDrawing);
+      sigCanvas.addEventListener('mousemove', draw);
+      sigCanvas.addEventListener('mouseup', stopDrawing);
+      sigCanvas.addEventListener('mouseout', stopDrawing);
+
+      sigCanvas.addEventListener('touchstart', startDrawingTouch, { passive: false });
+      sigCanvas.addEventListener('touchmove', drawTouch, { passive: false });
+      sigCanvas.addEventListener('touchend', stopDrawing);
+    }
+
+    function startDrawing(e) {
+      isDrawing = true;
+      sigCtx.beginPath();
+      const rect = sigCanvas.getBoundingClientRect();
+      sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      hasDrawn = true;
+      const rect = sigCanvas.getBoundingClientRect();
+      sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      sigCtx.stroke();
+    }
+
+    function stopDrawing() {
+      isDrawing = false;
+    }
+
+    function startDrawingTouch(e) {
+      e.preventDefault();
+      isDrawing = true;
+      sigCtx.beginPath();
+      const touch = e.touches[0];
+      const rect = sigCanvas.getBoundingClientRect();
+      sigCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    }
+
+    function drawTouch(e) {
+      e.preventDefault();
+      if (!isDrawing) return;
+      hasDrawn = true;
+      const touch = e.touches[0];
+      const rect = sigCanvas.getBoundingClientRect();
+      sigCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+      sigCtx.stroke();
+    }
+
+    function clearSignature() {
+      if (sigCtx && sigCanvas) {
+        sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+        hasDrawn = false;
+      }
+    }
+
+    function openEvidenceModal(id) {
+      currentDeliveryId = id;
+      hasDrawn = false;
+      
+      const overlay = document.getElementById('evidenceOverlay');
+      overlay.classList.add('show');
+      
+      switchEvidenceTab('firma');
+      
+      document.getElementById('evidenceFotoInput').value = '';
+      document.getElementById('evidencePhotoPreview').style.display = 'none';
+      document.getElementById('uploadLabel').textContent = 'Toca para capturar o subir foto';
+    }
+
+    function closeEvidenceModal() {
+      const overlay = document.getElementById('evidenceOverlay');
+      overlay.classList.remove('show');
+      clearSignature();
+    }
+
+    function switchEvidenceTab(type) {
+      currentEvidenceType = type;
+      const tabFirma = document.getElementById('evidenceTabFirma');
+      const tabFoto = document.getElementById('evidenceTabFoto');
+      const secFirma = document.getElementById('sectionFirma');
+      const secFoto = document.getElementById('sectionFoto');
+
+      if (type === 'firma') {
+        tabFirma.classList.add('active');
+        tabFoto.classList.remove('active');
+        tabFirma.style.background = 'var(--primary)';
+        tabFirma.style.color = 'white';
+        tabFoto.style.background = 'var(--gray-100)';
+        tabFoto.style.color = 'var(--gray-800)';
+        secFirma.style.display = 'flex';
+        secFoto.style.display = 'none';
+        if (!sigCanvas) {
+          setTimeout(initSignatureCanvas, 100);
+        }
+      } else {
+        tabFirma.classList.remove('active');
+        tabFoto.classList.add('active');
+        tabFoto.style.background = 'var(--primary)';
+        tabFoto.style.color = 'white';
+        tabFirma.style.background = 'var(--gray-100)';
+        tabFirma.style.color = 'var(--gray-800)';
+        secFirma.style.display = 'none';
+        secFoto.style.display = 'flex';
+      }
+    }
+
+    function previewEvidencePhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = document.getElementById('evidencePhotoPreview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        document.getElementById('uploadLabel').textContent = 'Foto cargada ✓';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+      var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {type:mime});
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function submitDeliveryEvidence() {
+      if (!currentDeliveryId) return;
+
+      const fotoInput = document.getElementById('evidenceFotoInput');
+
+      let firmaUrl = null;
+      let fotoUrl = null;
+
+      if (hasDrawn) {
+        const firmaFile = dataURLtoFile(sigCanvas.toDataURL('image/png'), 'firma.png');
+        firmaUrl = await sb.uploadImage(firmaFile);
+        if (!firmaUrl) {
+          showToast("Error al subir la firma", "error");
+          return;
+        }
+      }
+
+      if (fotoInput.files && fotoInput.files[0]) {
+        fotoUrl = await sb.uploadImage(fotoInput.files[0]);
+        if (!fotoUrl) {
+          showToast("Error al subir la foto", "error");
+          return;
+        }
+      }
+
+      if (!firmaUrl && !fotoUrl) {
+        showToast("Por favor, captura la firma o sube una foto", "error");
+        return;
+      }
+
+      const btn = document.getElementById('btnConfirmarEntrega');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Procesando...';
+
+      try {
+        const ok = await mediConnect.submitEvidence(currentDeliveryId, firmaUrl, fotoUrl);
+
+        if (ok) {
+          showToast("Evidencia guardada correctamente ✓", "success");
+          closeEvidenceModal();
+          await loadDashboard();
+        } else {
+          showToast("Error al guardar evidencia", "error");
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      } catch (e) {
+        console.error("Error al registrar evidencia:", e);
+        showToast("Error de conexión", "error");
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    function showDeliveryEvidence(id) {
+      currentEvidenceViewingId = id;
+      const user = mediConnect.getUser();
+      const firmaLocal = localStorage.getItem('firma_' + id);
+      const fotoLocal = localStorage.getItem('evidencia_' + id);
+
+      const firmaEl = document.getElementById('viewFirmaImage');
+      const fotoEl = document.getElementById('viewFotoImage');
+      const firmaSection = document.getElementById('viewSignatureSection');
+      const fotoSection = document.getElementById('viewPhotoSection');
+      const noEvidence = document.getElementById('viewNoEvidence');
+      const btnEntregado = document.getElementById('btnMarcarEntregado');
+
+      firmaSection.style.display = 'none';
+      fotoSection.style.display = 'none';
+      noEvidence.style.display = 'none';
+      btnEntregado.style.display = 'none';
+
+      function showEvidence() {
+        const hasEvidence = firmaLocal || fotoLocal;
+        if (hasEvidence && user && user.rol === 'validador') {
+          btnEntregado.style.display = 'block';
+        }
+        if (firmaLocal) {
+          firmaEl.src = firmaLocal;
+          firmaSection.style.display = 'block';
+        }
+        if (fotoLocal) {
+          fotoEl.src = fotoLocal;
+          fotoSection.style.display = 'block';
+        }
+        document.getElementById('viewEvidenceOverlay').classList.add('show');
+      }
+
+      if (firmaLocal || fotoLocal) {
+        showEvidence();
+        return;
+      }
+
+      mediConnect.getDonationById(id).then(d => {
+        if (d) {
+          if (d.firma_url) {
+            localStorage.setItem('firma_' + id, d.firma_url);
+            firmaEl.src = d.firma_url;
+            firmaSection.style.display = 'block';
+          }
+          if (d.evidencia_url) {
+            localStorage.setItem('evidencia_' + id, d.evidencia_url);
+            fotoEl.src = d.evidencia_url;
+            fotoSection.style.display = 'block';
+          }
+          if ((d.firma_url || d.evidencia_url) && user && user.rol === 'validador') {
+            btnEntregado.style.display = 'block';
+          }
+          if (!d.firma_url && !d.evidencia_url) {
+            noEvidence.style.display = 'block';
+          }
+          document.getElementById('viewEvidenceOverlay').classList.add('show');
+        } else {
+          noEvidence.style.display = 'block';
+          document.getElementById('viewEvidenceOverlay').classList.add('show');
+        }
+      }).catch(err => {
+        showToast("Error al obtener la evidencia", "error");
+      });
+    }
+
+    function closeViewEvidenceModal() {
+      document.getElementById('viewEvidenceOverlay').classList.remove('show');
+    }
+
     initDashboard();
   </script>
+
+  <!-- Modal de Evidencia de Entrega (para DONANTE) -->
+  <div class="modal-overlay" id="evidenceOverlay">
+    <div class="modal" id="evidenceModal" style="max-width: 420px; text-align: left; padding: 24px;">
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px; font-family: var(--font-title); color: var(--gray-800);">
+        Entregar Medicamento
+      </h3>
+      <p style="font-size: 13px; color: var(--gray-400); margin-bottom: 20px;">
+        Captura la firma del receptor y/o una foto de la entrega como evidencia.
+      </p>
+
+      <div style="display:flex;gap:10px;margin-bottom:18px;">
+        <button id="evidenceTabFirma" class="tab-evidence active" onclick="switchEvidenceTab('firma')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--primary);color:white;font-weight:700;cursor:pointer;">Firma</button>
+        <button id="evidenceTabFoto" class="tab-evidence" onclick="switchEvidenceTab('foto')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--gray-100);color:var(--gray-800);font-weight:700;cursor:pointer;">Foto</button>
+      </div>
+
+      <div id="sectionFirma" style="display: flex; flex-direction: column; gap: 12px;">
+        <label style="font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase;">Firma del Receptor</label>
+        <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 14px; padding: 10px; min-height: 180px;">
+          <canvas id="signatureCanvas" style="width:100%;height:180px;touch-action:none;"></canvas>
+        </div>
+        <button class="btn-secondary" type="button" onclick="clearSignature()" style="width:100%;padding:10px;border:none;color:var(--gray-700);font-weight:600;cursor:pointer;">Borrar firma</button>
+      </div>
+
+      <div id="sectionFoto" style="display: none; flex-direction: column; gap: 12px;">
+        <label style="font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase;">Fotografía de Entrega</label>
+        <div class="photo-upload" onclick="document.getElementById('evidenceFotoInput').click()" style="border: 2px dashed var(--gray-200); border-radius: var(--radius); padding: 24px; text-align: center; cursor: pointer; background: var(--gray-50);">
+          <input type="file" id="evidenceFotoInput" accept="image/*" onchange="previewEvidencePhoto(event)" style="display: none;" />
+          <div class="photo-upload-icon" style="font-size: 28px; margin-bottom: 6px;">📷</div>
+          <span id="uploadLabel" style="font-size: 13px; color: var(--gray-400); font-weight: 600;">Toca para tomar foto</span>
+          <img id="evidencePhotoPreview" style="max-width: 100%; border-radius: 10px; margin-top: 10px; display: none; max-height: 120px; object-fit: contain; margin-left: auto; margin-right: auto;" />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 24px;">
+        <button class="btn-secondary" onclick="closeEvidenceModal()" style="flex:1; padding: 10px; border: none; color: var(--gray-700); font-weight: 600; cursor: pointer;">
+          Cancelar
+        </button>
+        <button class="btn-primary" id="btnConfirmarEntrega" onclick="submitDeliveryEvidence()" style="flex:1; padding: 10px; font-weight: 700; cursor: pointer;">
+          Guardar evidencia
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Visualización de Evidencia -->
+  <div class="modal-overlay" id="viewEvidenceOverlay">
+    <div class="modal" id="viewEvidenceModal" style="max-width: 420px; text-align: left; padding: 24px;">
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 4px; font-family: var(--font-title); color: var(--gray-800);">
+        Evidencia de Entrega
+      </h3>
+      <p style="font-size: 13px; color: var(--gray-400); margin-bottom: 20px;">
+        Revisa la evidencia antes de marcar como entregado.
+      </p>
+
+      <div id="viewSignatureSection" style="display:none; margin-bottom: 16px;">
+        <label style="font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; display:block; margin-bottom: 8px;">✍️ Firma del Receptor</label>
+        <div style="width: 100%; border: 1px solid var(--gray-200); border-radius: 12px; background: var(--gray-50); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 10px;">
+          <img id="viewFirmaImage" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px;" />
+        </div>
+      </div>
+
+      <div id="viewPhotoSection" style="display:none; margin-bottom: 16px;">
+        <label style="font-size: 13px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; display:block; margin-bottom: 8px;">📸 Foto de Entrega</label>
+        <div style="width: 100%; border: 1px solid var(--gray-200); border-radius: 12px; background: var(--gray-50); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 120px; padding: 10px;">
+          <img id="viewFotoImage" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px;" />
+        </div>
+      </div>
+
+      <p id="viewNoEvidence" style="font-size:13px;color:var(--gray-400);text-align:center;padding:20px 0;">No se ha registrado evidencia para esta donación.</p>
+
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+        <button id="btnMarcarEntregado" class="btn-primary" onclick="closeViewEvidenceModal();updateMedStatus(currentEvidenceViewingId,'entregado')" style="display:none; padding:12px;">
+          Marcar como entregado
+        </button>
+        <button class="btn-secondary" onclick="closeViewEvidenceModal()" style="width:100%;padding:10px;border:none;color:var(--gray-700);font-weight:600;cursor:pointer;">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

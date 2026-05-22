@@ -6,6 +6,7 @@
   --primary-dark: #1d4ed8;
   --primary-light: #EFF6FF;
   --primary-gradient: linear-gradient(135deg, #2563EB, #3B82F6);
+  --secondary: #6B7280;
   --success: #10B981;
   --warning: #F59E0B;
   --danger: #EF4444;
@@ -1061,6 +1062,7 @@ select.input-field {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 20px;
 }
 
 .account-item-icon svg {

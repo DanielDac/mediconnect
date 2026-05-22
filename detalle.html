@@ -241,7 +241,7 @@
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" onclick="location.href='donar.html'">
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -291,6 +291,46 @@
       const fechaFmt = d.fecha_vencimiento
         ? new Date(d.fecha_vencimiento + 'T00:00:00').toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric' })
         : '—';
+
+      let evidenceHtml = '';
+      if (d.estado === 'entregado' || (d.estado === 'aprobado' && (d.firma_url || d.evidencia_url))) {
+        const localFirma = localStorage.getItem('firma_' + d.id) || d.firma_url;
+        const localFoto = localStorage.getItem('evidencia_' + d.id) || d.evidencia_url;
+        if (localFirma || localFoto) {
+          let sections = '';
+          if (localFirma) {
+            sections += `
+              <div style="margin-bottom: 14px;">
+                <h4 style="font-size: 12px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; margin-bottom: 8px;">✍️ Firma del Receptor</h4>
+                <div style="width: 100%; border: 1px solid var(--gray-100); border-radius: 8px; background: var(--gray-50); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 100px; padding: 10px;">
+                  <img src="${localFirma}" style="max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 6px;" alt="Firma del receptor" />
+                </div>
+              </div>
+            `;
+          }
+          if (localFoto) {
+            sections += `
+              <div>
+                <h4 style="font-size: 12px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; margin-bottom: 8px;">📸 Foto de Entrega</h4>
+                <div style="width: 100%; border: 1px solid var(--gray-100); border-radius: 8px; background: var(--gray-50); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 100px; padding: 10px;">
+                  <img src="${localFoto}" style="max-width: 100%; max-height: 180px; object-fit: contain; border-radius: 6px;" alt="Foto de entrega" />
+                </div>
+              </div>
+            `;
+          }
+          evidenceHtml = `
+            <div class="detalle-card fade-up" style="margin-top: 16px; padding: 18px;">
+              <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-family: var(--font-title);">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 16px; height: 16px; color: var(--success);">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Evidencia de Entrega
+              </h3>
+              ${sections}
+            </div>
+          `;
+        }
+      }
 
       document.getElementById('detalleContent').innerHTML = `
         <!-- Hero con nombre e imagen -->
@@ -357,6 +397,17 @@
             </span>
             <span class="value">${d.donante}</span>
           </div>
+          ${d.receptor_nombre ? `
+          <div class="detalle-row">
+            <span class="label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+              </svg>
+              Receptor
+            </span>
+            <span class="value">${d.receptor_nombre}</span>
+          </div>
+          ` : ''}
           <div class="detalle-row">
             <span class="label">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
@@ -372,6 +423,8 @@
         <div class="id-badge fade-up">
           🔍 ID de trazabilidad: ${d.id}
         </div>
+
+        ${evidenceHtml}
 
         <!-- Acciones según rol -->
         <div id="detalleActions" class="fade-up" style="margin-top: 20px;"></div>
@@ -395,6 +448,27 @@
           </div>
         `;
       }
+
+      if (user && user.rol === 'donante' && d.estado === 'aprobado' && d.donante_id === user.id) {
+        const actionsArea = document.getElementById('detalleActions');
+        const tieneEvidencia = d.firma_url || d.evidencia_url;
+        if (tieneEvidencia) {
+          actionsArea.innerHTML = `
+            <div style="background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-md);border:1px solid var(--gray-100);">
+              <h3 style="font-size:15px;margin-bottom:8px;font-weight:700;color:var(--success)">✅ Evidencia enviada</h3>
+              <p style="font-size:13px;color:var(--gray-600);margin-bottom:0">El validador revisará la evidencia y confirmará la entrega.</p>
+            </div>
+          `;
+        } else {
+          actionsArea.innerHTML = `
+            <div style="background:var(--white);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-md);border:1px solid var(--gray-100);">
+              <h3 style="font-size:15px;margin-bottom:12px;font-weight:700">Entrega pendiente</h3>
+              <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px">Captura la firma del receptor y/o una foto de la entrega como evidencia.</p>
+              <button class="btn-primary" onclick="openDeliveryEvidenceModal('${d.id}')" style="width:100%;">Entregar ahora</button>
+            </div>
+          `;
+        }
+      }
     }
 
     async function reservar(id) {
@@ -409,17 +483,167 @@
       btn.innerHTML = '<span class="spinner"></span>';
 
       try {
-        const ok = await mediConnect.reserveDonation(id, qty);
-        if (ok) {
-          showToast('¡Reserva realizada con éxito!', 'success');
+        const result = await mediConnect.reserveDonation(id, qty);
+        if (result.success) {
+          showToast(result.message, 'success');
           setTimeout(() => location.href = 'dashboard.html', 1500);
         } else {
-          showToast('Error al procesar la reserva', 'error');
+          showToast(result.message, 'error');
           btn.disabled = false;
           btn.textContent = originalText;
         }
       } catch (e) {
         showToast('Error de conexión', 'error');
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }
+
+    let deliveryEvidenceCanvas = null;
+    let deliveryEvidenceCtx = null;
+    let deliveryEvidenceDrawing = false;
+    let deliveryEvidenceHasDrawn = false;
+    let currentDeliveryEvidenceId = null;
+    let currentDeliveryEvidenceType = 'firma';
+
+    function initDeliveryEvidenceCanvas() {
+      deliveryEvidenceCanvas = document.getElementById('deliveryEvidenceCanvas');
+      if (!deliveryEvidenceCanvas) return;
+      deliveryEvidenceCtx = deliveryEvidenceCanvas.getContext('2d');
+      deliveryEvidenceCanvas.width = deliveryEvidenceCanvas.offsetWidth * window.devicePixelRatio;
+      deliveryEvidenceCanvas.height = 200 * window.devicePixelRatio;
+      deliveryEvidenceCanvas.style.height = '200px';
+      deliveryEvidenceCanvas.style.width = '100%';
+      deliveryEvidenceCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      deliveryEvidenceCtx.strokeStyle = '#2563EB';
+      deliveryEvidenceCtx.lineWidth = 3;
+      deliveryEvidenceCtx.lineCap = 'round';
+      deliveryEvidenceCtx.lineJoin = 'round';
+    }
+
+    function startDeliveryEvidenceDrawing(e) {
+      deliveryEvidenceDrawing = true;
+      const rect = deliveryEvidenceCanvas.getBoundingClientRect();
+      const x = e.clientX || (e.touches && e.touches[0].clientX);
+      const y = e.clientY || (e.touches && e.touches[0].clientY);
+      deliveryEvidenceCtx.beginPath();
+      deliveryEvidenceCtx.moveTo(x - rect.left, y - rect.top);
+    }
+
+    function drawDeliveryEvidence(e) {
+      if (!deliveryEvidenceDrawing) return;
+      deliveryEvidenceHasDrawn = true;
+      const rect = deliveryEvidenceCanvas.getBoundingClientRect();
+      deliveryEvidenceCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      deliveryEvidenceCtx.stroke();
+    }
+
+    function stopDeliveryEvidenceDrawing() {
+      deliveryEvidenceDrawing = false;
+    }
+
+    function switchDeliveryEvidenceTab(type) {
+      currentDeliveryEvidenceType = type;
+      document.getElementById('deliveryTabFirma').classList.toggle('active', type === 'firma');
+      document.getElementById('deliveryTabFoto').classList.toggle('active', type === 'foto');
+      document.getElementById('deliverySectionFirma').style.display = type === 'firma' ? 'flex' : 'none';
+      document.getElementById('deliverySectionFoto').style.display = type === 'foto' ? 'flex' : 'none';
+      if (type === 'firma') {
+        setTimeout(initDeliveryEvidenceCanvas, 100);
+      }
+    }
+
+    function openDeliveryEvidenceModal(id) {
+      currentDeliveryEvidenceId = id;
+      deliveryEvidenceHasDrawn = false;
+      const overlay = document.getElementById('deliveryEvidenceOverlay');
+      overlay.classList.add('show');
+      switchDeliveryEvidenceTab('firma');
+      document.getElementById('deliveryEvidencePhotoInput').value = '';
+      document.getElementById('deliveryEvidencePreview').style.display = 'none';
+    }
+
+    function closeDeliveryEvidenceModal() {
+      document.getElementById('deliveryEvidenceOverlay').classList.remove('show');
+      if (deliveryEvidenceCtx && deliveryEvidenceCanvas) {
+        deliveryEvidenceCtx.clearRect(0, 0, deliveryEvidenceCanvas.width, deliveryEvidenceCanvas.height);
+        deliveryEvidenceHasDrawn = false;
+      }
+    }
+
+    function clearDeliverySignature() {
+      if (deliveryEvidenceCtx && deliveryEvidenceCanvas) {
+        deliveryEvidenceCtx.clearRect(0, 0, deliveryEvidenceCanvas.width, deliveryEvidenceCanvas.height);
+        deliveryEvidenceHasDrawn = false;
+      }
+    }
+
+    function previewDeliveryEvidencePhoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = document.getElementById('deliveryEvidencePreview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+      const arr = dataurl.split(',');
+      const mime = arr[0].match(/:(.*?);/)[1];
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, { type: mime });
+    }
+
+    async function submitDeliveryEvidence() {
+      if (!currentDeliveryEvidenceId) return;
+      let firmaUrl = null;
+      let fotoUrl = null;
+      if (deliveryEvidenceHasDrawn) {
+        firmaUrl = deliveryEvidenceCanvas.toDataURL('image/png');
+      }
+      const input = document.getElementById('deliveryEvidencePhotoInput');
+      if (input.files && input.files[0]) {
+        const fileToUpload = input.files[0];
+        fotoUrl = await sb.uploadImage(fileToUpload);
+        if (!fotoUrl) {
+          console.warn("No se pudo subir la foto a Storage, usando respaldo local.");
+          const reader = new FileReader();
+          fotoUrl = await new Promise((resolve) => {
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(fileToUpload);
+          });
+        }
+      }
+      if (!firmaUrl && !fotoUrl) {
+        showToast('Captura la firma o sube una foto', 'error');
+        return;
+      }
+      const btn = document.getElementById('btnSubmitDeliveryEvidence');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Procesando...';
+      try {
+        const ok = await mediConnect.submitEvidence(currentDeliveryEvidenceId, firmaUrl, fotoUrl);
+        if (ok) {
+          showToast('Evidencia guardada con éxito', 'success');
+          closeDeliveryEvidenceModal();
+          cargarDetalle();
+        } else {
+          showToast('Error al guardar evidencia', 'error');
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      } catch (err) {
+        console.error(err);
+        showToast('Error al guardar evidencia', 'error');
         btn.disabled = false;
         btn.textContent = originalText;
       }
@@ -442,8 +666,8 @@
       if (!user) { location.href = 'index.html'; return; }
 
       // Ocultar botón "+" si no es donante
-      const btnAdd = document.querySelector('.nav-btn-center');
-      if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+      const btnAdd = document.getElementById('addDonationBtn');
+      if (btnAdd && user.rol === 'donante') btnAdd.style.display = '';
 
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
@@ -466,6 +690,38 @@
 
     cargarDetalle();
   </script>
+
+  <!-- Modal de Evidencia de Entrega (Delivery Evidence) -->
+  <div class="modal-overlay" id="deliveryEvidenceOverlay">
+    <div class="modal" style="max-width: 420px; text-align: left; padding: 24px;">
+      <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 8px;">Entregar Medicamento</h3>
+      <p style="font-size: 13px; color: var(--gray-500); margin-bottom: 18px;">Captura la firma del receptor y/o una foto de la entrega como evidencia.</p>
+      <div style="display:flex;gap:10px;margin-bottom:18px;">
+        <button id="deliveryTabFirma" onclick="switchDeliveryEvidenceTab('firma')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--primary);color:white;font-weight:700;cursor:pointer;">Firma</button>
+        <button id="deliveryTabFoto" onclick="switchDeliveryEvidenceTab('foto')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--gray-100);color:var(--gray-800);font-weight:700;cursor:pointer;">Foto</button>
+      </div>
+      <div id="deliverySectionFirma" style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">
+        <label style="font-size:13px;font-weight:700;color:var(--gray-600);text-transform:uppercase;">Firma del Receptor</label>
+        <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 14px; padding: 10px; min-height: 200px;">
+          <canvas id="deliveryEvidenceCanvas" style="width:100%;height:200px;touch-action:none;"></canvas>
+        </div>
+        <button class="btn-secondary" type="button" onclick="clearDeliverySignature()" style="width:100%;padding:10px;border:none;color:var(--gray-700);font-weight:600;cursor:pointer;">Borrar firma</button>
+      </div>
+      <div id="deliverySectionFoto" style="display:none;flex-direction:column;gap:12px;margin-bottom:18px;">
+        <label style="font-size:13px;font-weight:700;color:var(--gray-600);text-transform:uppercase;">Foto de entrega</label>
+        <div class="photo-upload" onclick="document.getElementById('deliveryEvidencePhotoInput').click()" style="border: 2px dashed var(--gray-200); border-radius: 16px; padding: 28px; text-align: center; cursor: pointer; background: var(--gray-50);">
+          <input type="file" id="deliveryEvidencePhotoInput" accept="image/*" onchange="previewDeliveryEvidencePhoto(event)" style="display:none;" />
+          <div style="font-size:28px;margin-bottom:10px;">📷</div>
+          <span id="deliveryUploadLabel" style="font-size:13px;color:var(--gray-500);">Toca para subir una foto</span>
+          <img id="deliveryEvidencePreview" style="max-width:100%;border-radius:10px;margin-top:10px;display:none;max-height:160px;object-fit:contain;" />
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px;">
+        <button class="btn-secondary" type="button" onclick="closeDeliveryEvidenceModal()" style="flex:1;padding:10px;border:none;color:var(--gray-700);font-weight:600;cursor:pointer;">Cancelar</button>
+        <button class="btn-primary" type="button" id="btnSubmitDeliveryEvidence" onclick="submitDeliveryEvidence()" style="flex:1;padding:10px;font-weight:700;cursor:pointer;">Enviar evidencia</button>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

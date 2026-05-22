@@ -238,9 +238,9 @@ const mediConnect = {
       // Consulta básica para asegurar compatibilidad
       let query = 'select=*';
       
-      // Intentamos traer el nombre del donante si es posible
+      // Intentamos traer el nombre del donante y receptor si es posible
       if (!filters.skipJoin) {
-        query = 'select=*,usuarios!donante_id(nombre)';
+        query = 'select=*,donante:usuarios!donante_id(nombre),receptor:usuarios!receptor_id(nombre)';
       }
 
       if (filters.estado) query += `&estado=eq.${filters.estado}`;
@@ -255,10 +255,10 @@ const mediConnect = {
       });
       console.log("Donaciones crudas desde Supabase (con join):", data);
 
-      // Mapear para que cada donación tenga el campo "donante" con el nombre del usuario
       const mapped = (data || []).map(d => ({
         ...d,
-        donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
+        donante: d.donante?.nombre || d.usuarios?.nombre || 'Donante anónimo',
+        receptor_nombre: d.receptor?.nombre || null
       }));
 
       console.log("Donaciones mapeadas (con donante):", mapped);
@@ -308,7 +308,7 @@ const mediConnect = {
     }
   },
 
-  async updateDonationStatus(id, estado, newQuantity = null) {
+  async updateDonationStatus(id, estado, newQuantity = null, evidenciaUrl = null) {
     try {
       const user = this.getUser();
       if (!user) return false;
@@ -317,6 +317,9 @@ const mediConnect = {
 
       const updateData = { estado };
       if (newQuantity !== null) updateData.cantidad = newQuantity;
+      if (evidenciaUrl !== null) {
+        updateData.evidencia_url = evidenciaUrl;
+      }
 
       // SI SE RECHAZA: Intentar devolver el stock al original si existe
       if (estado === 'rechazado') {
@@ -347,11 +350,49 @@ const mediConnect = {
         }
       }
 
-      const ok = await sb.update('donaciones', id, updateData);
-      if (ok) console.log("Estado actualizado exitosamente.");
+      let ok = false;
+      if (evidenciaUrl) {
+        // Intentar actualizar con la columna evidencia_url
+        ok = await sb.update('donaciones', id, updateData);
+        if (!ok) {
+          console.warn("Fallo al actualizar con evidencia_url (columna probablemente inexistente). Reintentando solo con estado...");
+          delete updateData.evidencia_url;
+          ok = await sb.update('donaciones', id, updateData);
+        }
+      } else {
+        ok = await sb.update('donaciones', id, updateData);
+      }
+
+      if (ok) {
+        console.log("Estado actualizado exitosamente.");
+        if (evidenciaUrl) {
+          localStorage.setItem('evidence_' + id, evidenciaUrl);
+        }
+      }
       return ok;
     } catch (error) {
       console.error("Error al actualizar la donación:", error);
+      return false;
+    }
+  },
+
+  async submitEvidence(id, firmaUrl, fotoUrl) {
+    try {
+      const user = this.getUser();
+      if (!user) return false;
+      console.log(`Guardando evidencia para donación ${id}...`);
+      const updateData = {};
+      if (firmaUrl) updateData.firma_url = firmaUrl;
+      if (fotoUrl) updateData.evidencia_url = fotoUrl;
+      const ok = await sb.update('donaciones', id, updateData);
+      if (ok) {
+        console.log("Evidencia guardada exitosamente.");
+        if (firmaUrl) localStorage.setItem('firma_' + id, firmaUrl);
+        if (fotoUrl) localStorage.setItem('evidencia_' + id, fotoUrl);
+      }
+      return ok;
+    } catch (error) {
+      console.error("Error al guardar evidencia:", error);
       return false;
     }
   },
@@ -392,40 +433,41 @@ const mediConnect = {
     try {
       const user = this.getUser();
       if (!user || user.rol !== 'receptor') {
-        alert("Solo los receptores pueden reservar medicamentos.");
-        return false;
+        return { success: false, message: "Solo los receptores pueden reservar medicamentos." };
+      }
+
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
+      const recentResQuery = `select=id&receptor_id=eq.${user.id}&created_at=gte.${encodeURIComponent(monthStart)}&created_at=lt.${encodeURIComponent(nextMonthStart)}&estado=neq.rechazado`;
+      const recentReservations = await sb.select('donaciones', recentResQuery);
+
+      if (recentReservations && recentReservations.length >= 3) {
+        return { success: false, message: "Solo puedes reservar hasta 3 donaciones por mes." };
       }
 
       // 1. Obtener datos actuales del medicamento
       const med = await this.getDonationById(id);
       if (!med || med.estado !== 'disponible') {
-        alert("El medicamento ya no está disponible.");
-        return false;
+        return { success: false, message: "El medicamento ya no está disponible." };
       }
 
       const available = parseInt(med.cantidad);
       const toReserve = requestedQuantity ? parseInt(requestedQuantity) : available;
 
       if (toReserve > available) {
-        alert("No hay suficiente cantidad disponible.");
-        return false;
+        return { success: false, message: "No hay suficiente cantidad disponible." };
       }
 
       if (toReserve === available) {
-        // Reserva total: solo actualizar estado
-        console.log(`Reservando total (${toReserve}) de donación ${id} por el usuario ${user.id}...`);
-        return await sb.update('donaciones', id, {
+        await sb.update('donaciones', id, {
           estado: 'reservado',
           receptor_id: user.id
         });
+        return { success: true, message: 'Reserva realizada con éxito' };
       } else {
-        // Reserva parcial:
-        console.log(`Reservando parcial (${toReserve} de ${available}) de donación ${id}...`);
-
-        // A. Actualizar el original con lo que queda
         await sb.update('donaciones', id, { cantidad: available - toReserve });
 
-        // B. Crear una nueva entrada para la reserva
         const newDonation = {
           nombre: med.nombre,
           tipo: med.tipo,
@@ -440,11 +482,39 @@ const mediConnect = {
           created_at: new Date().toISOString()
         };
 
-        return await sb.insert('donaciones', newDonation);
+        await sb.insert('donaciones', newDonation);
+        return { success: true, message: 'Reserva realizada con éxito' };
       }
     } catch (error) {
       console.error("Error al reservar donación:", error);
-      return false;
+      return { success: false, message: 'Error de conexión al realizar la reserva' };
+    }
+  },
+
+  async cancelReservation(id) {
+    try {
+      const user = this.getUser();
+      if (!user || user.rol !== 'receptor') {
+        return { success: false, message: 'Solo los receptores pueden cancelar reservas.' };
+      }
+      const current = await this.getDonationById(id);
+      if (!current || current.estado !== 'reservado' || current.receptor_id !== user.id) {
+        return { success: false, message: 'Esta reserva no existe o ya fue procesada.' };
+      }
+      const query = `donante_id=eq.${current.donante_id}&nombre=eq.${encodeURIComponent(current.nombre)}&tipo=eq.${encodeURIComponent(current.tipo)}&estado=eq.disponible&fecha_vencimiento=eq.${current.fecha_vencimiento}`;
+      const results = await sb.select('donaciones', query);
+      if (results && results.length > 0) {
+        const original = results[0];
+        const newQty = parseInt(original.cantidad) + parseInt(current.cantidad);
+        await sb.update('donaciones', original.id, { cantidad: newQty });
+        await sb.delete('donaciones', id);
+      } else {
+        await sb.update('donaciones', id, { estado: 'disponible', receptor_id: null });
+      }
+      return { success: true, message: 'Reserva cancelada correctamente.' };
+    } catch (error) {
+      console.error("Error al cancelar reserva:", error);
+      return { success: false, message: 'Error al cancelar la reserva.' };
     }
   },
 
@@ -452,15 +522,19 @@ const mediConnect = {
   async getDonationById(id) {
     try {
       console.log(`Buscando donación con id: ${id}`);
-      const query = `select=*,usuarios!donante_id(nombre)&id=eq.${id}`;
-      const data = await sb.select('donaciones', query);
+      const query = `select=*,donante:usuarios!donante_id(nombre),receptor:usuarios!receptor_id(nombre)&id=eq.${id}`;
+      const data = await sb.select('donaciones', query).catch(err => {
+        console.warn("Fallo el join en getDonationById, reintentando consulta simple...", err);
+        return sb.select('donaciones', `select=*&id=eq.${id}`);
+      });
       console.log("Donación cruda por ID (con join):", data);
 
       if (data && data.length > 0) {
         const d = data[0];
         const mapped = {
           ...d,
-          donante: d.usuarios?.nombre || d.donante || 'Donante anónimo'
+          donante: d.donante?.nombre || d.usuarios?.nombre || 'Donante anónimo',
+          receptor_nombre: d.receptor?.nombre || null
         };
         console.log("Donación mapeada por ID:", mapped);
         return mapped;
