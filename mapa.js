@@ -244,8 +244,13 @@ async function loadDonationPins() {
   const user = mediConnect.getUser();
   if (!user) return;
 
-  // Obtener solo donaciones disponibles
-  const donations = await mediConnect.getDonations({ estado: 'disponible' });
+  let donations;
+  try {
+    donations = await mediConnect.getDonations({ estado: 'disponible' });
+  } catch (e) {
+    console.error("Error al cargar donaciones para el mapa:", e);
+    return;
+  }
 
   const infoWindow = new google.maps.InfoWindow();
 

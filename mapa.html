@@ -82,23 +82,25 @@
     const user = mediConnect.getUser();
     if (!user) location.href = 'index.html';
 
-    // Ocultar botón "+" si no es donante
+    // Mostrar botón "+" solo si es donante
     const btnAdd = document.getElementById('addDonationBtn');
-    if (btnAdd && user.rol !== 'donante') btnAdd.style.display = 'none';
+    if (btnAdd) btnAdd.style.display = user.rol === 'donante' ? 'flex' : 'none';
 
     async function checkNotificaciones() {
-  try {
-    const user = mediConnect.getUser();
-    if (!user) return;
-    const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false&limit=1`;
-    const pendientes = await sb.select('notificaciones', query);
-    const hay = pendientes && pendientes.length > 0;
-    const navDot = document.getElementById('navNotifDot');
-    if (navDot) navDot.style.display = hay ? 'block' : 'none';
-  } catch(e) {}
-}
+      try {
+        const user = mediConnect.getUser();
+        if (!user) return;
 
-checkNotificaciones();
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false&limit=1`;
+        const pendientes = await sb.select('notificaciones', query);
+        const hay = pendientes && pendientes.length > 0;
+
+        const navDot = document.getElementById('navNotifDot');
+        if (navDot) navDot.style.display = hay ? 'block' : 'none';
+      } catch (e) {}
+    }
+
+    checkNotificaciones();
   </script>
 </body>
 
