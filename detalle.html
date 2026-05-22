@@ -671,7 +671,7 @@
 
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
-      console.log("ID recibido desde URL:", id);
+      // console.log("ID recibido desde URL:", id);
 
       if (!id) {
         renderError('No se proporcionó un ID en la URL. Usa detalle.html?id=TU_ID');
@@ -679,7 +679,7 @@
       }
 
       const donacion = await mediConnect.getDonationById(id);
-      console.log("Donación recibida para renderizar:", donacion);
+      // console.log("Donación recibida para renderizar:", donacion);
 
       if (donacion) {
         renderDetalle(donacion);

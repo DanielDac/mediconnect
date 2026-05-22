@@ -10,92 +10,307 @@
 
 <body>
   <div class="page">
-    <!-- Header -->
     <div class="app-header fade-up">
       <button class="back-btn" onclick="location.href='perfil.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-          stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </button>
       <h1>Notificaciones</h1>
     </div>
 
-    <div class="view-content" style="padding-top: 20px; display: flex; flex-direction: column; gap: 12px;">
-      <div class="fade-up delay-1"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">¡Bienvenido a MediConnect!</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">Hoy</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu cuenta ha sido creada exitosamente.
-          Explora las medicinas disponibles.</p>
-      </div>
-
-      <div class="fade-up delay-2"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm);">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Seguridad al día</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">Ayer</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Recuerda verificar siempre la fecha de
-          vencimiento antes de consumir.</p>
-      </div>
-
-      <div class="fade-up delay-3"
-        style="padding: 16px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-sm); opacity: 0.7;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <h3 style="font-size: 14px; font-weight: 700; color: var(--gray-800);">Perfil verificado</h3>
-          <span style="font-size: 10px; color: var(--gray-400);">2 may</span>
-        </div>
-        <p style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Tu correo ha sido validado correctamente.
-        </p>
-      </div>
+    <div class="view-content" id="notifContainer"
+      style="padding-top:20px;display:flex;flex-direction:column;gap:12px;">
+      <p style="text-align:center;color:var(--gray-400);padding:20px;">
+        Cargando notificaciones...
+      </p>
     </div>
   </div>
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
+
     <a href="dashboard.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
       </svg>
       Inicio
     </a>
+
     <a href="buscar.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 0z" />
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+
+    <button class="nav-btn-center"
+      id="addDonationBtn"
+      onclick="location.href='donar.html'"
+      style="display:none;">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2.5"
+        stroke="currentColor">
+        <path stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
+
     <a href="mapa.html" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
+      <svg xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round"
+          stroke-linejoin="round"
           d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
       </svg>
       Mapa
     </a>
+
     <a href="perfil.html" class="nav-item active">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
+      <svg xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="2"
+        stroke="currentColor">
+        <path stroke-linecap="round"
+          stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
     </a>
+
   </nav>
 
   <script src="app.js"></script>
+
   <script>
+
     const user = mediConnect.getUser();
+
+    if (!user) {
+      location.href = 'index.html';
+    }
+
+    // Mostrar botón "+" solo si es donante
     const btnAdd = document.getElementById('addDonationBtn');
-    if (btnAdd && user && user.rol === 'donante') btnAdd.style.display = '';
+
+    if (btnAdd) {
+      btnAdd.style.display = user.rol === 'donante'
+        ? 'flex'
+        : 'none';
+    }
+
+    async function cargarNotificaciones() {
+
+      const container = document.getElementById('notifContainer');
+
+      try {
+
+        const query =
+          `or=(usuario_id.eq.${user.id},usuario_id.is.null)&order=created_at.desc&limit=20`;
+
+        let notificaciones = [];
+
+        try {
+
+          notificaciones = await sb.select(
+            'notificaciones',
+            query
+          );
+
+        } catch (e) {
+
+          container.innerHTML = `
+            <div style="text-align:center;padding:40px;color:var(--gray-400);">
+              <p style="font-size:40px;">🔔</p>
+              <p>No hay notificaciones disponibles.</p>
+            </div>
+          `;
+
+          return;
+        }
+
+        if (!notificaciones || !notificaciones.length) {
+
+          container.innerHTML = `
+            <div style="text-align:center;padding:40px;color:var(--gray-400);">
+              <p style="font-size:40px;">🔔</p>
+              <p>No tienes notificaciones.</p>
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML = notificaciones.map((n, i) => `
+
+          <div class="fade-up delay-${i + 1}"
+            onclick="marcarLeida('${n.id}')"
+            style="
+              padding:16px;
+              background:var(--white);
+              border-radius:var(--radius);
+              box-shadow:var(--shadow-sm);
+              ${!n.leida
+                ? 'border-left:4px solid var(--primary);'
+                : 'opacity:0.7;'
+              };
+              position:relative;
+              cursor:pointer;
+            ">
+
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              align-items:flex-start;
+            ">
+
+              <h3 style="
+                font-size:14px;
+                font-weight:700;
+                color:var(--gray-800);
+              ">
+                ${!n.leida ? '🔵 ' : ''}
+                ${escapeHtml(n.titulo)}
+              </h3>
+
+              <div style="
+                display:flex;
+                align-items:center;
+                gap:8px;
+              ">
+
+                <span style="
+                  font-size:10px;
+                  color:var(--gray-400);
+                ">
+                  ${formatearFecha(n.created_at)}
+                </span>
+
+                <button
+                  onclick="event.stopPropagation();eliminarNotificacion('${n.id}')"
+                  style="
+                    background:none;
+                    border:none;
+                    color:#EF4444;
+                    cursor:pointer;
+                    font-size:14px;
+                    padding:2px 4px;
+                  ">
+                  🗑️
+                </button>
+
+              </div>
+            </div>
+
+            <p style="
+              font-size:12px;
+              color:var(--gray-500);
+              margin-top:4px;
+            ">
+              ${escapeHtml(n.mensaje)}
+            </p>
+
+            <span style="
+              font-size:10px;
+              color:var(--primary);
+              font-weight:700;
+            ">
+              ${n.usuario_id ? '👤 Personal' : '📢 General'}
+            </span>
+
+          </div>
+
+        `).join('');
+
+      } catch (error) {
+
+        container.innerHTML = `
+          <div style="text-align:center;padding:40px;color:var(--gray-400);">
+            Error al cargar.
+          </div>
+        `;
+      }
+    }
+
+    async function marcarLeida(id) {
+
+      try {
+
+        await sb.update(
+          'notificaciones',
+          id,
+          { leida: true }
+        );
+
+        cargarNotificaciones();
+
+      } catch (e) {}
+    }
+
+    async function eliminarNotificacion(id) {
+
+      if (!confirm('¿Eliminar esta notificación?')) return;
+
+      try {
+
+        await sb.delete('notificaciones', id);
+
+        cargarNotificaciones();
+
+      } catch (e) {}
+    }
+
+    function formatearFecha(fecha) {
+
+      if (!fecha) return '';
+
+      const d = new Date(fecha);
+      const ahora = new Date();
+
+      const diff = Math.floor(
+        (ahora - d) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diff === 0) return 'Hoy';
+
+      if (diff === 1) return 'Ayer';
+
+      return d.toLocaleDateString(
+        'es-GT',
+        {
+          day: '2-digit',
+          month: 'short'
+        }
+      );
+    }
+
+    function escapeHtml(value) {
+
+      return String(value ?? '').replace(
+        /[&<>'"]/g,
+        char => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[char])
+      );
+    }
+
+    cargarNotificaciones();
+
   </script>
 </body>
 

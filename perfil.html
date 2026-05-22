@@ -98,7 +98,6 @@
       </div>
 
       <div class="profile-badge">
-        ⭐ Donante Estrella
       </div>
     </div>
 
@@ -257,10 +256,6 @@
       <!-- CUENTA -->
       <div class="profile-section fade-up delay-2">
 
-        <div class="profile-section-title">
-          Cuenta
-        </div>
-
         <div class="account-item"
           onclick="location.href='perfil-editar.html'">
 
@@ -286,6 +281,7 @@
 
           <span class="account-item-label">
             Notificaciones
+            <span id="notifBadge" style="display:none;background:#EF4444;color:white;border-radius:50%;min-width:20px;height:20px;font-size:11px;font-weight:700;text-align:center;line-height:20px;margin-left:8px;">0</span>
           </span>
 
           <span class="account-item-arrow">
@@ -387,7 +383,7 @@
     </div>
   </div>
 
-  <!-- NAV -->
+  <!-- Bottom Nav -->
   <nav class="bottom-nav">
     <a href="dashboard.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -396,6 +392,7 @@
       </svg>
       Inicio
     </a>
+
     <a href="buscar.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -403,11 +400,13 @@
       </svg>
       Buscar
     </a>
-    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none">
+
+    <button class="nav-btn-center" id="addDonationBtn" onclick="location.href='donar.html'" style="display:none;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
     </button>
+
     <a href="mapa.html" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -415,42 +414,29 @@
       </svg>
       Mapa
     </a>
-    <a href="perfil.html" class="nav-item active">
+
+    <a href="perfil.html" class="nav-item active" style="position:relative;">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
       Perfil
+      <span id="navNotifDot" style="position:absolute;top:2px;right:6px;width:8px;height:8px;background:#EF4444;border-radius:50%;display:none;"></span>
     </a>
   </nav>
 
-  <div id="toast"
-    class="toast"></div>
+  <div id="toast" class="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="app.js"></script>
 
   <script>
-
-    const supabaseClient =
-      supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-    // ===== TOAST =====
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     function showToast(msg, type = '') {
-
-      const t =
-        document.getElementById('toast');
-
+      const t = document.getElementById('toast');
       t.textContent = msg;
-
-      t.className =
-        'toast ' + type;
-
+      t.className = 'toast ' + type;
       t.classList.add('show');
 
       setTimeout(() => {
@@ -458,330 +444,199 @@
       }, 2800);
     }
 
-    // ===== LOGOUT =====
-
     async function handleLogout() {
-
       try {
         await supabaseClient.auth.signOut();
-      } catch (e) { }
+      } catch (e) {}
 
       mediConnect.logout();
-
       localStorage.clear();
 
       window.location.replace('index.html');
     }
 
-    // ===== MODALES =====
-
     function solicitarDonante() {
-      document.getElementById('modalDonante')
-        .classList.add('show');
+      document.getElementById('modalDonante').classList.add('show');
     }
 
     function cerrarModalDonante() {
-      document.getElementById('modalDonante')
-        .classList.remove('show');
+      document.getElementById('modalDonante').classList.remove('show');
     }
 
     function solicitarValidador() {
-      document.getElementById('modalValidador')
-        .classList.add('show');
+      document.getElementById('modalValidador').classList.add('show');
     }
 
     function cerrarModalValidador() {
-      document.getElementById('modalValidador')
-        .classList.remove('show');
+      document.getElementById('modalValidador').classList.remove('show');
     }
 
-    // ===== CARGAR PERFIL =====
-
     async function loadProfile() {
-
       const {
         data: { session }
-      } =
-        await supabaseClient.auth.getSession();
+      } = await supabaseClient.auth.getSession();
 
-      let user =
-        mediConnect.getUser();
+      let user = mediConnect.getUser();
 
-      // Actualizar desde BD
       if (user?.id) {
-
-        const usuarios =
-          await sb.select(
-            'usuarios',
-            `id=eq.${user.id}`
-          );
+        const usuarios = await sb.select('usuarios', `id=eq.${user.id}`);
 
         if (usuarios?.length > 0) {
-
           user = usuarios[0];
-
           mediConnect.saveUser(user);
         }
       }
 
       if (!user) {
-
         location.href = 'index.html';
         return;
       }
 
-      // Nombre
-      document.getElementById('profileName')
-        .textContent = user.nombre || 'Usuario';
+      document.getElementById('profileName').textContent = user.nombre || 'Usuario';
 
-      // Avatar
-      const avatarBD =
-        user.avatar_url;
-
-      const avatarGoogle =
-        session?.user?.user_metadata?.avatar_url;
+      const avatarBD = user.avatar_url;
+      const avatarGoogle = session?.user?.user_metadata?.avatar_url;
 
       if (avatarBD || avatarGoogle) {
-
-        document.getElementById('avatarLg')
-          .innerHTML =
+        document.getElementById('avatarLg').innerHTML =
           `<img src="${avatarBD || avatarGoogle}"
             style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-
       } else {
-
-        document.getElementById('avatarLg')
-          .innerHTML =
+        document.getElementById('avatarLg').innerHTML =
           `<span style="font-size:32px;font-weight:bold;color:white">
             ${user.nombre.charAt(0).toUpperCase()}
           </span>`;
       }
 
-      // Badge
-      const badge =
-        document.querySelector('.profile-badge');
+      const badge = document.querySelector('.profile-badge');
 
       if (user.rol === 'validador') {
-
-        badge.innerHTML =
-          '🛡️ VALIDADOR OFICIAL';
-
+        badge.innerHTML = '🛡️ VALIDADOR OFICIAL';
       } else if (user.rol === 'receptor') {
-
-        badge.innerHTML =
-          '📦 RECEPTOR';
-
+        badge.innerHTML = '📦 RECEPTOR';
       } else {
-
-        badge.innerHTML =
-          '⭐ DONANTE ESTRELLA';
+        badge.innerHTML = '⭐ DONANTE ESTRELLA';
       }
 
-      // Botones
       configurarBotones(user);
 
-      // Botón donar
-      const btnAdd =
-        document.getElementById('addDonationBtn');
+      const btnAdd = document.getElementById('addDonationBtn');
+      if (btnAdd) btnAdd.style.display = user.rol === 'donante' ? 'flex' : 'none';
 
-      if (btnAdd && user.rol === 'donante') {
-        btnAdd.style.display = '';
-      }
-
-      // Admin
       if (user.rol === 'validador') {
-
-        document.getElementById('adminPanelBtn')
-          .style.display = 'flex';
+        document.getElementById('adminPanelBtn').style.display = 'flex';
       }
+
+      checkNotificaciones();
     }
 
-    // ===== BOTONES =====
-
     async function configurarBotones(user) {
-
-      const btnDonante =
-        document.getElementById('btnDonante');
-
-      const btnValidador =
-        document.getElementById('btnValidador');
+      const btnDonante = document.getElementById('btnDonante');
+      const btnValidador = document.getElementById('btnValidador');
 
       if (user.rol === 'receptor') {
-
         btnDonante.style.display = 'flex';
       }
 
       if (user.rol === 'donante') {
-
         btnValidador.style.display = 'flex';
       }
 
       verificarSolicitudesPendientes(user);
     }
 
-    // ===== SOLICITUD DONANTE =====
-
     async function enviarSolicitudDonante() {
-
-      const motivo =
-        document.getElementById('motivoDonante')
-          .value.trim();
-
-      const tipo =
-        document.getElementById('tipoMedicamentos')
-          .value;
-
-      const user =
-        mediConnect.getUser();
+      const motivo = document.getElementById('motivoDonante').value.trim();
+      const tipo = document.getElementById('tipoMedicamentos').value;
+      const user = mediConnect.getUser();
 
       if (!motivo) {
-
         showToast('Escribe un motivo', 'error');
         return;
       }
 
       try {
-
-        const ok =
-          await sb.insert(
-            'solicitudes_donante',
-            {
-              usuario_id: user.id,
-              nombre: user.nombre,
-              email: user.email,
-              motivo,
-              tipo_medicamentos: tipo,
-              estado: 'pendiente'
-            }
-          );
+        const ok = await sb.insert('solicitudes_donante', {
+          usuario_id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          motivo,
+          tipo_medicamentos: tipo,
+          estado: 'pendiente'
+        });
 
         if (ok) {
-
-          showToast(
-            'Solicitud enviada ✓',
-            'success'
-          );
-
+          showToast('Solicitud enviada ✓', 'success');
           cerrarModalDonante();
 
           setTimeout(() => {
             location.reload();
           }, 1200);
         }
-
       } catch (e) {
-
-        showToast(
-          'Ya tienes una solicitud pendiente',
-          'warning'
-        );
+        showToast('Ya tienes una solicitud pendiente', 'warning');
       }
     }
 
-    // ===== SOLICITUD VALIDADOR =====
-
     async function enviarSolicitudValidador() {
-
-      const experiencia =
-        document.getElementById('experienciaValidador')
-          .value.trim();
-
-      const motivo =
-        document.getElementById('motivoValidador')
-          .value.trim();
-
-      const user =
-        mediConnect.getUser();
+      const experiencia = document.getElementById('experienciaValidador').value.trim();
+      const motivo = document.getElementById('motivoValidador').value.trim();
+      const user = mediConnect.getUser();
 
       if (!motivo) {
-
         showToast('Escribe un motivo', 'error');
         return;
       }
 
       try {
-
-        const ok =
-          await sb.insert(
-            'solicitudes_validador',
-            {
-              usuario_id: user.id,
-              nombre: user.nombre,
-              email: user.email,
-              experiencia,
-              motivo,
-              estado: 'pendiente'
-            }
-          );
+        const ok = await sb.insert('solicitudes_validador', {
+          usuario_id: user.id,
+          nombre: user.nombre,
+          email: user.email,
+          experiencia,
+          motivo,
+          estado: 'pendiente'
+        });
 
         if (ok) {
-
-          showToast(
-            'Solicitud enviada ✓',
-            'success'
-          );
-
+          showToast('Solicitud enviada ✓', 'success');
           cerrarModalValidador();
 
           setTimeout(() => {
             location.reload();
           }, 1200);
         }
-
       } catch (e) {
-
-        showToast(
-          'Ya tienes una solicitud pendiente',
-          'warning'
-        );
+        showToast('Ya tienes una solicitud pendiente', 'warning');
       }
     }
 
-    // ===== PENDIENTES =====
-
     async function verificarSolicitudesPendientes(user) {
-
       if (user.rol === 'receptor') {
-
-        const p =
-          await sb.select(
-            'solicitudes_donante',
-            `usuario_id=eq.${user.id}&estado=eq.pendiente`
-          );
+        const p = await sb.select(
+          'solicitudes_donante',
+          `usuario_id=eq.${user.id}&estado=eq.pendiente`
+        );
 
         if (p?.length > 0) {
-
-          renderBtnPendiente(
-            'btnDonante',
-            'donante',
-            p[0].id
-          );
+          renderBtnPendiente('btnDonante', 'donante', p[0].id);
         }
       }
 
       if (user.rol === 'donante') {
-
-        const p =
-          await sb.select(
-            'solicitudes_validador',
-            `usuario_id=eq.${user.id}&estado=eq.pendiente`
-          );
+        const p = await sb.select(
+          'solicitudes_validador',
+          `usuario_id=eq.${user.id}&estado=eq.pendiente`
+        );
 
         if (p?.length > 0) {
-
-          renderBtnPendiente(
-            'btnValidador',
-            'validador',
-            p[0].id
-          );
+          renderBtnPendiente('btnValidador', 'validador', p[0].id);
         }
       }
     }
 
     function renderBtnPendiente(id, tipo, sid) {
-
-      const btn =
-        document.getElementById(id);
+      const btn = document.getElementById(id);
 
       btn.innerHTML =
         `<div class="account-item-icon"
@@ -797,16 +652,11 @@
 
         <span class="account-item-arrow">›</span>`;
 
-      btn.onclick =
-        () => cancelarSolicitud(tipo, sid);
-
+      btn.onclick = () => cancelarSolicitud(tipo, sid);
       btn.style.display = 'flex';
     }
 
-    // ===== CANCELAR =====
-
     async function cancelarSolicitud(tipo, sid) {
-
       if (!confirm('¿Cancelar solicitud?')) return;
 
       const tabla =
@@ -814,22 +664,18 @@
           ? 'solicitudes_donante'
           : 'solicitudes_validador';
 
-      const r =
-        await fetch(
-          `${SUPABASE_URL}/rest/v1/${tabla}?id=eq.${sid}`,
-          {
-            method: 'DELETE',
-
-            headers: {
-              'apikey': SUPABASE_KEY,
-              'Authorization':
-                'Bearer ' + SUPABASE_KEY
-            }
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/${tabla}?id=eq.${sid}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY
           }
-        );
+        }
+      );
 
       if (r.ok) {
-
         showToast('Cancelada', 'success');
 
         setTimeout(() => {
@@ -838,10 +684,28 @@
       }
     }
 
-    // ===== INIT =====
+    async function checkNotificaciones() {
+      try {
+        const user = mediConnect.getUser();
+        if (!user) return;
+
+        const query = `or=(usuario_id.eq.${user.id},usuario_id.is.null)&leida=eq.false`;
+        const pendientes = await sb.select('notificaciones', query);
+        const hay = pendientes && pendientes.length > 0;
+        const count = pendientes ? pendientes.length : 0;
+
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+          badge.textContent = count;
+          badge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+
+        const navDot = document.getElementById('navNotifDot');
+        if (navDot) navDot.style.display = hay ? 'block' : 'none';
+      } catch (e) {}
+    }
 
     loadProfile();
-
   </script>
 </body>
 
